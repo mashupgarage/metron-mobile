@@ -1,0 +1,62 @@
+export type UserT = {
+  id: string;
+  email: string;
+  name: string;
+  avatar: string;
+  type: string;
+  address: AddressT;
+};
+
+export type AddressT = {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+};
+
+export type SeriesT = {
+  id: number;
+  title: string;
+  description: string | null;
+  publisher_id: number | null;
+  store_id: number | null;
+  created_at: string;
+  updated_at: string;
+  user_id: number | null;
+  code: string | null;
+  subtitle: string | null;
+};
+
+export type ProductT = {
+  id: number;
+  title: string;
+  cover_price: string;
+  price: string;
+  quantity: number | null;
+  featured: boolean;
+  hidden: boolean;
+  description: string;
+  creators: string;
+  series: Series;
+  slug: string;
+  isbn: string | null;
+  upc: string;
+  publisher_id: number;
+  category_id: number;
+  series_id: number;
+  issue_number: string;
+  year: number | null;
+  cover_url: string;
+  cover_url_large: string;
+  formatted_price: string;
+  publisher_name: string;
+  category_name: string;
+  meta_attributes: Record<string, unknown>;
+};
+
+export type CreatorT = {
+  id: string;
+  name: string;
+  avatar: string;
+};
