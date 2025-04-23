@@ -18,6 +18,18 @@ export default function Product(props: {
 
   const store = useBoundStore();
   const navigation = useNavigation();
+
+  const handleAddToCart = () => {
+    if (product && (product.quantity ?? 0) > 0) {
+      const currentCartItems = store.cartItems;
+      const newCartItems = [...currentCartItems, product];
+      store.setCartItems(newCartItems as []);
+      console.log(`${product.title} added to cart.`);
+    } else {
+      console.log("Product out of stock or invalid.");
+    }
+  };
+
   return (
     <SafeAreaView>
       <Button
@@ -48,6 +60,13 @@ export default function Product(props: {
           <Text>{product?.isbn ?? "not available"}</Text>
           <Text className="font-bold 2xl mt-4 mb-2">Buy this product</Text>
           <Text>{product?.quantity ?? 0} copies remaining</Text>
+          <Button
+            className="mt-4"
+            onPress={handleAddToCart}
+            disabled={(product?.quantity ?? 0) <= 0}
+          >
+            <ButtonText>Add to Cart ({product?.formatted_price ?? ''})</ButtonText>
+          </Button>
         </Box>
       </ScrollView>
     </SafeAreaView>
