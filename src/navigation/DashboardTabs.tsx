@@ -10,16 +10,13 @@ import { House, Search, ShoppingBag, User2 } from "lucide-react-native";
 import { useBoundStore } from "../store";
 import { useEffect, useState } from "react";
 import HomeDrawer from "./HomeDrawer";
+import { ProductT } from "../utils/types/common";
 
 const DashboardTab = createBottomTabNavigator();
 
 const DashboardTabs = () => {
-  const cartCount = useBoundStore((state) => state.cartCount);
-  const [badgeCount, setBadgeCount] = useState(cartCount);
-
-  useEffect(() => {
-    setBadgeCount(cartCount);
-  }, [cartCount]);
+  const cartItems = useBoundStore((state) => state.cartItems);
+  const uniqueItemCount = new Set(cartItems.map(item => item.id)).size;
 
   const screenConfig = ({
     route,
@@ -30,9 +27,9 @@ const DashboardTabs = () => {
     tabBarIcon: ({ color }) => iconDisplay(route.name, color, 24),
     tabBarBadge:
       route.name === "My Cart"
-        ? badgeCount === 0
+        ? uniqueItemCount === 0
           ? undefined
-          : badgeCount
+          : uniqueItemCount
         : undefined,
   });
 
