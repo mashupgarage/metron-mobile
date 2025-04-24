@@ -64,6 +64,7 @@ export default function Product(props: {
             className="mt-4"
             onPress={handleAddToCart}
             disabled={(product?.quantity ?? 0) <= 0}
+            style={(product?.quantity ?? 0) <= 0 ? { backgroundColor: '#cccccc' } : undefined}
           >
             <ButtonText>Add to Cart ({product?.formatted_price ?? ''})</ButtonText>
           </Button>
