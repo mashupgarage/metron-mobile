@@ -92,7 +92,7 @@ export default function Cart() {
         <CheckboxIndicator>
           <CheckboxIconComponent as={CheckIcon} />
         </CheckboxIndicator>
-      </Checkbox>
+     
       <Image source={{ uri: item.cover_url_large }} className="w-16 h-24 mr-2" alt={item.title} />
       <View style={{ flex: 1 }}>
         <Text className="font-semibold">{item.title}</Text>
@@ -117,12 +117,14 @@ export default function Cart() {
       <Button
         size="xs"
         variant="link"
-        className="p-2 ml-auto self-start"
+        className="p-2 ml-auto self-center"
         onPress={() => handleRemoveCompletely(item.id)}
       >
         <Trash2 size={18} color="red" />
       </Button>
+      </Checkbox>
     </Box>
+    
   );
 
   const totalSelectedItems = selectedItems.size;

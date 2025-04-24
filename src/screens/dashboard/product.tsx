@@ -8,6 +8,7 @@ import { Button, ButtonText } from "@/src/components/ui/button";
 import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { ProductT } from "@/src/utils/types/common";
+import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 
 export default function Product(props: {
   route: { params: { product: ProductT } };
@@ -18,6 +19,7 @@ export default function Product(props: {
 
   const store = useBoundStore();
   const navigation = useNavigation();
+  const toast = useToast();
 
   const handleAddToCart = () => {
     if (product && (product.quantity ?? 0) > 0) {
@@ -25,6 +27,19 @@ export default function Product(props: {
       const newCartItems = [...currentCartItems, product];
       store.setCartItems(newCartItems as []);
       console.log(`${product.title} added to cart.`);
+      
+      // Show success toast
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Toast nativeID={toastId} action="success">
+              <ToastTitle>Successfully added to cart!</ToastTitle>
+            </Toast>
+          );
+        },
+      });
     } else {
       console.log("Product out of stock or invalid.");
     }
