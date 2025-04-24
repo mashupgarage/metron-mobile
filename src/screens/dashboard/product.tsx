@@ -83,21 +83,36 @@ export default function Product(props: {
             marginHorizontal: 12,
           }}
         >
-          <Button
-            onPress={handleAddToCart}
-            disabled={(product?.quantity ?? 0) <= 0}
-            style={[
-              (product?.quantity ?? 0) <= 0
-                ? { backgroundColor: "#cccccc" }
-                : undefined,
-              { flex: 1 },
-            ]}
-            size="xl"
-          >
-            <ButtonText>
-              Add to Cart ({product?.formatted_price ?? ""})
-            </ButtonText>
-          </Button>
+          {(product?.quantity ?? 0) !== 0 ? (
+            <Button
+              onPress={handleAddToCart}
+              disabled={(product?.quantity ?? 0) <= 0}
+              style={[
+                (product?.quantity ?? 0) <= 0
+                  ? { backgroundColor: "#cccccc" }
+                  : undefined,
+                { flex: 1 },
+              ]}
+              size="xl"
+            >
+              <ButtonText>
+                Add to Cart ({product?.formatted_price ?? ""})
+              </ButtonText>
+            </Button>
+          ) : (
+            <Button
+              onPress={() => {
+                // TODO: Implement add to want list
+                // for now we navigate to login
+                // @ts-ignore
+                navigation.navigate("Home", { screen: "Profile" });
+              }}
+              style={[{ flex: 1 }]}
+              size="xl"
+            >
+              <ButtonText>Add to want list instead</ButtonText>
+            </Button>
+          )}
         </View>
       </View>
     </SafeAreaView>
