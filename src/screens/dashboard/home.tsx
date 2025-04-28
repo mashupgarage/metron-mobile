@@ -21,6 +21,7 @@ import { Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
 import { useEffect, useMemo, useState } from "react";
 import { fetchProducts, searchProduct } from "@/src/api/apiEndpoints";
+import axios from "axios";
 
 export default function Home() {
   const store = useBoundStore();
@@ -42,10 +43,8 @@ export default function Home() {
   useEffect(() => {
     searchProduct("avengers")
       .then((res) => {
-        console.log("total", res.data);
       })
       .catch((err) => {
-        console.log(err);
       });
   }, []);
 

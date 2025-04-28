@@ -7,7 +7,16 @@ import axiosClient from "./client";
  * @returns A promise that resolves to the search results
  */
 export const searchProduct = (query: string) => {
-  return axiosClient.get(`/products/search`, { params: { q: query } });
+  const url = `marketplace/products`;
+  const params = { q: query };
+  
+  return axiosClient.get(url, { params })
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      throw error;
+    });
 };
 
 /**
@@ -15,7 +24,15 @@ export const searchProduct = (query: string) => {
  * @returns A promise that resolves to the list of products
  */
 export const fetchProducts = () => {
-  return axiosClient.get("/products");
+  const url = "products";
+  
+  return axiosClient.get(url)
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      throw error;
+    });
 };
 
 /**
