@@ -7,7 +7,7 @@ import axiosClient from "./client";
  * @returns A promise that resolves to the search results
  */
 export const searchProduct = (query: string) => {
-  const url = `marketplace/products`;
+  const url = `products/search`;
   const params = { q: query };
   
   return axiosClient.get(url, { params })
