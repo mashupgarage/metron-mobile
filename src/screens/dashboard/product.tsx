@@ -5,7 +5,6 @@ import { useBoundStore } from "@/src/store";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, View } from "react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
-import { ArrowLeft } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { ProductT } from "@/src/utils/types/common";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
