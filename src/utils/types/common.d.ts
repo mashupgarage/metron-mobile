@@ -1,10 +1,20 @@
 export type UserT = {
   id: string;
   email: string;
-  name: string;
+  contact_number: string;
+  branch_name: string;
+  series_ids: number[];
   avatar: string;
   type: string;
   address: AddressT;
+  shipping_region: string | null;
+  shipping_address: string | null;
+  full_name: string;
+  blocked: boolean;
+  discount_rate: number;
+  primary_address: null | string;
+  primary_full_address: null | string;
+  default_fulfillment: string;
 };
 
 export type AddressT = {

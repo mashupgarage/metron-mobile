@@ -1,5 +1,7 @@
 import axios from "axios";
 import axiosClient from "./client";
+import constants from "expo-constants";
+import { UserT } from "../utils/types/common";
 
 /**
  * Search for products based on a query string
@@ -31,14 +33,14 @@ export const authenticateUser = async (email: string, password: string) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        Authorization: `Bearer ${constants.expoConfig?.extra?.sessionToken}`,
       },
     });
 
     const response = await authClient.post("/users/sign_in", {
-      user: {
-        email: email,
-        password: password,
-      },
+      email: email,
+      password: password,
+      remember_me: 0,
     });
 
     return response;
@@ -52,3 +54,28 @@ export const authenticateUser = async (email: string, password: string) => {
     throw error;
   }
 };
+
+export const fetchCartItems = (userId: UserT["id"]) => {
+  return axiosClient.get(`/users/${userId}/cart_items`);
+};
+
+export const addToCart = (
+  userId: UserT["id"],
+  productId: number,
+  product_item_id: number
+) => {
+  return axiosClient.post(`/users/${userId}/cart_items`, {
+    product_id: productId,
+    product_item_id: product_item_id,
+  });
+};
+
+export const fetchReleases = () => {
+  return axiosClient.get("/releases.json");
+};
+
+export const fetchUserProfile = () => {
+  return axiosClient.get("/users.json");
+};
+
+export const fetchReservations = () => {};
