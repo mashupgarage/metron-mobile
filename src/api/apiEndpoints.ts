@@ -52,3 +52,19 @@ export const authenticateUser = async (email: string, password: string) => {
     throw error;
   }
 };
+
+/**
+ * Fetch all releases data
+ * @returns A promise that resolves to the list of releases
+ */
+export const fetchReleases = () => {
+  const url = "releases.json";
+  
+  return axiosClient.get(url)
+    .then(response => {
+      return response;
+    })
+    .catch(error => {
+      throw error;
+    });
+};
