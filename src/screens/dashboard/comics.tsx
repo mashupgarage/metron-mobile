@@ -1,9 +1,7 @@
 import { Box } from "@/src/components/ui/box";
-import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { Dimensions, useColorScheme } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+import { useColorScheme } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 
 import ProductCard from "@/src/components/product";
@@ -20,15 +18,8 @@ import { Button, ButtonText } from "@/src/components/ui/button";
 import { Filter, Menu } from "lucide-react-native";
 import { mockData, mockedCarouselItems } from "@/src/utils/mock";
 import { useState } from "react";
-import {
-  Modal,
-  ModalBackdrop,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-} from "@/src/components/ui/modal";
+import { Modal, ModalBackdrop, ModalContent } from "@/src/components/ui/modal";
 import { FilterModal } from "@/src/components/modal/filter";
-import { CloseIcon } from "@/src/components/ui/icon";
 
 export default function Comics() {
   const store = useBoundStore();
