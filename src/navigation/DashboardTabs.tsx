@@ -5,6 +5,7 @@ import {
 import SearchScreen from "../screens/dashboard/search";
 import CartScreen from "../screens/dashboard/cart";
 import ProfileSceen from "../screens/dashboard/profile";
+import ReservationsScreen from "../screens/dashboard/reservations";
 
 import {
   BookOpen,
@@ -14,9 +15,7 @@ import {
   User2,
 } from "lucide-react-native";
 import { useBoundStore } from "../store";
-import { useEffect, useState } from "react";
 import HomeDrawer from "./HomeDrawer";
-import { ProductT } from "../utils/types/common";
 import { View } from "react-native";
 
 const DashboardTab = createBottomTabNavigator();
@@ -100,7 +99,7 @@ const DashboardTabs = () => {
           tabBarLabel: () => null,
         }}
         name="Reservations"
-        component={() => null /* Replace with your Reservations screen */}
+        component={ReservationsScreen}
       />
       <DashboardTab.Screen
         options={{

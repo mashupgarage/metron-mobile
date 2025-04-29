@@ -71,7 +71,7 @@ export const addToCart = (
 };
 
 export const fetchReleases = () => {
-  return axiosClient.get("/releases.json");
+  return axiosClient.get("/releases");
 };
 
 export const fetchUserProfile = () => {
