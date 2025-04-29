@@ -2,7 +2,7 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { Dimensions, useColorScheme } from "react-native";
+import { Dimensions, useColorScheme, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import MasonryList from "@react-native-seoul/masonry-list";
 
@@ -17,7 +17,7 @@ import {
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { HStack } from "@/src/components/ui/hstack";
 import { Button } from "@/src/components/ui/button";
-import { Menu } from "lucide-react-native";
+import { Filter, Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
 import { useEffect, useState } from "react";
 import {
@@ -37,10 +37,41 @@ export default function ReservationsScreen() {
         <MasonryList
           data={store.products}
           scrollEnabled
-          ListHeaderComponent={<Text>Reservations</Text>}
+          ListHeaderComponent={
+            <View className="ml-4 mr-4">
+              <View className="flex-row justify-between items-center">
+                <Text className="font-bold text-xl">Latest Release</Text>
+                <View className="mr-2">
+                  <Filter
+                    size={24}
+                    color={useColorScheme() === "dark" ? "#FFFFFF" : "#4E4E4E"}
+                  />
+                </View>
+              </View>
+              <Text className="mb-2 text-sm">
+                FINAL ORDER CUT OFF (F.O.C.) for titles arriving MMM DD / MMM DD
+                YYYY
+              </Text>
+              <View className="mb-4 bg-red-200 max-w-[200px] rounded">
+                <Text className="text-center text-red-800">
+                  RESERVATION CLOSED
+                </Text>
+              </View>
+            </View>
+          }
           numColumns={2}
           keyExtractor={(item) => item.id}
-          renderItem={({ item, i }) => <></>}
+          renderItem={({ item, i }) => (
+            <Pressable
+              onPress={() => {
+                navigation.navigate("Product", { product: item as ProductT });
+              }}
+            >
+              <Box key={i} className="ml-1 mr-1 mb-4">
+                <ProductCard isInCart={false} product={item as ProductT} />
+              </Box>
+            </Pressable>
+          )}
         />
       </Box>
     </DashboardLayout>
