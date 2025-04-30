@@ -8,13 +8,11 @@ import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
 import { ProductT } from "@/src/utils/types/common";
 import { Pressable } from "react-native-gesture-handler";
-import DashboardLayout from "./_layout";
-import { fetchReleases } from "@/src/api/apiEndpoints";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { Menu } from "lucide-react-native";
 import DashboardLayout from "./_layout";
-import { fetchReleases, fetchReleasesByDate } from "@/src/api/apiEndpoints";
+import { fetchReleases } from "@/src/api/apiEndpoints";
 import { mockReleases, mockReleaseDates, mockReleasesByDate } from "@/src/utils/mock";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
@@ -29,23 +27,7 @@ export default function ReservationsScreen() {
 
   // Load initial releases
   useEffect(() => {
-    setReleases([]);
-    setLoading(false);
-
-    const loadReleases = async () => {
-      try {
-        setLoading(true);
-        const response = await fetchReleases();
-        setReleases(response.data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch releases:", err);
-        setError("Failed to load releases");
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    // Use mock data instead of API call
     loadReleases();
   }, []);
 
@@ -241,6 +223,12 @@ export default function ReservationsScreen() {
           }
           ListHeaderComponent={
             <View className="ml-4 mr-4">
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="font-bold text-lg">{selectedDate}</Text>
+                <TouchableOpacity onPress={toggleDrawer} className="p-2">
+                  <Menu size={24} color="#333" />
+                </TouchableOpacity>
+              </View>
               <Text className="mb-2 text-sm">
                 FINAL ORDER CUT OFF (F.O.C.) for titles arriving{" "}
                 {formatReleaseDate()}
