@@ -1,14 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import { 
-  Animated, 
-  SafeAreaView, 
-  ScrollView, 
-  StyleSheet, 
-  TouchableOpacity, 
-  View 
-} from 'react-native';
-import { Text } from './ui/text';
-import { X } from 'lucide-react-native';
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Text } from "./ui/text";
+import { X } from "lucide-react-native";
 
 interface ReleaseDate {
   date: string;
@@ -23,12 +23,12 @@ interface ReleasesDrawerProps {
   onShowAllReleases: () => void;
 }
 
-const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({ 
-  visible, 
-  releaseDates, 
+const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
+  visible,
+  releaseDates,
   onClose,
   onSelectDate,
-  onShowAllReleases
+  onShowAllReleases,
 }) => {
   const drawerAnimation = useRef(new Animated.Value(-300)).current;
 
@@ -51,9 +51,9 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
   return (
     <>
       {visible && (
-        <TouchableOpacity 
-          style={styles.overlay} 
-          activeOpacity={1} 
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
           onPress={onClose}
         />
       )}
@@ -67,25 +67,25 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
       >
         <SafeAreaView style={styles.drawerContent}>
           <View style={styles.drawerHeader}>
-            <Text style={styles.drawerHeaderText}>NEW RELEASES</Text>
+            <Text style={styles.drawerHeaderText}>Release History</Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color="#333333" />
             </TouchableOpacity>
           </View>
-          
+
           <ScrollView style={styles.drawerList}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.drawerItem, styles.allReleasesItem]}
               onPress={() => {
                 onShowAllReleases();
                 onClose();
               }}
             >
-              <Text style={styles.drawerItemText}>LATEST RELEASES</Text>
+              <Text style={styles.drawerItemText}>LATEST RELEASE</Text>
             </TouchableOpacity>
-            
+
             {releaseDates.map((item, index) => (
-              <TouchableOpacity 
+              <TouchableOpacity
                 key={index}
                 style={styles.drawerItem}
                 onPress={() => {
@@ -107,21 +107,21 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
     zIndex: 1,
   },
   drawer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     bottom: 0,
     width: 300,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     zIndex: 2,
   },
   drawerContent: {
@@ -130,45 +130,45 @@ const styles = StyleSheet.create({
   drawerHeader: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    borderBottomColor: "#e0e0e0",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f9f9f9",
   },
   drawerHeaderText: {
-    color: '#333333',
+    color: "#333333",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   drawerList: {
     flex: 1,
   },
   drawerItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   allReleasesItem: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   drawerItemText: {
-    color: '#333333',
+    color: "#333333",
     fontSize: 16,
   },
   drawerBadge: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: "rgb(43,100,207)",
     borderRadius: 4,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   drawerBadgeText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 14,
   },
 });
 
-export default ReleasesDrawer; 
+export default ReleasesDrawer;

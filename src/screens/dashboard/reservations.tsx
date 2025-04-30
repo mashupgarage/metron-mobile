@@ -8,85 +8,109 @@ import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
 import { ProductT } from "@/src/utils/types/common";
 import { Pressable } from "react-native-gesture-handler";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { Menu } from "lucide-react-native";
 import DashboardLayout from "./_layout";
-import { fetchReleases } from "@/src/api/apiEndpoints";
-import { mockReleases, mockReleaseDates, mockReleasesByDate } from "@/src/utils/mock";
+import {
+  fetchProducts,
+  fetchProductsByReleaseId,
+  fetchReleases,
+} from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
+import { mockReleaseDates } from "@/src/utils/mock";
+
+interface Release {
+  id: number;
+  title: string;
+  release_date: string;
+  status: string;
+  products_count: number;
+  reservations_total: number;
+  customers_count: number;
+}
+
 export default function ReservationsScreen() {
-  const [releases, setReleases] = useState<ProductT[]>([]);
+  const [releaseDates, setReleaseDates] = useState<Release[]>([]);
+  const [products, setProducts] = useState<ProductT[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(mockReleaseDates[0]?.date || '');
-  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(mockReleaseDates[0]?.id || null);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(
+    null
+  );
 
-  // Load initial releases
-  useEffect(() => {
-    // Use mock data instead of API call
-    loadReleases();
-  }, []);
-
-  // Function to load all releases
-  const loadReleases = async () => {
+  // Fetch all release dates from API
+  const fetchReleaseDatesFromAPI = async () => {
     try {
       setLoading(true);
-      
-      // Using mock data until API is working
-      setReleases(mockReleases);
-      setError(null);
-      
-      // Commenting out API call for now due to auth issues
-      /*
       const response = await fetchReleases();
-      setReleases(response.data);
-      */
+      setReleaseDates(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch release dates:", err);
+      setError("Failed to load release dates");
+      setLoading(false);
+    }
+  };
+
+  // Find the latest release (by date) from loaded releaseDates
+  const getLatestRelease = (entries: Release[]): Release | null => {
+    if (!entries || entries.length === 0) return null;
+    let latest = entries[0];
+    for (const rel of entries) {
+      if (new Date(rel.release_date) > new Date(latest.release_date)) {
+        latest = rel;
+      }
+    }
+    return latest;
+  };
+
+  const loadProductsByRelease = async (id: number | null) => {
+    try {
+      setLoading(true);
+      if (id) {
+        const response = await fetchProductsByReleaseId(id);
+        setProducts(response.data);
+        setLoading(false);
+      } else {
+        const response = await fetchProducts();
+        setProducts(response.data);
+        setLoading(false);
+      }
     } catch (err) {
       console.error("Failed to fetch releases:", err);
       setError("Failed to load releases");
-    } finally {
       setLoading(false);
     }
   };
 
-  // Function to clear filters and show all releases
+  // Clear filters and show all releases
   const clearFilters = () => {
     setSelectedReleaseId(null);
-    setSelectedDate('ALL RELEASES');
-    loadReleases();
+    setSelectedDate("ALL RELEASES");
+    loadProductsByRelease(null);
   };
 
-  // Function to load releases by specific date ID
-  const loadReleasesByDate = async (releaseId: number) => {
-    try {
-      setLoading(true);
-      
-      // Use the mockReleasesByDate object to get releases for the specific date
-      if (releaseId in mockReleasesByDate) {
-        setReleases(mockReleasesByDate[releaseId as keyof typeof mockReleasesByDate]);
-      } else {
-        // Fallback to all releases if date not found
-        setReleases(mockReleases);
+  // On mount: fetch release dates, then select latest and load its releases
+  useEffect(() => {
+    const initialize = async () => {
+      await fetchReleaseDatesFromAPI();
+    };
+    initialize();
+  }, []);
+
+  // When releaseDates are loaded, select latest and load its releases
+  useEffect(() => {
+    if (releaseDates.length > 0) {
+      const latest = getLatestRelease(releaseDates);
+      if (latest) {
+        setSelectedDate(latest.release_date);
+        setSelectedReleaseId(latest.id);
       }
-      
-      // Commenting out API call for now
-      /*
-      const response = await fetchReleasesByDate(releaseId.toString());
-      setReleases(response.data);
-      */
-      
-      setError(null);
-    } catch (err) {
-      console.error(`Failed to fetch releases for id ${releaseId}:`, err);
-      setError("Failed to load releases for selected date");
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [releaseDates]);
 
   // Format for displaying dates
   const formatReleaseDate = () => {
@@ -120,7 +144,7 @@ export default function ReservationsScreen() {
     if (selectedProducts.length === 0) return;
 
     // Update the reserved status for selected products
-    setReleases((prev) =>
+    setProducts((prev) =>
       prev.map((product) => {
         if (selectedProducts.includes(product.id)) {
           return {
@@ -154,57 +178,35 @@ export default function ReservationsScreen() {
   const handleSelectDate = (date: string) => {
     setSelectedDate(date);
     setShowDrawer(false);
-    
-    // Find the release ID from the mockReleaseDates array
-    const selectedRelease = mockReleaseDates.find(item => item.date === date);
+    const selectedRelease = releaseDates.find(
+      (item) => item.release_date === date
+    );
     if (selectedRelease) {
       setSelectedReleaseId(selectedRelease.id);
-      loadReleasesByDate(selectedRelease.id);
+      loadProductsByRelease(selectedRelease.id);
     }
   };
 
   return (
     <DashboardLayout>
       <Box className="h-screen w-full pb-24">
-        <ReleasesDrawer 
+        <ReleasesDrawer
           visible={showDrawer}
           releaseDates={mockReleaseDates}
           onClose={toggleDrawer}
           onSelectDate={handleSelectDate}
           onShowAllReleases={clearFilters}
         />
-        
+
         <MasonryList
-          data={releases}
+          data={products}
           scrollEnabled
+          loading={loading}
           ListEmptyComponent={
-            <View className="flex mt-56 mb-4 flex-col items-center">
-              {loading ? (
-                <>
-                  <Image
-                    alt="Comic Odyssey Icon"
-                    key="loading"
-                    className="w-full max-h-16 scale-[0.8]"
-                    resizeMethod="scale"
-                    source={ComicOdysseyIcon}
-                  />
-                  <Text className="mt-4 mb-2">
-                    Hang tight, we're loading the latest releases!
-                  </Text>
-                </>
-              ) : error ? (
-                <>
-                  <Image
-                    key="error"
-                    alt="Comic Odyssey Icon"
-                    className="w-full max-h-16 scale-[0.8]"
-                    resizeMethod="scale"
-                    source={ComicOdysseyIcon}
-                  />
-                  <Text className="mt-4 mb-2">Sorry! Something went wrong</Text>
-                  <Text className="mb-2">{error}</Text>
-                </>
-              ) : (
+            loading ? (
+              <View className="flex mt-56 mb-4 flex-col items-center" />
+            ) : (
+              <View className="flex mt-56 mb-4 flex-col items-center">
                 <>
                   <Image
                     alt="Comic Odyssey Icon"
@@ -214,12 +216,12 @@ export default function ReservationsScreen() {
                     source={ComicOdysseyIcon}
                   />
                   <Text className="mt-4 mb-2">
-                    Sorry, Last week's list is now closed.
+                    the reservation list is already closed or was not found.
                   </Text>
                   <Text>Please come back on Friday for the new releases!</Text>
                 </>
-              )}
-            </View>
+              </View>
+            )
           }
           ListHeaderComponent={
             <View className="ml-4 mr-4">
@@ -230,8 +232,8 @@ export default function ReservationsScreen() {
                 </TouchableOpacity>
               </View>
               <Text className="mb-2 text-sm">
-                FINAL ORDER CUT OFF (F.O.C.) for titles arriving{" "}
-                {formatReleaseDate()}
+                {/* FINAL ORDER CUT OFF (F.O.C.) for titles arriving{" "} */}
+                {/* {formatReleaseDate()} */}
               </Text>
               <View className="flex-row items-center justify-between mb-4">
                 {selectedProducts.length > 0 && (
@@ -245,12 +247,21 @@ export default function ReservationsScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-              {releases.length > 0 && (
-                <Text className="mb-2 font-bold">
-                  Total Products: {releases.length}
-                </Text>
-              )}
             </View>
+          }
+          LoadingView={
+            <>
+              <Image
+                alt="Comic Odyssey Icon"
+                key="loading"
+                className="w-full max-h-16 scale-[0.8] align-center"
+                resizeMethod="scale"
+                source={ComicOdysseyIcon}
+              />
+              <Text className="mt-4 text-center mb-2">
+                Hang tight, we're loading the latest releases!
+              </Text>
+            </>
           }
           numColumns={2}
           keyExtractor={(item) => item.id.toString()}
@@ -302,11 +313,6 @@ export default function ReservationsScreen() {
                           {getQuantityLeft(product)} left
                         </Text>
                       </View>
-
-                      <Text className="text-gray-600 text-sm mt-1">
-                        Pickup:{" "}
-                        {(product.meta_attributes as any)?.pickup_date || "N/A"}
-                      </Text>
                     </View>
                   </View>
                 </Box>
@@ -318,5 +324,3 @@ export default function ReservationsScreen() {
     </DashboardLayout>
   );
 }
-
-
