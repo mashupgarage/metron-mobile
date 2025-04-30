@@ -10,13 +10,24 @@ import { ProductT } from "@/src/utils/types/common";
 import { Pressable } from "react-native-gesture-handler";
 import DashboardLayout from "./_layout";
 import { fetchReleases } from "@/src/api/apiEndpoints";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { DashboardStackParams } from "@/src/utils/types/navigation";
+import { Menu } from "lucide-react-native";
+import DashboardLayout from "./_layout";
+import { fetchReleases, fetchReleasesByDate } from "@/src/api/apiEndpoints";
+import { mockReleases, mockReleaseDates, mockReleasesByDate } from "@/src/utils/mock";
+import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
 export default function ReservationsScreen() {
   const [releases, setReleases] = useState<ProductT[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(mockReleaseDates[0]?.date || '');
+  const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(mockReleaseDates[0]?.id || null);
 
+  // Load initial releases
   useEffect(() => {
     setReleases([]);
     setLoading(false);
@@ -37,6 +48,63 @@ export default function ReservationsScreen() {
 
     loadReleases();
   }, []);
+
+  // Function to load all releases
+  const loadReleases = async () => {
+    try {
+      setLoading(true);
+      
+      // Using mock data until API is working
+      setReleases(mockReleases);
+      setError(null);
+      
+      // Commenting out API call for now due to auth issues
+      /*
+      const response = await fetchReleases();
+      setReleases(response.data);
+      */
+    } catch (err) {
+      console.error("Failed to fetch releases:", err);
+      setError("Failed to load releases");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to clear filters and show all releases
+  const clearFilters = () => {
+    setSelectedReleaseId(null);
+    setSelectedDate('ALL RELEASES');
+    loadReleases();
+  };
+
+  // Function to load releases by specific date ID
+  const loadReleasesByDate = async (releaseId: number) => {
+    try {
+      setLoading(true);
+      
+      // Use the mockReleasesByDate object to get releases for the specific date
+      if (releaseId in mockReleasesByDate) {
+        setReleases(mockReleasesByDate[releaseId as keyof typeof mockReleasesByDate]);
+      } else {
+        // Fallback to all releases if date not found
+        setReleases(mockReleases);
+      }
+      
+      // Commenting out API call for now
+      /*
+      const response = await fetchReleasesByDate(releaseId.toString());
+      setReleases(response.data);
+      */
+      
+      setError(null);
+    } catch (err) {
+      console.error(`Failed to fetch releases for id ${releaseId}:`, err);
+      setError("Failed to load releases for selected date");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Format for displaying dates
   const formatReleaseDate = () => {
@@ -97,9 +165,33 @@ export default function ReservationsScreen() {
     return product.quantity || 0;
   };
 
+  const toggleDrawer = () => {
+    setShowDrawer(!showDrawer);
+  };
+
+  const handleSelectDate = (date: string) => {
+    setSelectedDate(date);
+    setShowDrawer(false);
+    
+    // Find the release ID from the mockReleaseDates array
+    const selectedRelease = mockReleaseDates.find(item => item.date === date);
+    if (selectedRelease) {
+      setSelectedReleaseId(selectedRelease.id);
+      loadReleasesByDate(selectedRelease.id);
+    }
+  };
+
   return (
     <DashboardLayout>
       <Box className="h-screen w-full pb-24">
+        <ReleasesDrawer 
+          visible={showDrawer}
+          releaseDates={mockReleaseDates}
+          onClose={toggleDrawer}
+          onSelectDate={handleSelectDate}
+          onShowAllReleases={clearFilters}
+        />
+        
         <MasonryList
           data={releases}
           scrollEnabled
@@ -238,3 +330,5 @@ export default function ReservationsScreen() {
     </DashboardLayout>
   );
 }
+
+
