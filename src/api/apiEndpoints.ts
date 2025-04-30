@@ -29,7 +29,7 @@ export const fetchProducts = () => {
 export const authenticateUser = async (email: string, password: string) => {
   try {
     const authClient = axios.create({
-      baseURL: "https://www.comic-odyssey.com/",
+      baseURL: constants.expoConfig?.extra?.apiUrl,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -77,5 +77,3 @@ export const fetchReleases = () => {
 export const fetchUserProfile = () => {
   return axiosClient.get("/users.json");
 };
-
-export const fetchReservations = () => {};

@@ -3,7 +3,7 @@ import constants from "expo-constants";
 
 // Create an Axios instance with default settings
 const axiosClient = axios.create({
-  baseURL: "https://www.comic-odyssey.com/api/v1/",
+  baseURL: constants.expoConfig?.extra?.apiUrl + "/api/v1/",
   withCredentials: true,
   headers: {
     Accept: "application/json",

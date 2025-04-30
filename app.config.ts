@@ -28,6 +28,7 @@ const config: ExpoConfig = {
   },
   extra: {
     sessionToken: process.env.SESSION_TOKEN,
+    apiUrl: process.env.API_URL,
   },
 };
 

@@ -1,36 +1,26 @@
 import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
-import { Dimensions, useColorScheme, View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
+// @ts-ignore
 import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
-
-import ProductCard from "@/src/components/product";
 import { ProductT } from "@/src/utils/types/common";
 import { Pressable } from "react-native-gesture-handler";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { DashboardStackParams } from "@/src/utils/types/navigation";
-import { Filter } from "lucide-react-native";
 import DashboardLayout from "./_layout";
 import { fetchReleases } from "@/src/api/apiEndpoints";
-import { mockReleases } from "@/src/utils/mock";
 
 export default function ReservationsScreen() {
-  const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
-  const screenWidth = Dimensions.get("window").width;
   const [releases, setReleases] = useState<ProductT[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
 
   useEffect(() => {
-    // Using mock data instead of API call due to auth issues
-    setReleases(mockReleases);
+    setReleases([]);
     setLoading(false);
-    
-    // Commenting out API call for now
-    /*
+
     const loadReleases = async () => {
       try {
         setLoading(true);
@@ -46,27 +36,30 @@ export default function ReservationsScreen() {
     };
 
     loadReleases();
-    */
   }, []);
 
   // Format for displaying dates
   const formatReleaseDate = () => {
     const now = new Date();
-    const month = now.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const month = now
+      .toLocaleString("default", { month: "short" })
+      .toUpperCase();
     const day = now.getDate();
     const nextWeek = new Date(now);
     nextWeek.setDate(nextWeek.getDate() + 7);
-    const nextMonth = nextWeek.toLocaleString('default', { month: 'short' }).toUpperCase();
+    const nextMonth = nextWeek
+      .toLocaleString("default", { month: "short" })
+      .toUpperCase();
     const nextDay = nextWeek.getDate();
     const year = nextWeek.getFullYear();
-    
+
     return `${month} ${day}/${nextMonth} ${nextDay} ${year}`;
   };
 
   const toggleProductSelection = (productId: number) => {
-    setSelectedProducts(prev => {
+    setSelectedProducts((prev) => {
       if (prev.includes(productId)) {
-        return prev.filter(id => id !== productId);
+        return prev.filter((id) => id !== productId);
       } else {
         return [...prev, productId];
       }
@@ -75,23 +68,23 @@ export default function ReservationsScreen() {
 
   const confirmReservation = () => {
     if (selectedProducts.length === 0) return;
-    
+
     // Update the reserved status for selected products
-    setReleases(prev => 
-      prev.map(product => {
+    setReleases((prev) =>
+      prev.map((product) => {
         if (selectedProducts.includes(product.id)) {
           return {
             ...product,
             meta_attributes: {
               ...product.meta_attributes,
-              reserved: true
-            }
+              reserved: true,
+            },
           };
         }
         return product;
       })
     );
-    
+
     // Clear selections after reservation
     setSelectedProducts([]);
   };
@@ -111,15 +104,38 @@ export default function ReservationsScreen() {
           data={releases}
           scrollEnabled
           ListEmptyComponent={
-            <View className="flex mt-48 mb-4 flex-col items-center ml-4 mr-4">
+            <View className="flex mt-56 mb-4 flex-col items-center">
               {loading ? (
-                <Text>Loading releases...</Text>
+                <>
+                  <Image
+                    alt="Comic Odyssey Icon"
+                    key="loading"
+                    className="w-full max-h-16 scale-[0.8]"
+                    resizeMethod="scale"
+                    source={ComicOdysseyIcon}
+                  />
+                  <Text className="mt-4 mb-2">
+                    Hang tight, we're loading the latest releases!
+                  </Text>
+                </>
               ) : error ? (
-                <Text>{error}</Text>
+                <>
+                  <Image
+                    key="error"
+                    alt="Comic Odyssey Icon"
+                    className="w-full max-h-16 scale-[0.8]"
+                    resizeMethod="scale"
+                    source={ComicOdysseyIcon}
+                  />
+                  <Text className="mt-4 mb-2">Sorry! Something went wrong</Text>
+                  <Text className="mb-2">{error}</Text>
+                </>
               ) : (
                 <>
                   <Image
-                    className="w-full max-h-8"
+                    alt="Comic Odyssey Icon"
+                    key="closed"
+                    className="w-full max-h-16 scale-[0.8]"
                     resizeMethod="scale"
                     source={ComicOdysseyIcon}
                   />
@@ -133,37 +149,27 @@ export default function ReservationsScreen() {
           }
           ListHeaderComponent={
             <View className="ml-4 mr-4">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="font-bold text-xl">Latest Release</Text>
-                <View className="mr-2">
-                  <Filter
-                    size={24}
-                    color={useColorScheme() === "dark" ? "#FFFFFF" : "#4E4E4E"}
-                  />
-                </View>
-              </View>
               <Text className="mb-2 text-sm">
-                FINAL ORDER CUT OFF (F.O.C.) for titles arriving {formatReleaseDate()}
+                FINAL ORDER CUT OFF (F.O.C.) for titles arriving{" "}
+                {formatReleaseDate()}
               </Text>
               <View className="flex-row items-center justify-between mb-4">
-                <View className="bg-green-200 px-3 py-1 rounded">
-                  <Text className="text-green-800">
-                    RESERVATION AVAILABLE
-                  </Text>
-                </View>
-                
                 {selectedProducts.length > 0 && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={confirmReservation}
-                    className="bg-red-700 py-2 px-4 rounded-md"
+                    className="bg-blue-900 py-2 px-4 rounded-md"
                   >
                     <Text className="text-white font-bold">
-                      Confirm Reserved ({selectedProducts.length})
+                      Reserve ({selectedProducts.length})
                     </Text>
                   </TouchableOpacity>
                 )}
               </View>
-              <Text className="mb-2 font-bold">Total Products: {releases.length}</Text>
+              {releases.length > 0 && (
+                <Text className="mb-2 font-bold">
+                  Total Products: {releases.length}
+                </Text>
+              )}
             </View>
           }
           numColumns={2}
@@ -176,9 +182,15 @@ export default function ReservationsScreen() {
                 onPress={() => toggleProductSelection(product.id)}
                 style={({ pressed }) => [
                   { opacity: pressed ? 0.7 : 1 },
-                  selectedProducts.includes(product.id) 
-                    ? { borderWidth: 2, borderColor: '#4CAF50', borderRadius: 8, padding: 6, margin: 8 } 
-                    : { padding: 6, margin: 8 }
+                  selectedProducts.includes(product.id)
+                    ? {
+                        borderWidth: 2,
+                        borderColor: "rgb(43,100,207)",
+                        borderRadius: 8,
+                        padding: 6,
+                        margin: 8,
+                      }
+                    : { padding: 6, margin: 8 },
                 ]}
               >
                 <Box className="mb-2">
@@ -199,18 +211,21 @@ export default function ReservationsScreen() {
                       <Text numberOfLines={1} className="text-gray-600">
                         {product.creators}
                       </Text>
-                      
+
                       <View className="flex-row justify-between items-center mt-1">
                         {isProductReserved(product) ? (
                           <View className="bg-green-200 px-3 py-1 rounded">
                             <Text className="text-green-800">Reserved</Text>
                           </View>
                         ) : null}
-                        <Text className="mr-4">{getQuantityLeft(product)} left</Text>
+                        <Text className="mr-4">
+                          {getQuantityLeft(product)} left
+                        </Text>
                       </View>
-                      
+
                       <Text className="text-gray-600 text-sm mt-1">
-                        Pickup: {(product.meta_attributes as any)?.pickup_date || 'N/A'}
+                        Pickup:{" "}
+                        {(product.meta_attributes as any)?.pickup_date || "N/A"}
                       </Text>
                     </View>
                   </View>
