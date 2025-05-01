@@ -5,18 +5,24 @@ import {
 import SearchScreen from "../screens/dashboard/search";
 import CartScreen from "../screens/dashboard/cart";
 import ProfileSceen from "../screens/dashboard/profile";
+import ReservationsScreen from "../screens/dashboard/reservations";
 
-import { House, Search, ShoppingBag, User2 } from "lucide-react-native";
+import {
+  BookOpen,
+  House,
+  Search,
+  ShoppingBag,
+  User2,
+} from "lucide-react-native";
 import { useBoundStore } from "../store";
-import { useEffect, useState } from "react";
 import HomeDrawer from "./HomeDrawer";
-import { ProductT } from "../utils/types/common";
+import { View } from "react-native";
 
 const DashboardTab = createBottomTabNavigator();
 
 const DashboardTabs = () => {
   const cartItems = useBoundStore((state) => state.cartItems);
-  const uniqueItemCount = new Set(cartItems.map(item => item.id)).size;
+  const uniqueItemCount = new Set(cartItems.map((item) => item.id)).size;
 
   const screenConfig = ({
     route,
@@ -41,6 +47,28 @@ const DashboardTabs = () => {
         return <Search color={color} size={size} />;
       case "My Cart":
         return <ShoppingBag color={color} size={size} />;
+      case "Reservations":
+        // Bigger icon with circular background
+        return (
+          <View
+            style={{
+              width: 70,
+              height: 70,
+              borderRadius: 50,
+              backgroundColor: "#fff",
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 12,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 6,
+              elevation: 8,
+            }}
+          >
+            <BookOpen color={color} size={36} />
+          </View>
+        );
       case "Profile":
         return <User2 color={color} size={size} />;
     }
@@ -51,22 +79,39 @@ const DashboardTabs = () => {
   return (
     <DashboardTab.Navigator>
       <DashboardTab.Screen
-        options={screenConfig}
+        options={{
+          ...screenConfig({ route: { name: "Home" } }),
+        }}
         name="Home"
         component={HomeDrawer}
       />
       <DashboardTab.Screen
-        options={screenConfig}
+        options={{
+          ...screenConfig({ route: { name: "Search" } }),
+        }}
         name="Search"
         component={SearchScreen}
       />
       <DashboardTab.Screen
-        options={screenConfig}
+        options={{
+          ...screenConfig({ route: { name: "Reservations" } }),
+          tabBarIcon: ({ color }) => iconDisplay("Reservations", color, 24),
+          tabBarLabel: () => null,
+        }}
+        name="Reservations"
+        component={ReservationsScreen}
+      />
+      <DashboardTab.Screen
+        options={{
+          ...screenConfig({ route: { name: "My Cart" } }),
+        }}
         name="My Cart"
         component={CartScreen}
       />
       <DashboardTab.Screen
-        options={screenConfig}
+        options={{
+          ...screenConfig({ route: { name: "Profile" } }),
+        }}
         name="Profile"
         component={ProfileSceen}
       />

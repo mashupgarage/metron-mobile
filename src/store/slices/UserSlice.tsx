@@ -12,10 +12,12 @@ export type UserSlice = {
   user: UserT | null;
   isOnboardingDone: boolean;
   setOnboardingDone: (isDone: boolean) => void;
+  setUser: (payload: UserT) => void;
 };
 
 export const createUserSlice: StateCreator<UserSlice> = (set) => ({
   user: null,
   isOnboardingDone: false,
   setOnboardingDone: (isDone: boolean) => set({ isOnboardingDone: isDone }),
+  setUser: (payload: UserT) => set({ user: payload }),
 });

@@ -19,8 +19,12 @@ import { HStack } from "@/src/components/ui/hstack";
 import { Button } from "@/src/components/ui/button";
 import { Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
-import { useEffect, useMemo, useState } from "react";
-import { fetchProducts, searchProduct } from "@/src/api/apiEndpoints";
+import { useEffect, useState } from "react";
+import {
+  fetchProducts,
+  fetchReleases,
+  fetchUserProfile,
+} from "@/src/api/apiEndpoints";
 
 export default function Home() {
   const store = useBoundStore();
@@ -37,12 +41,20 @@ export default function Home() {
       .catch((err) => {
         console.log(err);
       });
+
+    fetchUserProfile()
+      .then((res) => {
+        store.setUser(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   useEffect(() => {
-    searchProduct("avengers")
+    fetchReleases()
       .then((res) => {
-        console.log("total", res.data);
+        console.log("------------> total", res.data);
       })
       .catch((err) => {
         console.log(err);
