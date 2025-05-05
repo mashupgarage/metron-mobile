@@ -49,7 +49,7 @@ export default function CGC() {
           <Box className="items-center justify-center mx-6 my-6">
             <Button
               onPress={() => {
-                // Path is empty for now
+                navigation.navigate("CGCSubmit");
               }}
               className="w-full rounded-full bg-blue-800 border-2 border-red-500"
             >
@@ -144,15 +144,15 @@ export default function CGC() {
             <Text className="mb-8 font-bold">For more information on the grading services, please do not hesitate to contact us via email at grading@comic-odyssey.com, or message us at @gradingph on Facebook during business hours.</Text>
           
             <Box className="items-center justify-center mx-6 my-6">
-            <Button
-              onPress={() => {
-                // Path is empty for now
-              }}
-              className="w-full rounded-full bg-blue-800 border-2 border-red-500"
-            >
-              <ButtonText className="text-white text-lg font-semibold">Submit your books</ButtonText>
-            </Button>
-          </Box>
+              <Button
+                onPress={() => {
+                  navigation.navigate("CGCSubmit");
+                }}
+                className="w-full rounded-full bg-blue-800 border-2 border-red-500"
+              >
+                <ButtonText className="text-white text-lg font-semibold">Submit your books</ButtonText>
+              </Button>
+            </Box>
 
           </Box>
         </Box>
