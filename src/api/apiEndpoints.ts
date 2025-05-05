@@ -61,10 +61,8 @@ export const authenticateUser = async (email: string, password: string) => {
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const errorMessage =
-        error.response?.data?.error || "Authentication failed";
       console.error("Authentication error:", error);
-      throw new Error(errorMessage);
+      throw new Error(error.response?.data?.error || "Authentication failed");
     }
     throw error;
   }

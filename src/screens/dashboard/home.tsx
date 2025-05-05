@@ -55,6 +55,7 @@ export default function Home() {
     fetchReleases()
       .then((res) => {
         console.log("------------> total", res.data);
+        store.setReleases(res.data);
       })
       .catch((err) => {
         console.log(err);

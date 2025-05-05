@@ -45,8 +45,13 @@ export default function ReservationsScreen() {
   const fetchReleaseDatesFromAPI = async () => {
     try {
       setLoading(true);
-      const response = await fetchReleases();
-      setReleaseDates(response.data);
+      const response = await fetchReleases()
+        .then((res) => {
+          setReleaseDates(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       setLoading(false);
     } catch (err) {
       console.error("Failed to fetch release dates:", err);
@@ -55,16 +60,33 @@ export default function ReservationsScreen() {
     }
   };
 
-  // Find the latest release (by date) from loaded releaseDates
+  console.log("------------> releases", releaseDates);
+
+  // Find the latest release (by date) with status 'published' or 'closed'
   const getLatestRelease = (entries: Release[]): Release | null => {
     if (!entries || entries.length === 0) return null;
-    let latest = entries[0];
-    for (const rel of entries) {
-      if (new Date(rel.release_date) > new Date(latest.release_date)) {
-        latest = rel;
-      }
+    const validStatuses = ["publish", "close"];
+    const filtered = entries.filter((rel) =>
+      validStatuses.includes(rel.status)
+    );
+    if (filtered.length === 0) return null;
+    return filtered.reduce((latest, rel) =>
+      new Date(rel.release_date) > new Date(latest.release_date) ? rel : latest
+    );
+  };
+
+  // Clear filters and show latest published/closed release
+  const clearFilters = () => {
+    const latest = getLatestRelease(releaseDates);
+    if (latest) {
+      setSelectedReleaseId(latest.id);
+      setSelectedDate(latest.release_date);
+      loadProductsByRelease(latest.id);
+    } else {
+      setSelectedReleaseId(null);
+      setSelectedDate("");
+      loadProductsByRelease(null);
     }
-    return latest;
   };
 
   const loadProductsByRelease = async (id: number | null) => {
@@ -86,13 +108,6 @@ export default function ReservationsScreen() {
     }
   };
 
-  // Clear filters and show all releases
-  const clearFilters = () => {
-    setSelectedReleaseId(null);
-    setSelectedDate("ALL RELEASES");
-    loadProductsByRelease(null);
-  };
-
   // On mount: fetch release dates, then select latest and load its releases
   useEffect(() => {
     const initialize = async () => {
@@ -101,13 +116,14 @@ export default function ReservationsScreen() {
     initialize();
   }, []);
 
-  // When releaseDates are loaded, select latest and load its releases
+  // When releaseDates are loaded, select latest published/closed and load its releases
   useEffect(() => {
     if (releaseDates.length > 0) {
       const latest = getLatestRelease(releaseDates);
       if (latest) {
         setSelectedDate(latest.release_date);
         setSelectedReleaseId(latest.id);
+        loadProductsByRelease(latest.id);
       }
     }
   }, [releaseDates]);
@@ -175,16 +191,23 @@ export default function ReservationsScreen() {
     setShowDrawer(!showDrawer);
   };
 
-  const handleSelectDate = (date: string) => {
+  // Format date as 'MMM DD, YYYY'
+  const formatDateHuman = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const handleSelectDate = (id: number, date: string) => {
     setSelectedDate(date);
+    setSelectedReleaseId(id);
     setShowDrawer(false);
-    const selectedRelease = releaseDates.find(
-      (item) => item.release_date === date
-    );
-    if (selectedRelease) {
-      setSelectedReleaseId(selectedRelease.id);
-      loadProductsByRelease(selectedRelease.id);
-    }
+    loadProductsByRelease(id);
   };
 
   return (
@@ -192,7 +215,14 @@ export default function ReservationsScreen() {
       <Box className="h-screen w-full pb-24">
         <ReleasesDrawer
           visible={showDrawer}
-          releaseDates={mockReleaseDates}
+          releaseDates={releaseDates
+            .filter((release) => release.status !== "draft")
+            .map((release) => ({
+              id: release.id,
+              date: release.release_date,
+              count: release.products_count,
+            }))}
+          selectedReleaseId={selectedReleaseId}
           onClose={toggleDrawer}
           onSelectDate={handleSelectDate}
           onShowAllReleases={clearFilters}
@@ -226,15 +256,61 @@ export default function ReservationsScreen() {
           ListHeaderComponent={
             <View className="ml-4 mr-4">
               <View className="flex-row justify-between items-center mb-4">
-                <Text className="font-bold text-lg">{selectedDate}</Text>
+                <Text className="font-bold text-lg">
+                  {formatDateHuman(selectedDate)}
+                </Text>
                 <TouchableOpacity onPress={toggleDrawer} className="p-2">
                   <Menu size={24} color="#333" />
                 </TouchableOpacity>
               </View>
               <Text className="mb-2 text-sm">
-                {/* FINAL ORDER CUT OFF (F.O.C.) for titles arriving{" "} */}
-                {/* {formatReleaseDate()} */}
+                {(() => {
+                  const selectedRelease = releaseDates.find(
+                    (item) => item.id === selectedReleaseId
+                  );
+                  return selectedRelease ? selectedRelease.title : "";
+                })()}
               </Text>
+              {/* Highlighted message for past releases */}
+              {(() => {
+                const latest = getLatestRelease(releaseDates);
+                if (
+                  latest &&
+                  selectedReleaseId &&
+                  selectedReleaseId !== latest.id
+                ) {
+                  return (
+                    <View
+                      style={{
+                        backgroundColor: "#FFF7D6",
+                        borderRadius: 6,
+                        padding: 10,
+                        marginBottom: 10,
+                        borderWidth: 1,
+                        borderColor: "#FFE29C",
+                      }}
+                    >
+                      <Text style={{ color: "#7A5C00" }}>
+                        This is a past release. To browse the current release,{" "}
+                        <Text
+                          style={{ fontWeight: "bold", color: "#1A237E" }}
+                          onPress={() => {
+                            const latest = getLatestRelease(releaseDates);
+                            if (latest) {
+                              setSelectedReleaseId(latest.id);
+                              setSelectedDate(latest.release_date);
+                              loadProductsByRelease(latest.id);
+                            }
+                          }}
+                        >
+                          press here.
+                        </Text>
+                      </Text>
+                    </View>
+                  );
+                }
+                return null;
+              })()}
               <View className="flex-row items-center justify-between mb-4">
                 {selectedProducts.length > 0 && (
                   <TouchableOpacity
@@ -310,7 +386,9 @@ export default function ReservationsScreen() {
                           </View>
                         ) : null}
                         <Text className="mr-4">
-                          {getQuantityLeft(product)} left
+                          {getQuantityLeft(product) === 0
+                            ? "Out of Stock"
+                            : `${getQuantityLeft(product)} left`}
                         </Text>
                       </View>
                     </View>

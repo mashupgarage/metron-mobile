@@ -128,7 +128,7 @@ export default function Profile(props: { navigation: any }) {
 
           <TouchableOpacity
             style={styles.settingItem}
-            onPress={() => handleSettingPress("About")}
+            onPress={() => store.setUser(null)}
           >
             <View style={styles.settingLeft}>
               <Ionicons name="log-out-outline" size={22} color="#333" />
