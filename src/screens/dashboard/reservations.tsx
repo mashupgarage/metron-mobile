@@ -14,10 +14,12 @@ import {
   fetchProducts,
   fetchProductsByReleaseId,
   fetchReleases,
+  addToWantList,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
 import { mockReleaseDates } from "@/src/utils/mock";
+import { useNavigation } from "@react-navigation/native";
 
 interface Release {
   id: number;
@@ -30,6 +32,7 @@ interface Release {
 }
 
 export default function ReservationsScreen() {
+  const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
   const [loading, setLoading] = useState(true);
@@ -346,7 +349,15 @@ export default function ReservationsScreen() {
             const product = item as ProductT;
             return (
               <Pressable
-                onPress={() => toggleProductSelection(product.id)}
+                onLongPress={() => {
+                  toggleProductSelection(product.id);
+                }}
+                onPress={() => {
+                  // @ts-ignore
+                  navigation.navigate("Product", {
+                    product: product as ProductT,
+                  });
+                }}
                 style={({ pressed }) => [
                   { opacity: pressed ? 0.7 : 1 },
                   selectedProducts.includes(product.id)
@@ -385,11 +396,38 @@ export default function ReservationsScreen() {
                             <Text className="text-green-800">Reserved</Text>
                           </View>
                         ) : null}
-                        <Text className="mr-4">
-                          {getQuantityLeft(product) === 0
-                            ? "Out of Stock"
-                            : `${getQuantityLeft(product)} left`}
-                        </Text>
+                        <View style={{ alignItems: "flex-end" }}>
+                          <Text className="mr-4">
+                            {getQuantityLeft(product) === 0
+                              ? "Out of Stock"
+                              : `${getQuantityLeft(product)} left`}
+                          </Text>
+                          {getQuantityLeft(product) === 0 && (
+                            <TouchableOpacity
+                              style={{
+                                marginTop: 8,
+                                backgroundColor: "#2b64cf",
+                                borderRadius: 4,
+                                paddingVertical: 4,
+                                paddingHorizontal: 12,
+                              }}
+                              onPress={async () => {
+                                try {
+                                  await addToWantList(product.id);
+                                  alert("Added to your want list!");
+                                } catch (e) {
+                                  alert("Failed to add to want list.");
+                                }
+                              }}
+                            >
+                              <Text
+                                style={{ color: "#fff", fontWeight: "bold" }}
+                              >
+                                I want this
+                              </Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
                       </View>
                     </View>
                   </View>

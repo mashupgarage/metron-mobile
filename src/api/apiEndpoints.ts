@@ -145,3 +145,26 @@ export const fetchReleaseById = (id: number) => {
 export const fetchProductsByReleaseId = (id: number) => {
   return axiosClient.get(`/releases/${id}/products`);
 };
+
+// =========================
+// Product-related Endpoints
+// =========================
+
+/**
+ * Add a product to a user's want list.
+ * @param productId - The product ID.
+ * @returns Axios promise resolving to the updated want list.
+ * @example
+ * addToWantList(123).then(res => res.data)
+ */
+export const addToWantList = (productId: number) => {
+  return axiosClient.post(`/want`, {
+    product_id: productId,
+  });
+};
+
+export const addToReservation = (productId: number) => {
+  return axiosClient.post(`/reservations`, {
+    product_id: productId,
+  });
+};
