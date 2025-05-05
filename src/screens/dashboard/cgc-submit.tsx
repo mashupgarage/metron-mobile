@@ -4,12 +4,10 @@ import { Image } from "@/src/components/ui/image";
 import { useColorScheme } from "react-native";
 import { HStack } from "@/src/components/ui/hstack";
 import { Button } from "@/src/components/ui/button";
-import { Menu } from "lucide-react-native";
 import { WebView } from "react-native-webview";
 import {
   NavigationProp,
   useNavigation,
-  DrawerActions,
 } from "@react-navigation/native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { useState } from "react";
@@ -45,10 +43,6 @@ export default function CGCSubmit() {
           resizeMode="contain"
         />
       </Box>
-      
-      {/* <Text className="px-4 mb-4 text-center">
-        Please fill out the form below to submit your books for CGC grading service.
-      </Text> */}
       
       <Box className="flex-1 mx-2 mb-2">
         {isLoading && (
