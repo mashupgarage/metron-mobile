@@ -17,6 +17,7 @@ import {
   getWantList,
 } from "@/src/api/apiEndpoints";
 import { profileStyles } from "./style";
+import { removeAuthToken } from "@/src/api/tokenManager";
 
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore();
@@ -42,14 +43,22 @@ export default function Profile(props: { navigation: any }) {
       // Fetch real orders count
       getReservationList(store.user.id)
         .then((res) => {
-          setOrdersCount(Array.isArray(res.data) ? res.data.length : (res.data.reservations?.length || 0));
+          setOrdersCount(
+            Array.isArray(res.data)
+              ? res.data.length
+              : res.data.reservations?.length || 0
+          );
         })
         .catch(() => setOrdersCount(0));
 
       // Fetch real collection count
       getMyCollection(store.user.id)
         .then((res) => {
-          setCollectionCount(Array.isArray(res.data) ? res.data.length : (res.data.collection?.length || 0));
+          setCollectionCount(
+            Array.isArray(res.data)
+              ? res.data.length
+              : res.data.collection?.length || 0
+          );
         })
         .catch(() => setCollectionCount(0));
     }
@@ -185,7 +194,10 @@ export default function Profile(props: { navigation: any }) {
 
           <TouchableOpacity
             style={styles.settingItem}
-            onPress={() => store.setUser(null)}
+            onPress={() => {
+              removeAuthToken();
+              store.setUser(null);
+            }}
           >
             <View style={styles.settingLeft}>
               <Ionicons name="log-out-outline" size={22} color="#333" />

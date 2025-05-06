@@ -54,7 +54,6 @@ export default function Home() {
   useEffect(() => {
     fetchReleases()
       .then((res) => {
-        console.log("------------> total", res.data);
         store.setReleases(res.data);
       })
       .catch((err) => {

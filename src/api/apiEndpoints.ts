@@ -25,7 +25,7 @@ export const searchProduct = (query: string) => {
  * fetchProducts().then(res => res.data)
  */
 export const fetchProducts = () => {
-  return axiosClient.get("/products");
+  return axiosClient.get("/marketplace/catalog_products");
 };
 
 // =========================
