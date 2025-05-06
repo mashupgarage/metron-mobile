@@ -24,8 +24,11 @@ export default function Profile(props: { navigation: any }) {
   const styles = profileStyles;
   const wantlistCount = useWantListStore((state) => state.wantlistCount);
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
-  const [ordersCount, setOrdersCount] = useState<number>(0);
-  const [collectionCount, setCollectionCount] = useState<number>(0);
+  // Use dedicated slices for ordersCount and collectionCount
+  const ordersCount = store.ordersCount ?? 0;
+  const collectionCount = store.collectionCount ?? 0;
+  const setOrdersCount = (count: number) => store.setOrdersCount(count);
+  const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
   useEffect(() => {
     if (store.user === null) {
@@ -46,7 +49,7 @@ export default function Profile(props: { navigation: any }) {
           setOrdersCount(
             Array.isArray(res.data)
               ? res.data.length
-              : res.data.reservations?.length || 0
+              : res.data.reservations.length || 0
           );
         })
         .catch(() => setOrdersCount(0));
@@ -128,7 +131,7 @@ export default function Profile(props: { navigation: any }) {
             onPress={() => {
               // console.log("display user data", store.user);
               getReservationList(store.user?.id).then((res) => {
-                console.log("reservation list", res.data);
+                console.log("reservation list", res.data.reservations);
               });
             }}
           >

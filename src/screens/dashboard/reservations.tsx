@@ -16,11 +16,13 @@ import {
   fetchReleases,
   addToWantList,
   getWantList,
+  getReservationList,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
 import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
+import { useBoundStore } from "@/src/store";
 
 interface Release {
   id: number;
@@ -33,6 +35,7 @@ interface Release {
 }
 
 export default function ReservationsScreen() {
+  const store = useBoundStore();
   const [wantedProductIds, setWantedProductIds] = useState<number[]>([]);
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
@@ -76,8 +79,6 @@ export default function ReservationsScreen() {
       setLoading(false);
     }
   };
-
-  console.log("------------> releases", releaseDates);
 
   // Find the latest release (by date) with status 'published' or 'closed'
   const getLatestRelease = (entries: Release[]): Release | null => {
@@ -367,9 +368,16 @@ export default function ReservationsScreen() {
                 <View className="p-0">
                   <Pressable
                     onPress={() => {
-                      // @ts-ignore
-                      navigation.navigate("Product", {
-                        product: product,
+                      // Fetch reservation list and navigate to Product
+                      getReservationList(store.user?.id).then((res) => {
+                        const reservationList = res.data.reservations;
+                        // @ts-ignore
+                        navigation.navigate("Product", {
+                          product: product,
+                          fromReservations: true,
+                          reservationId: selectedReleaseId,
+                          reservationList,
+                        });
                       });
                     }}
                     style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}

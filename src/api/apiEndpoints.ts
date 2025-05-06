@@ -190,9 +190,16 @@ export const getReservationList = async (userId: number) => {
  * @example
  * addToReservation(123).then(res => res.data)
  */
-export const addToReservation = (productId: number) => {
-  return axiosClient.post(`/reservations`, {
-    product_id: productId,
+export const addToReservation = (
+  productId: number,
+  quantity: number,
+  reservation_id: number
+) => {
+  return axiosClient.post(`/reservation_lists/${reservation_id}/reservations`, {
+    reservation: {
+      product_id: productId,
+      quantity: quantity,
+    },
   });
 };
 

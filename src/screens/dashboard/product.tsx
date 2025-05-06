@@ -16,21 +16,41 @@ import { useNavigation } from "@react-navigation/native";
 import { ProductT } from "@/src/utils/types/common";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 import NavigationHeader from "@/src/components/navigation-header";
-import { addToWantList, getWantList } from "@/src/api/apiEndpoints";
+import {
+  addToReservation,
+  addToWantList,
+  getWantList,
+} from "@/src/api/apiEndpoints";
 
 export default function Product(props: {
-  route: { params: { product: ProductT } };
+  route: {
+    params: {
+      product: ProductT;
+      fromReservations?: boolean;
+      reservationId?: number;
+      reservationList?: any[];
+    };
+  };
 }) {
   const { route } = props;
   const { params } = route;
-  const { product } = params;
+  const { product, fromReservations, reservationId, reservationList } = params;
+
+  // Local state for reservation list so we can update it after reservation
+  const [localReservationList, setLocalReservationList] = React.useState<any[]>(
+    reservationList || []
+  );
+
+  // Check if this product is already reserved in the user's reservation list
+  const isAlreadyReserved = Array.isArray(localReservationList)
+    ? localReservationList.some((r) => r.product?.id === product.id)
+    : false;
 
   const [quantity, setQuantity] = React.useState(1);
   const [quantityError, setQuantityError] = React.useState(false);
 
   // Helper to check if quantity is valid
   const isQuantityValid = quantity >= 1 && quantity <= product.quantity;
-
 
   const store = useBoundStore();
   const navigation = useNavigation();
@@ -75,7 +95,70 @@ export default function Product(props: {
     }
   };
 
+  // Reservation handler for reservations entry point
+  // (use isAlreadyReserved from above)
+  const handleAddToReservation = () => {
+    if (fromReservations && isAlreadyReserved) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Toast nativeID={toastId} action="error">
+              <ToastTitle>This product is already reserved!</ToastTitle>
+            </Toast>
+          );
+        },
+      });
+      return;
+    }
+    if (product && (product.quantity ?? 0) > 0) {
+      addToReservation(product.id, quantity, reservationId)
+        .then((res) => {
+          // Dynamically update localReservationList so button disables and count updates
+          setLocalReservationList((prev) => [
+            ...prev,
+            {
+              ...res.data.reservation, // If your API returns the new reservation in this field
+              product,
+            },
+          ]);
+          toast.show({
+            placement: "top",
+            render: ({ id }) => {
+              const toastId = "toast-" + id;
+              return (
+                <Toast nativeID={toastId} action="success">
+                  <ToastTitle>Reserved product!</ToastTitle>
+                </Toast>
+              );
+            },
+          });
+        })
+        .catch((err) => {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => {
+              const toastId = "toast-" + id;
+              return (
+                <Toast nativeID={toastId} action="error">
+                  <ToastTitle>Failed to reserve product!</ToastTitle>
+                </Toast>
+              );
+            },
+          });
+        });
+    } else {
+      console.log("Product out of stock or invalid.");
+    }
+  };
+
   console.log(product);
+  // Count of reserved products
+  const reservedCount = Array.isArray(localReservationList)
+    ? localReservationList.length
+    : 0;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <KeyboardAvoidingView
@@ -88,6 +171,11 @@ export default function Product(props: {
           <Text size="3xl" bold>
             {product?.title ?? ""}
           </Text>
+          {fromReservations && (
+            <Text style={{ fontSize: 14, color: "#888", marginTop: 4 }}>
+              Reserved products in this list: {reservedCount}
+            </Text>
+          )}
         </View>
         <View className="flex-1">
           <FlatList
@@ -156,12 +244,19 @@ export default function Product(props: {
             )}
             {(product?.quantity ?? 0) !== 0 ? (
               <Button
-                onPress={handleAddToCart}
+                onPress={
+                  fromReservations ? handleAddToReservation : handleAddToCart
+                }
                 disabled={
-                  (product?.quantity ?? 0) <= 0 || !isQuantityValid
+                  (product?.quantity ?? 0) <= 0 ||
+                  !isQuantityValid ||
+                  (fromReservations && isAlreadyReserved)
                 }
                 style={[
-                  (product?.quantity ?? 0) <= 0 || quantityError || quantity < 1
+                  (product?.quantity ?? 0) <= 0 ||
+                  quantityError ||
+                  quantity < 1 ||
+                  (fromReservations && isAlreadyReserved)
                     ? { backgroundColor: "#cccccc" }
                     : undefined,
                   { flex: 1 },
@@ -169,7 +264,17 @@ export default function Product(props: {
                 size="xl"
               >
                 <ButtonText>
-                  Add to Cart ({product?.formatted_price ?? ""})
+                  {fromReservations
+                    ? isAlreadyReserved
+                      ? "Already reserved"
+                      : `Add to Reservation (${
+                          product?.formatted_price ??
+                          Number(product.price).toFixed(2)
+                        })`
+                    : `Add to Cart (${
+                        product?.formatted_price ??
+                        Number(product.price).toFixed(2)
+                      })`}
                 </ButtonText>
               </Button>
             ) : (
