@@ -48,11 +48,10 @@ export const authenticateUser = async (email: string, password: string) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${constants.expoConfig?.extra?.sessionToken}`,
       },
     });
 
-    const response = await authClient.post("/users/sign_in", {
+    const response = await authClient.post("/api/v1/login", {
       email: email,
       password: password,
       remember_me: 0,
@@ -157,9 +156,11 @@ export const fetchProductsByReleaseId = (id: number) => {
  * @example
  * addToWantList(123).then(res => res.data)
  */
-export const addToWantList = (productId: number) => {
-  return axiosClient.post(`/want`, {
-    product_id: productId,
+export const addToWantList = async (productId: number) => {
+  await axiosClient.post(`/want`, {
+    want_list: {
+      product_id: productId,
+    },
   });
 };
 

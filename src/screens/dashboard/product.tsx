@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { ProductT } from "@/src/utils/types/common";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 import NavigationHeader from "@/src/components/navigation-header";
+import { addToWantList } from "@/src/api/apiEndpoints";
 
 export default function Product(props: {
   route: { params: { product: ProductT } };
@@ -45,6 +46,7 @@ export default function Product(props: {
     }
   };
 
+  console.log(product);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
       <NavigationHeader showCartButton />
@@ -67,10 +69,14 @@ export default function Product(props: {
                 />
               </Box>
               <Text className="mt-4 mb-4">{product?.description ?? ""}</Text>
-              <Text className="font-bold 2xl mb-2">Creators</Text>
+              <Text className="font-bold 2xl mb-2">Publisher</Text>
+              <Text>{product?.publisher_name}</Text>
+              <Text className="font-bold 2xl mt-4 mb-2">Creators</Text>
               <Text>{product?.creators}</Text>
               <Text className="font-bold 2xl mt-4 mb-2">ISBN/UPC</Text>
-              <Text>{product?.isbn ?? "not available"}</Text>
+              <Text>
+                {product?.isbn === null ? product?.upc : "not available"}
+              </Text>
               <Text className="font-bold 2xl mt-4 mb-2">Buy this product</Text>
               <Text>{product?.quantity ?? 0} copies remaining</Text>
             </Box>
@@ -101,10 +107,13 @@ export default function Product(props: {
           ) : (
             <Button
               onPress={() => {
-                // TODO: Implement add to want list
-                // for now we navigate to login
-                // @ts-ignore
-                navigation.navigate("Home", { screen: "Profile" });
+                addToWantList(product.id)
+                  .then((res) => {
+                    console.log("success", res);
+                  })
+                  .catch((err) => {
+                    console.log("error", err);
+                  });
               }}
               style={[{ flex: 1 }]}
               size="xl"

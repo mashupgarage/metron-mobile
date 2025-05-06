@@ -119,9 +119,7 @@ export default function Home() {
               navigation.navigate("Product", { product: item as ProductT });
             }}
           >
-            <Box key={i} className="ml-1 mr-1 mb-4">
-              <ProductCard isInCart={false} product={item as ProductT} />
-            </Box>
+            <ProductCard key={i} isInCart={false} product={item as ProductT} />
           </Pressable>
         )}
       />

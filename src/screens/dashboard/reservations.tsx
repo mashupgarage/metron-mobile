@@ -20,6 +20,7 @@ import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
 import { mockReleaseDates } from "@/src/utils/mock";
 import { useNavigation } from "@react-navigation/native";
+import { ProductPreview } from "@/src/components/product-preview";
 
 interface Release {
   id: number;
@@ -348,91 +349,36 @@ export default function ReservationsScreen() {
           renderItem={({ item, i }) => {
             const product = item as ProductT;
             return (
-              <Pressable
-                onLongPress={() => {
-                  toggleProductSelection(product.id);
-                }}
-                onPress={() => {
-                  // @ts-ignore
-                  navigation.navigate("Product", {
-                    product: product as ProductT,
-                  });
-                }}
-                style={({ pressed }) => [
-                  { opacity: pressed ? 0.7 : 1 },
-                  selectedProducts.includes(product.id)
-                    ? {
-                        borderWidth: 2,
-                        borderColor: "rgb(43,100,207)",
-                        borderRadius: 8,
-                        padding: 6,
-                        margin: 8,
+              <>
+                <View className="p-4">
+                  <ProductPreview
+                    product={product}
+                    navigation={navigation}
+                    selectedProducts={selectedProducts}
+                    isProductReserved={isProductReserved}
+                    getQuantityLeft={getQuantityLeft}
+                  />
+                </View>
+                {
+                  <TouchableOpacity
+                    style={{
+                      paddingHorizontal: 12,
+                    }}
+                    onPress={async () => {
+                      try {
+                        await addToWantList(product.id);
+                        alert("Added to your want list!");
+                      } catch (e) {
+                        alert("Failed to add to want list.");
                       }
-                    : { padding: 6, margin: 8 },
-                ]}
-              >
-                <Box className="mb-2">
-                  <View>
-                    <Image
-                      source={{ uri: product.cover_url }}
-                      alt={product.id.toString()}
-                      className="h-48 w-full rounded-md"
-                      resizeMode="cover"
-                    />
-                    <View className="mt-2">
-                      <Text numberOfLines={1} className="font-bold">
-                        {product.title}
-                      </Text>
-                      <Text className="text-green-700 font-bold">
-                        {product.formatted_price}
-                      </Text>
-                      <Text numberOfLines={1} className="text-gray-600">
-                        {product.creators}
-                      </Text>
-
-                      <View className="flex-row justify-between items-center mt-1">
-                        {isProductReserved(product) ? (
-                          <View className="bg-green-200 px-3 py-1 rounded">
-                            <Text className="text-green-800">Reserved</Text>
-                          </View>
-                        ) : null}
-                        <View style={{ alignItems: "flex-end" }}>
-                          <Text className="mr-4">
-                            {getQuantityLeft(product) === 0
-                              ? "Out of Stock"
-                              : `${getQuantityLeft(product)} left`}
-                          </Text>
-                          {getQuantityLeft(product) === 0 && (
-                            <TouchableOpacity
-                              style={{
-                                marginTop: 8,
-                                backgroundColor: "#2b64cf",
-                                borderRadius: 4,
-                                paddingVertical: 4,
-                                paddingHorizontal: 12,
-                              }}
-                              onPress={async () => {
-                                try {
-                                  await addToWantList(product.id);
-                                  alert("Added to your want list!");
-                                } catch (e) {
-                                  alert("Failed to add to want list.");
-                                }
-                              }}
-                            >
-                              <Text
-                                style={{ color: "#fff", fontWeight: "bold" }}
-                              >
-                                I want this
-                              </Text>
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </Box>
-              </Pressable>
+                    }}
+                  >
+                    <Text style={{ color: "#1A237E", fontWeight: "bold" }}>
+                      I want this
+                    </Text>
+                  </TouchableOpacity>
+                }
+              </>
             );
           }}
         />

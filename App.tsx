@@ -11,11 +11,13 @@ import { DashboardStack } from "./src/navigation/DashboardStack";
 import { useBoundStore } from "./src/store";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import Constants from "expo-constants";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const store = useBoundStore();
+  console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     store.setOnboardingDone(true);
   }, []);
