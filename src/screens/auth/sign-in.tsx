@@ -51,19 +51,20 @@ export default function SignIn(props: {
                   console.log("data >", res.data);
                   if (res.data) {
                     // Save auth_token using AsyncStorage and update Axios
-                    saveAuthToken(res.data.auth_token);
-                    fetchUserProfile()
-                      .then((res) => {
-                        console.log("profile fetched", res.data);
-                        setUser(res.data);
-                        // @ts-ignore
-                        props.navigation.replace("Dashboard", {
-                          screen: "Home",
+                    saveAuthToken(res.data.auth_token).then(() => {
+                      fetchUserProfile()
+                        .then((res) => {
+                          console.log("profile fetched", res.data);
+                          setUser(res.data);
+                          // @ts-ignore
+                          props.navigation.replace("Dashboard", {
+                            screen: "Home",
+                          });
+                        })
+                        .catch((error) => {
+                          console.log("error ", error);
                         });
-                      })
-                      .catch((error) => {
-                        console.log("error ", error);
-                      });
+                    });
                   }
                 })
                 .catch((error) => {
