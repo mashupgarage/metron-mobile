@@ -2,7 +2,7 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { Dimensions, useColorScheme } from "react-native";
+import { Dimensions, useColorScheme, View } from "react-native";
 import Carousel from "react-native-reanimated-carousel";
 import MasonryList from "@react-native-seoul/masonry-list";
 
@@ -119,7 +119,9 @@ export default function Home() {
               navigation.navigate("Product", { product: item as ProductT });
             }}
           >
-            <ProductCard key={i} isInCart={false} product={item as ProductT} />
+            <View key={i} className="p-2">
+              <ProductCard isInCart={false} product={item as ProductT} />
+            </View>
           </Pressable>
         )}
       />

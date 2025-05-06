@@ -150,22 +150,63 @@ export const fetchProductsByReleaseId = (id: number) => {
 // =========================
 
 /**
- * Add a product to a user's want list.
- * @param productId - The product ID.
- * @returns Axios promise resolving to the updated want list.
+ * Add a product to the authenticated user's want list.
+ * @param productId - The product ID to add to the want list.
+ * @returns Axios promise resolving to the updated want list response.
  * @example
  * addToWantList(123).then(res => res.data)
  */
 export const addToWantList = async (productId: number) => {
-  await axiosClient.post(`/want`, {
-    want_list: {
-      product_id: productId,
-    },
+  await axiosClient.post(`/want_lists`, {
+    product_id: productId,
   });
 };
 
+/**
+ * Fetch the authenticated user's want list.
+ * @returns Axios promise resolving to the user's want list array.
+ * @example
+ * getWantList().then(res => res.data.want_lists)
+ */
+export const getWantList = async () => {
+  return axiosClient.get(`/want_lists`);
+};
+
+/**
+ * Fetch the reservation box (reservations) for a specific user.
+ * @param userId - The user ID whose reservation box to fetch.
+ * @returns Axios promise resolving to the user's reservation list.
+ * @example
+ * getReservationList(123).then(res => res.data)
+ */
+export const getReservationList = async (userId: number) => {
+  return axiosClient.post(`/reservation_box/${userId}/reservations`);
+};
+
+/**
+ * Add a product to the authenticated user's reservations.
+ * @param productId - The product ID to reserve.
+ * @returns Axios promise resolving to the updated reservations list.
+ * @example
+ * addToReservation(123).then(res => res.data)
+ */
 export const addToReservation = (productId: number) => {
   return axiosClient.post(`/reservations`, {
     product_id: productId,
+  });
+};
+
+/**
+ * Fetch the authenticated user's collection (orders).
+ * @param userId - The user ID whose collection to fetch.
+ * @returns Axios promise resolving to the user's collection array.
+ * @example
+ * getMyCollection(123).then(res => res.data)
+ */
+export const getMyCollection = async (userId: number) => {
+  return axiosClient.get(`/orders/collection`, {
+    params: {
+      user_id: userId,
+    },
   });
 };

@@ -1,5 +1,5 @@
 export type UserT = {
-  id: string;
+  id: number;
   email: string;
   contact_number: string;
   branch_name: string;

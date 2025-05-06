@@ -6,8 +6,8 @@ import MasonryList from "@react-native-seoul/masonry-list";
 // @ts-ignore
 import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
+import { useWantListStore } from "@/src/store/slices/WantListSlice";
 import { ProductT } from "@/src/utils/types/common";
-import { Pressable } from "react-native-gesture-handler";
 import { Menu } from "lucide-react-native";
 import DashboardLayout from "./_layout";
 import {
@@ -15,12 +15,12 @@ import {
   fetchProductsByReleaseId,
   fetchReleases,
   addToWantList,
+  getWantList,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
-import { mockReleaseDates } from "@/src/utils/mock";
 import { useNavigation } from "@react-navigation/native";
-import { ProductPreview } from "@/src/components/product-preview";
+import { Pressable } from "react-native";
 
 interface Release {
   id: number;
@@ -33,6 +33,7 @@ interface Release {
 }
 
 export default function ReservationsScreen() {
+  const [wantedProductIds, setWantedProductIds] = useState<number[]>([]);
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
@@ -44,6 +45,18 @@ export default function ReservationsScreen() {
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(
     null
   );
+
+  const incrementWantlistCount = useWantListStore(
+    (state) => state.incrementWantlistCount
+  );
+
+  // Fetch want list on mount
+  useEffect(() => {
+    getWantList().then((res) => {
+      const ids = res.data.want_lists.map((item: any) => item.product_id);
+      setWantedProductIds(ids);
+    });
+  }, []);
 
   // Fetch all release dates from API
   const fetchReleaseDatesFromAPI = async () => {
@@ -348,36 +361,73 @@ export default function ReservationsScreen() {
           contentContainerStyle={{ padding: 12 }}
           renderItem={({ item, i }) => {
             const product = item as ProductT;
+            const isWanted = wantedProductIds.includes(product.id);
             return (
               <>
-                <View className="p-4">
-                  <ProductPreview
-                    product={product}
-                    navigation={navigation}
-                    selectedProducts={selectedProducts}
-                    isProductReserved={isProductReserved}
-                    getQuantityLeft={getQuantityLeft}
-                  />
-                </View>
-                {
-                  <TouchableOpacity
-                    style={{
-                      paddingHorizontal: 12,
+                <View className="p-0">
+                  <Pressable
+                    onPress={() => {
+                      // @ts-ignore
+                      navigation.navigate("Product", {
+                        product: product,
+                      });
                     }}
-                    onPress={async () => {
-                      try {
-                        await addToWantList(product.id);
-                        alert("Added to your want list!");
-                      } catch (e) {
-                        alert("Failed to add to want list.");
-                      }
-                    }}
+                    style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
                   >
-                    <Text style={{ color: "#1A237E", fontWeight: "bold" }}>
-                      I want this
-                    </Text>
-                  </TouchableOpacity>
-                }
+                    <Box className="mb-2">
+                      <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
+                        <Image
+                          source={{ uri: product.cover_url }}
+                          alt={product.id.toString()}
+                          className="h-48 w-full rounded-md"
+                          resizeMode="cover"
+                        />
+                        <View className="mt-2">
+                          <Text numberOfLines={1} className="font-bold">
+                            {product.title}
+                          </Text>
+                          <Text className="text-green-700 font-bold">
+                            {product.formatted_price}
+                          </Text>
+                          <Text numberOfLines={1} className="text-gray-600">
+                            {product.creators}
+                          </Text>
+                        </View>
+                        <View className="flex-row justify-between items-center mt-1">
+                          <View style={{ alignItems: "flex-end" }}>
+                            <Text className="mr-4">
+                              {getQuantityLeft(product) === 0
+                                ? "Out of Stock"
+                                : `${getQuantityLeft(product)} left`}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </Box>
+                  </Pressable>
+                </View>
+                <TouchableOpacity
+                  style={{
+                    paddingHorizontal: 12,
+                    opacity: isWanted ? 0.5 : 1,
+                  }}
+                  disabled={isWanted}
+                  onPress={async () => {
+                    try {
+                      await addToWantList(product.id);
+                      setWantedProductIds([...wantedProductIds, product.id]);
+                      incrementWantlistCount();
+                      alert("Added to your want list!");
+                    } catch (e) {
+                      console.log(e);
+                      alert("Failed to add to want list.");
+                    }
+                  }}
+                >
+                  <Text style={{ color: "#1A237E", fontWeight: "bold" }}>
+                    {isWanted ? "Wanted!" : "I want this"}
+                  </Text>
+                </TouchableOpacity>
               </>
             );
           }}
