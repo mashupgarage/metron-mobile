@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Onboarding from "../screens/dashboard/onboarding";
 import ProductScreen from "../screens/dashboard/product";
+import CGCSubmitScreen from "../screens/dashboard/cgc-submit";
 import { useBoundStore } from "../store";
 import { screenOption } from "../utils/screenOption";
 import DashboardTabs from "./DashboardTabs";
@@ -30,6 +31,11 @@ export function DashboardStack() {
         options={screenOption}
         // @ts-ignore
         component={ProductScreen}
+      />
+      <Stack.Screen
+        name="CGCSubmit"
+        options={screenOption}
+        component={CGCSubmitScreen}
       />
     </Stack.Navigator>
   );
