@@ -10,7 +10,8 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { AuthStackParams } from "@/src/utils/types/navigation";
 import AuthLayout from "./_layout";
 import React from "react";
-import { authenticateUser } from "@/src/api/apiEndpoints";
+import { authenticateUser, fetchUserProfile } from "@/src/api/apiEndpoints";
+import { saveAuthToken, loadAuthTokenToAxios } from "@/src/api/tokenManager";
 import { useBoundStore } from "@/src/store";
 
 export default function SignIn(props: {
@@ -18,7 +19,7 @@ export default function SignIn(props: {
     replace: (arg0: string, arg1: { screen: string }) => void;
   };
 }) {
-  const { setLoading } = useBoundStore();
+  const { setLoading, setUser } = useBoundStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,6 +27,8 @@ export default function SignIn(props: {
 
   useEffect(() => {
     setLoading(false);
+    // Load token from storage to Axios on mount
+    loadAuthTokenToAxios();
   }, []);
 
   return (
@@ -44,10 +47,25 @@ export default function SignIn(props: {
             setTimeout(() => setLoading(false), 2000);
             if (payload.email && payload.password) {
               authenticateUser(payload.email, payload.password)
-                .then((data) => {
-                  console.log("data >", data);
-                  // in this flow, we will store necessary user data in the user store.
-                  // props.navigation.replace("Dashboard");
+                .then((res) => {
+                  console.log("data >", res.data);
+                  if (res.data) {
+                    // Save auth_token using AsyncStorage and update Axios
+                    saveAuthToken(res.data.auth_token).then(() => {
+                      fetchUserProfile()
+                        .then((res) => {
+                          console.log("profile fetched", res.data);
+                          setUser(res.data);
+                          // @ts-ignore
+                          props.navigation.replace("Dashboard", {
+                            screen: "Home",
+                          });
+                        })
+                        .catch((error) => {
+                          console.log("error ", error);
+                        });
+                    });
+                  }
                 })
                 .catch((error) => {
                   console.log("error >", error);

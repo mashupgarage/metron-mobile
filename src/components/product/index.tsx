@@ -3,6 +3,7 @@ import { FC } from "react";
 import { Box } from "../ui/box";
 import { Image } from "../ui/image";
 import { Text } from "../ui/text";
+import { View } from "react-native";
 
 interface ProductCardProps {
   product: ProductT;
@@ -10,23 +11,42 @@ interface ProductCardProps {
 }
 
 const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
+  const { product } = data;
+
+  const getQuantityLeft = (product: ProductT) => {
+    return product.quantity || 0;
+  };
+
   return (
-    <Box className="">
-      <Image
-        source={{ uri: data.product.cover_url }}
-        alt={data.product.id.toString()}
-        className="h-72 w-80 rounded-md"
-      />
-      <Box className="mt-2 ml-2 mr-2">
-        <Box>
-          <Text isTruncated className="font-bold line-clamp-1">
-            {data.product.title}
+    <Box className="mb-2">
+      <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
+        <Image
+          source={{ uri: product.cover_url }}
+          alt={product.id.toString()}
+          className="h-48 w-full rounded-md"
+          resizeMode="cover"
+        />
+        <View className="mt-2">
+          <Text numberOfLines={1} className="font-bold">
+            {product.title}
           </Text>
-        </Box>
-        <Box className="text-sm font-bold">
-          <Text>{data.product.formatted_price}</Text>
-        </Box>
-      </Box>
+          <Text className="text-green-700 font-bold">
+            {product.formatted_price}
+          </Text>
+          <Text numberOfLines={1} className="text-gray-600">
+            {product.creators}
+          </Text>
+        </View>
+        <View className="flex-row justify-between items-center mt-1">
+          <View style={{ alignItems: "flex-end" }}>
+            <Text className="mr-4">
+              {getQuantityLeft(product) === 0
+                ? "Out of Stock"
+                : `${getQuantityLeft(product)} left`}
+            </Text>
+          </View>
+        </View>
+      </View>
     </Box>
   );
 };

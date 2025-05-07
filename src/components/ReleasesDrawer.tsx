@@ -11,6 +11,7 @@ import { Text } from "./ui/text";
 import { X } from "lucide-react-native";
 
 interface ReleaseDate {
+  id: number;
   date: string;
   count: number;
 }
@@ -18,14 +19,16 @@ interface ReleaseDate {
 interface ReleasesDrawerProps {
   visible: boolean;
   releaseDates: ReleaseDate[];
+  selectedReleaseId: number | null;
   onClose: () => void;
-  onSelectDate: (date: string) => void;
+  onSelectDate: (id: number, date: string) => void;
   onShowAllReleases: () => void;
 }
 
 const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
   visible,
   releaseDates,
+  selectedReleaseId,
   onClose,
   onSelectDate,
   onShowAllReleases,
@@ -86,10 +89,13 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
 
             {releaseDates.map((item, index) => (
               <TouchableOpacity
-                key={index}
-                style={styles.drawerItem}
+                key={item.id}
+                style={[
+                  styles.drawerItem,
+                  item.id === selectedReleaseId && styles.selectedDrawerItem
+                ]}
                 onPress={() => {
-                  onSelectDate(item.date);
+                  onSelectDate(item.id, item.date);
                 }}
               >
                 <Text style={styles.drawerItemText}>{item.date}</Text>
@@ -97,7 +103,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   <Text style={styles.drawerBadgeText}>{item.count}</Text>
                 </View>
               </TouchableOpacity>
-            ))}
+            ))} 
           </ScrollView>
         </SafeAreaView>
       </Animated.View>
@@ -106,6 +112,9 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
 };
 
 const styles = StyleSheet.create({
+  selectedDrawerItem: {
+    backgroundColor: "#e0ebfa",
+  },
   overlay: {
     position: "absolute",
     top: 0,

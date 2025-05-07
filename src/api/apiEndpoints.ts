@@ -25,7 +25,7 @@ export const searchProduct = (query: string) => {
  * fetchProducts().then(res => res.data)
  */
 export const fetchProducts = () => {
-  return axiosClient.get("/products");
+  return axiosClient.get("/marketplace/catalog_products");
 };
 
 // =========================
@@ -48,11 +48,10 @@ export const authenticateUser = async (email: string, password: string) => {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
-        Authorization: `Bearer ${constants.expoConfig?.extra?.sessionToken}`,
       },
     });
 
-    const response = await authClient.post("/users/sign_in", {
+    const response = await authClient.post("/api/v1/login", {
       email: email,
       password: password,
       remember_me: 0,
@@ -61,10 +60,8 @@ export const authenticateUser = async (email: string, password: string) => {
     return response;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const errorMessage =
-        error.response?.data?.error || "Authentication failed";
       console.error("Authentication error:", error);
-      throw new Error(errorMessage);
+      throw new Error(error.response?.data?.error || "Authentication failed");
     }
     throw error;
   }
@@ -146,4 +143,77 @@ export const fetchReleaseById = (id: number) => {
  */
 export const fetchProductsByReleaseId = (id: number) => {
   return axiosClient.get(`/releases/${id}/products`);
+};
+
+// =========================
+// Product-related Endpoints
+// =========================
+
+/**
+ * Add a product to the authenticated user's want list.
+ * @param productId - The product ID to add to the want list.
+ * @returns Axios promise resolving to the updated want list response.
+ * @example
+ * addToWantList(123).then(res => res.data)
+ */
+export const addToWantList = async (productId: number) => {
+  await axiosClient.post(`/want_lists`, {
+    product_id: productId,
+  });
+};
+
+/**
+ * Fetch the authenticated user's want list.
+ * @returns Axios promise resolving to the user's want list array.
+ * @example
+ * getWantList().then(res => res.data.want_lists)
+ */
+export const getWantList = async () => {
+  return axiosClient.get(`/want_lists`);
+};
+
+/**
+ * Fetch the reservation box (reservations) for a specific user.
+ * @param userId - The user ID whose reservation box to fetch.
+ * @returns Axios promise resolving to the user's reservation list.
+ * @example
+ * getReservationList(123).then(res => res.data)
+ */
+export const getReservationList = async (userId: number) => {
+  return axiosClient.post(`/reservation_box/${userId}/reservations`);
+};
+
+/**
+ * Add a product to the authenticated user's reservations.
+ * @param productId - The product ID to reserve.
+ * @returns Axios promise resolving to the updated reservations list.
+ * @example
+ * addToReservation(123).then(res => res.data)
+ */
+export const addToReservation = (
+  productId: number,
+  quantity: number,
+  reservation_id: number
+) => {
+  return axiosClient.post(`/reservation_lists/${reservation_id}/reservations`, {
+    reservation: {
+      product_id: productId,
+      quantity: quantity,
+    },
+  });
+};
+
+/**
+ * Fetch the authenticated user's collection (orders).
+ * @param userId - The user ID whose collection to fetch.
+ * @returns Axios promise resolving to the user's collection array.
+ * @example
+ * getMyCollection(123).then(res => res.data)
+ */
+export const getMyCollection = async (userId: number) => {
+  return axiosClient.get(`/orders/collection`, {
+    params: {
+      user_id: userId,
+    },
+  });
 };
