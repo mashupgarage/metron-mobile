@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import "./global.css";
-
+import { useFonts } from 'expo-font';
+import { InterFonts } from './src/assets/fonts';
 import { useColorScheme } from "react-native";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import { View } from "react-native";
@@ -18,11 +19,18 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const store = useBoundStore();
+  const [fontsLoaded] = useFonts(InterFonts);
   console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     loadAuthTokenToAxios();
     store.setOnboardingDone(true);
   }, []);
+
+  if (!fontsLoaded) {
+    // Optionally, render a splash screen or loader
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       <View
@@ -35,7 +43,15 @@ export default function App() {
           justifyContent: "center",
         }}
       >
-        <GluestackUIProvider mode="system">
+        <GluestackUIProvider mode="system" config={{
+          theme: {
+            fonts: {
+              body: 'Inter-Regular',
+              heading: 'Inter-Bold',
+              mono: 'Inter-Light',
+            },
+          },
+        }}>
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen
