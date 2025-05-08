@@ -8,8 +8,9 @@ import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
 import { ProductT } from "@/src/utils/types/common";
-import { Menu } from "lucide-react-native";
+import { ClipboardCheck, Menu } from "lucide-react-native";
 import DashboardLayout from "./_layout";
+import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 import {
   fetchProducts,
   fetchProductsByReleaseId,
@@ -17,6 +18,7 @@ import {
   addToWantList,
   getWantList,
   getReservationList,
+  addToReservation,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
@@ -36,13 +38,19 @@ interface Release {
 
 export default function ReservationsScreen() {
   const store = useBoundStore();
+  const toast = useToast();
   const [wantedProductIds, setWantedProductIds] = useState<number[]>([]);
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
+  // List of product IDs that are already reserved
+  const reservedProductIds = products
+    .filter((p) => p.meta_attributes?.reserved)
+    .map((p) => p.id);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false); // NEW
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(
@@ -173,28 +181,55 @@ export default function ReservationsScreen() {
       }
     });
   };
-
-  const confirmReservation = () => {
-    if (selectedProducts.length === 0) return;
-
-    // Update the reserved status for selected products
-    setProducts((prev) =>
-      prev.map((product) => {
-        if (selectedProducts.includes(product.id)) {
-          return {
-            ...product,
-            meta_attributes: {
-              ...product.meta_attributes,
-              reserved: true,
-            },
-          };
-        }
-        return product;
-      })
-    );
-
-    // Clear selections after reservation
+  const exitMultiSelectMode = () => {
+    setIsMultiSelectMode(false);
     setSelectedProducts([]);
+  };
+
+  const confirmReservation = async () => {
+    if (selectedProducts.length === 0) return;
+    try {
+      // Save all selected products to reservation (parallel)
+      await Promise.all(
+        selectedProducts.map((productId) =>
+          addToReservation(productId, 1, selectedReleaseId)
+        )
+      );
+      setProducts((prev) =>
+        prev.map((product) => {
+          if (selectedProducts.includes(product.id)) {
+            return {
+              ...product,
+              meta_attributes: {
+                ...product.meta_attributes,
+                reserved: true,
+              },
+            };
+          }
+          return product;
+        })
+      );
+      setIsMultiSelectMode(false);
+      setSelectedProducts([]);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="success">
+            <ToastTitle>Reserved successfully!</ToastTitle>
+          </Toast>
+        ),
+      });
+    } catch (e) {
+      console.log(e);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Failed to reserve products.</ToastTitle>
+          </Toast>
+        ),
+      });
+    }
   };
 
   const isProductReserved = (product: ProductT) => {
@@ -230,7 +265,7 @@ export default function ReservationsScreen() {
 
   return (
     <DashboardLayout>
-      <Box className="h-screen w-full pb-24">
+      <Box className="h-screen w-full">
         <ReleasesDrawer
           visible={showDrawer}
           releaseDates={releaseDates
@@ -245,7 +280,93 @@ export default function ReservationsScreen() {
           onSelectDate={handleSelectDate}
           onShowAllReleases={clearFilters}
         />
-
+        <View className="ml-4 mr-4">
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="font-bold text-lg">
+              {formatDateHuman(selectedDate)}
+            </Text>
+            <View className="flex-row items-center">
+              <TouchableOpacity
+                onPress={() => {
+                  if (isMultiSelectMode) {
+                    setIsMultiSelectMode(false);
+                    setSelectedProducts([]);
+                  } else {
+                    setIsMultiSelectMode(true);
+                  }
+                }}
+              >
+                <Text className="mr-4">
+                  {isMultiSelectMode ? (
+                    "Cancel"
+                  ) : (
+                    <ClipboardCheck size={24} color="#333" />
+                  )}
+                </Text>
+              </TouchableOpacity>
+              <>
+                {selectedProducts.length > 0 && (
+                  <Pressable onPress={confirmReservation}>
+                    <Text className="font-bold">
+                      Confirm ({selectedProducts.length})
+                    </Text>
+                  </Pressable>
+                )}
+              </>
+              <TouchableOpacity onPress={toggleDrawer} className="p-2">
+                <Menu size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Text className="mb-2 text-sm">
+            {(() => {
+              const selectedRelease = releaseDates.find(
+                (item) => item.id === selectedReleaseId
+              );
+              return selectedRelease ? selectedRelease.title : "";
+            })()}
+          </Text>
+          {/* Highlighted message for past releases */}
+          {(() => {
+            const latest = getLatestRelease(releaseDates);
+            if (
+              latest &&
+              selectedReleaseId &&
+              selectedReleaseId !== latest.id
+            ) {
+              return (
+                <View
+                  style={{
+                    backgroundColor: "#FFF7D6",
+                    borderRadius: 6,
+                    padding: 10,
+                    marginBottom: 10,
+                    borderWidth: 1,
+                    borderColor: "#FFE29C",
+                  }}
+                >
+                  <Text style={{ color: "#7A5C00" }}>
+                    This is a past release. To browse the current release,{" "}
+                    <Text
+                      style={{ fontWeight: "bold", color: "#1A237E" }}
+                      onPress={() => {
+                        const latest = getLatestRelease(releaseDates);
+                        if (latest) {
+                          setSelectedReleaseId(latest.id);
+                          setSelectedDate(latest.release_date);
+                          loadProductsByRelease(latest.id);
+                        }
+                      }}
+                    >
+                      press here.
+                    </Text>
+                  </Text>
+                </View>
+              );
+            }
+            return null;
+          })()}
+        </View>
         <MasonryList
           data={products}
           scrollEnabled
@@ -271,78 +392,6 @@ export default function ReservationsScreen() {
               </View>
             )
           }
-          ListHeaderComponent={
-            <View className="ml-4 mr-4">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="font-bold text-lg">
-                  {formatDateHuman(selectedDate)}
-                </Text>
-                <TouchableOpacity onPress={toggleDrawer} className="p-2">
-                  <Menu size={24} color="#333" />
-                </TouchableOpacity>
-              </View>
-              <Text className="mb-2 text-sm">
-                {(() => {
-                  const selectedRelease = releaseDates.find(
-                    (item) => item.id === selectedReleaseId
-                  );
-                  return selectedRelease ? selectedRelease.title : "";
-                })()}
-              </Text>
-              {/* Highlighted message for past releases */}
-              {(() => {
-                const latest = getLatestRelease(releaseDates);
-                if (
-                  latest &&
-                  selectedReleaseId &&
-                  selectedReleaseId !== latest.id
-                ) {
-                  return (
-                    <View
-                      style={{
-                        backgroundColor: "#FFF7D6",
-                        borderRadius: 6,
-                        padding: 10,
-                        marginBottom: 10,
-                        borderWidth: 1,
-                        borderColor: "#FFE29C",
-                      }}
-                    >
-                      <Text style={{ color: "#7A5C00" }}>
-                        This is a past release. To browse the current release,{" "}
-                        <Text
-                          style={{ fontWeight: "bold", color: "#1A237E" }}
-                          onPress={() => {
-                            const latest = getLatestRelease(releaseDates);
-                            if (latest) {
-                              setSelectedReleaseId(latest.id);
-                              setSelectedDate(latest.release_date);
-                              loadProductsByRelease(latest.id);
-                            }
-                          }}
-                        >
-                          press here.
-                        </Text>
-                      </Text>
-                    </View>
-                  );
-                }
-                return null;
-              })()}
-              <View className="flex-row items-center justify-between mb-4">
-                {selectedProducts.length > 0 && (
-                  <TouchableOpacity
-                    onPress={confirmReservation}
-                    className="bg-blue-900 py-2 px-4 rounded-md"
-                  >
-                    <Text className="text-white font-bold">
-                      Reserve ({selectedProducts.length})
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          }
           LoadingView={
             <>
               <Image
@@ -359,28 +408,60 @@ export default function ReservationsScreen() {
           }
           numColumns={2}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ padding: 12 }}
+          contentContainerStyle={{
+            padding: 12,
+          }}
           renderItem={({ item, i }) => {
             const product = item as ProductT;
             const isWanted = wantedProductIds.includes(product.id);
+            const isSelected = selectedProducts.includes(product.id);
             return (
               <>
-                <View className="p-0">
+                <View
+                  className="p-0 m-1"
+                  style={
+                    isMultiSelectMode && isSelected
+                      ? {
+                          borderWidth: 1,
+                          borderColor: "#1976D2",
+                          borderRadius: 4,
+                        }
+                      : {}
+                  }
+                >
                   <Pressable
                     onPress={() => {
-                      // Fetch reservation list and navigate to Product
-                      getReservationList(store.user?.id).then((res) => {
-                        const reservationList = res.data.reservations;
-                        // @ts-ignore
-                        navigation.navigate("Product", {
-                          product: product,
-                          fromReservations: true,
-                          reservationId: selectedReleaseId,
-                          reservationList,
+                      if (isMultiSelectMode) {
+                        if (!reservedProductIds.includes(product.id)) {
+                          toggleProductSelection(product.id);
+                        }
+                      } else {
+                        getReservationList(store.user?.id).then((res) => {
+                          const reservationList = res.data.reservations;
+                          // @ts-ignore
+                          navigation.navigate("Product", {
+                            product: product,
+                            fromReservations: true,
+                            reservationId: selectedReleaseId,
+                            reservationList,
+                          });
                         });
-                      });
+                      }
                     }}
-                    style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}
+                    style={({ pressed }) => [
+                      { opacity: pressed ? 0.7 : 1 },
+                      isMultiSelectMode &&
+                      reservedProductIds.includes(product.id)
+                        ? { opacity: 0.4 }
+                        : {},
+                      isMultiSelectMode && isSelected
+                        ? {
+                            borderWidth: 4,
+                            borderColor: "#1976D2",
+                            borderRadius: 12,
+                          }
+                        : {},
+                    ]}
                   >
                     <Box className="mb-2">
                       <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
@@ -389,6 +470,15 @@ export default function ReservationsScreen() {
                           alt={product.id.toString()}
                           className="h-48 w-full rounded-md"
                           resizeMode="cover"
+                          style={
+                            isMultiSelectMode && isSelected
+                              ? {
+                                  borderWidth: 2,
+                                  borderColor: "#1A237E",
+                                  borderRadius: 8,
+                                }
+                              : {}
+                          }
                         />
                         <View className="mt-2">
                           <Text numberOfLines={1} className="font-bold">
@@ -402,13 +492,7 @@ export default function ReservationsScreen() {
                           </Text>
                         </View>
                         <View className="flex-row justify-between items-center mt-1">
-                          <View style={{ alignItems: "flex-end" }}>
-                            <Text className="mr-4">
-                              {getQuantityLeft(product) === 0
-                                ? "Out of Stock"
-                                : `${getQuantityLeft(product)} left`}
-                            </Text>
-                          </View>
+                          <View style={{ alignItems: "flex-end" }}></View>
                         </View>
                       </View>
                     </Box>
@@ -440,6 +524,7 @@ export default function ReservationsScreen() {
             );
           }}
         />
+        <Box className="h-40" />
       </Box>
     </DashboardLayout>
   );

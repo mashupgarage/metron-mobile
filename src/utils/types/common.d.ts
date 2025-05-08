@@ -38,6 +38,19 @@ export type SeriesT = {
   subtitle: string | null;
 };
 
+export type CartItemT = {
+  id: number; // cart item id
+  product_id: number;
+  product_item_id: number;
+  product: ProductT;
+  product_item: any; // You can define a more specific type if needed
+  price: string | null;
+  product_title: string;
+  user_id: number;
+  reservation?: any;
+  reservation_id?: number | null;
+};
+
 export type ProductT = {
   id: number;
   title: string;

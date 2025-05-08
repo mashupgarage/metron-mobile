@@ -18,6 +18,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const store = useBoundStore();
+
   console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     loadAuthTokenToAxios();
