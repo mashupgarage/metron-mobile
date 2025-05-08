@@ -3,7 +3,7 @@ import { useBoundStore } from "@/src/store";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ProductT } from "@/src/utils/types/common";
+import { ProductT, CartItemT } from "@/src/utils/types/common";
 import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import {
@@ -13,27 +13,40 @@ import {
   CheckIcon,
 } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Checkbox,
   CheckboxIndicator,
   CheckboxIcon as CheckboxIconComponent,
 } from "@/src/components/ui/checkbox";
+import {
+  fetchCartItems,
+  addToCart,
+  removeFromCart,
+} from "@/src/api/apiEndpoints";
 
 export default function Cart() {
   const store = useBoundStore();
   const navigation = useNavigation();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
-  const groupedCartItems = store.cartItems.reduce((acc, item) => {
-    const existingItem = acc.find((i) => i.id === item.id);
-    if (existingItem) {
-      existingItem.cartQuantity += 1;
-    } else {
-      acc.push({ ...item, cartQuantity: 1 });
-    }
-    return acc;
-  }, [] as (ProductT & { cartQuantity: number })[]);
+  useEffect(() => {
+    console.log("fetching cart....", store.cartItems);
+    fetchCartItems(store.user.id)
+      .then((res) => {
+        console.log("cart items", res.data);
+        store.setCartItems(res.data);
+      })
+      .catch((err) => {
+        console.log("cart items error", err);
+      });
+  }, []);
+
+  // Each cart item from the backend is already unique, so just add cartQuantity = 1 for each
+  const groupedCartItems = (store.cartItems as CartItemT[]).map((item) => ({
+    ...item,
+    cartQuantity: 1,
+  }));
 
   const toggleItemSelection = (itemId: number) => {
     setSelectedItems((prevSelectedItems) => {
@@ -47,20 +60,58 @@ export default function Cart() {
     });
   };
 
-  const handleRemoveCompletely = (productId: number) => {
-    store.removeAllOfItemFromCart(productId);
-    setSelectedItems((prevSelectedItems) => {
-      const newSelectedItems = new Set(prevSelectedItems);
-      newSelectedItems.delete(productId);
-      return newSelectedItems;
-    });
+  const handleRemoveCompletely = async (cartItemId: number) => {
+    if (!store.user || !store.user.id) {
+      alert("You must be logged in to remove items from the cart.");
+      navigation.navigate("Auth" as never);
+      return;
+    }
+    try {
+      await removeFromCart(store.user.id, cartItemId);
+      const res = await fetchCartItems(store.user.id);
+      if (res?.data) {
+        store.setCartItems(res.data);
+      }
+      setSelectedItems((prevSelectedItems) => {
+        const newSelectedItems = new Set(prevSelectedItems);
+        newSelectedItems.delete(cartItemId);
+        return newSelectedItems;
+      });
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+      alert("Failed to remove item from cart. Please try again.");
+    }
   };
 
-  const handleIncrease = (item: ProductT) => {
-    store.increaseItemQuantity(item.id);
+  const [addingProductId, setAddingProductId] = useState<number | null>(null);
+
+  const handleIncrease = async (item: CartItemT) => {
+    if (!store.user) {
+      alert("You must be logged in to add items to the cart.");
+      navigation.navigate("Auth" as never);
+      return;
+    }
+    if (!item.product_item_id) {
+      alert("Missing product item ID. Please try again.");
+      return;
+    }
+    setAddingProductId(item.id);
+    try {
+      const res = await addToCart(store.user.id, item.id, item.product_item_id);
+      // Assuming API returns the updated cart items array
+      if (res?.data) {
+        store.setCartItems(res.data);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      alert("Failed to add item to cart. Please try again.");
+    } finally {
+      setAddingProductId(null);
+    }
   };
 
-  const handleDecrease = (item: ProductT) => {
+  const handleDecrease = (item: CartItemT) => {
+    // TODO: Update to use API endpoint for decreasing/removing from cart
     store.decreaseItemQuantity(item.id);
   };
 
@@ -90,11 +141,11 @@ export default function Cart() {
   const renderItem = ({
     item,
   }: {
-    item: ProductT & { cartQuantity: number };
+    item: CartItemT & { cartQuantity: number };
   }) => (
     <Box className="flex-row items-center p-2 border-b border-gray-200">
       <Checkbox
-        aria-label={`Select item ${item.title}`}
+        aria-label={`Select item ${item.product.title}`}
         value={item.id.toString()}
         isChecked={selectedItems.has(item.id)}
         onChange={() => toggleItemSelection(item.id)}
@@ -105,34 +156,18 @@ export default function Cart() {
         </CheckboxIndicator>
 
         <Image
-          source={{ uri: item.cover_url_large }}
+          source={{ uri: item.product.cover_url_large }}
           className="w-16 h-24 mr-2"
-          alt={item.title}
+          alt={item.product.title}
         />
-        <View style={{ flex: 1 }}>
-          <Text className="font-semibold">{item.title}</Text>
-          <Text>Price: {item.formatted_price}</Text>
-          <Box className="flex-row items-center mt-1">
-            <Text>Quantity: </Text>
-            <Button
-              variant="link"
-              size="md"
-              className="p-1"
-              onPress={() => handleDecrease(item)}
-            >
-              <MinusCircle size={20} color="gray" />
-            </Button>
-            <Text className="mx-2 w-6 text-center">{item.cartQuantity}</Text>
-            <Button
-              variant="link"
-              size="md"
-              className="p-1"
-              onPress={() => handleIncrease(item)}
-              disabled={item.cartQuantity >= (item.quantity ?? 0)}
-            >
-              <PlusCircle size={20} color={"gray"} />
-            </Button>
-          </Box>
+        <View style={{ flex: 1, marginTop: 24 }}>
+          <Text className="font-semibold">{item.product.title}</Text>
+          <Text>NM: {item.product_item_id}</Text>
+          <Text>
+            Price:{" "}
+            {item.product.formatted_price ||
+              "₱" + Number(item.price).toFixed(2)}
+          </Text>
         </View>
         <Button
           size="xs"
@@ -160,7 +195,7 @@ export default function Cart() {
         ) : (
           <FlatList
             data={groupedCartItems}
-            renderItem={renderItem}
+            renderItem={({ item }) => renderItem({ item })}
             keyExtractor={(item) => item.id.toString()}
             style={styles.list}
             contentContainerStyle={{ paddingBottom: 96 }} // add space for footer

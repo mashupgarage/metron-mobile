@@ -129,10 +129,7 @@ export default function Profile(props: { navigation: any }) {
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => {
-              // console.log("display user data", store.user);
-              getReservationList(store.user?.id).then((res) => {
-                console.log("reservation list", res.data.reservations);
-              });
+              props.navigation.navigate("ReservationBoxScreen");
             }}
           >
             <Ionicons name="cube-outline" size={24} color="#4285F4" />
@@ -140,15 +137,11 @@ export default function Profile(props: { navigation: any }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={async () => {
-              console.log("clicked");
-              getWantList().then((res) => {
-                // handle want list display
-                console.log("want list", res.data.want_lists.length);
-              });
+            onPress={() => {
+              props.navigation.navigate("WantlistScreen");
             }}
           >
-            <Ionicons name="cube-outline" size={24} color="#4285F4" />
+            <Ionicons name="list-outline" size={24} color="#4285F4" />
             <Text style={styles.actionText}>Wantlist</Text>
           </TouchableOpacity>
           <TouchableOpacity

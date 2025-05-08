@@ -13,10 +13,6 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
   const { product } = data;
 
-  const getQuantityLeft = (product: ProductT) => {
-    return product.quantity || 0;
-  };
-
   return (
     <Box className="mb-2">
       <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
@@ -38,13 +34,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
           </Text>
         </View>
         <View className="flex-row justify-between items-center mt-1">
-          <View style={{ alignItems: "flex-end" }}>
-            <Text className="mr-4">
-              {getQuantityLeft(product) === 0
-                ? "Out of Stock"
-                : `${getQuantityLeft(product)} left`}
-            </Text>
-          </View>
+          <View style={{ alignItems: "flex-end" }}></View>
         </View>
       </View>
     </Box>

@@ -38,6 +38,19 @@ export type SeriesT = {
   subtitle: string | null;
 };
 
+export type CartItemT = {
+  id: number; // cart item id
+  product_id: number;
+  product_item_id: number;
+  product: ProductT;
+  product_item: any; // You can define a more specific type if needed
+  price: string | null;
+  product_title: string;
+  user_id: number;
+  reservation?: any;
+  reservation_id?: number | null;
+};
+
 export type ProductT = {
   id: number;
   title: string;
@@ -69,4 +82,51 @@ export type CreatorT = {
   id: string;
   name: string;
   avatar: string;
+};
+
+// New types for WantList and ReservationBox
+export type WantListItemT = {
+  id: number;
+  product_id: number;
+  user_id: number;
+  fulfilled?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  product?: {
+    id: number;
+    title: string;
+    cover_price?: string;
+    price?: string;
+    formatted_price?: string;
+    creators?: string;
+    cover_file_name?: string;
+    cover_content_type?: "image/jpeg";
+    cover_file_size?: number;
+    cover_updated_at?: string;
+    description?: string;
+    issue_number?: string;
+  };
+};
+
+export type ReservationItemT = {
+  id: number;
+  product_id: number;
+  quantity: number;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+  product?: {
+    id: number;
+    title: string;
+    cover_price?: string;
+    price?: string;
+    formatted_price?: string;
+    creators?: string;
+    cover_file_name?: string;
+    cover_content_type?: "image/jpeg";
+    cover_file_size?: number;
+    cover_updated_at?: string;
+    description?: string;
+    issue_number?: string;
+  };
 };

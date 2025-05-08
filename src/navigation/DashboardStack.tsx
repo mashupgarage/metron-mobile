@@ -2,6 +2,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Onboarding from "../screens/dashboard/onboarding";
 import ProductScreen from "../screens/dashboard/product";
+import WantlistScreen from "../screens/dashboard/wantlist/WantlistScreen";
+import ReservationBoxScreen from "../screens/dashboard/reservationBox/ReservationBoxScreen";
 import CGCSubmitScreen from "../screens/dashboard/cgc-submit";
 import { useBoundStore } from "../store";
 import { screenOption } from "../utils/screenOption";
@@ -31,6 +33,16 @@ export function DashboardStack() {
         options={screenOption}
         // @ts-ignore
         component={ProductScreen}
+      />
+      <Stack.Screen
+        name="WantlistScreen"
+        options={{ headerShown: false, title: "My Want List" }}
+        component={WantlistScreen}
+      />
+      <Stack.Screen
+        name="ReservationBoxScreen"
+        options={{ headerShown: false, title: "Reservation Box" }}
+        component={ReservationBoxScreen}
       />
       <Stack.Screen
         name="CGCSubmit"

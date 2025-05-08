@@ -12,5 +12,6 @@ export interface DashboardStackParams {
   SignIn: undefined;
   SignUp: undefined;
   Product: { product: Product };
+  Wantlist: undefined;
   CGCSubmit: undefined;
 }
