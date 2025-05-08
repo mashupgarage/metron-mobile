@@ -70,3 +70,50 @@ export type CreatorT = {
   name: string;
   avatar: string;
 };
+
+// New types for WantList and ReservationBox
+export type WantListItemT = {
+  id: number;
+  product_id: number;
+  user_id: number;
+  fulfilled?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  product?: {
+    id: number;
+    title: string;
+    cover_price?: string;
+    price?: string;
+    formatted_price?: string;
+    creators?: string;
+    cover_file_name?: string;
+    cover_content_type?: "image/jpeg";
+    cover_file_size?: number;
+    cover_updated_at?: string;
+    description?: string;
+    issue_number?: string;
+  };
+};
+
+export type ReservationItemT = {
+  id: number;
+  product_id: number;
+  quantity: number;
+  status: string;
+  created_at?: string;
+  updated_at?: string;
+  product?: {
+    id: number;
+    title: string;
+    cover_price?: string;
+    price?: string;
+    formatted_price?: string;
+    creators?: string;
+    cover_file_name?: string;
+    cover_content_type?: "image/jpeg";
+    cover_file_size?: number;
+    cover_updated_at?: string;
+    description?: string;
+    issue_number?: string;
+  };
+};
