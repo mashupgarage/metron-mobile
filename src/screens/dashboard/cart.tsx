@@ -164,7 +164,9 @@ export default function Cart() {
           <Text className="font-semibold">{item.product.title}</Text>
           <Text>NM: {item.product_item_id}</Text>
           <Text>
-            Price: {item.product.formatted_price || "₱" + item.price.toFixed(2)}
+            Price:{" "}
+            {item.product.formatted_price ||
+              "₱" + Number(item.price).toFixed(2)}
           </Text>
         </View>
         <Button
