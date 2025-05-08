@@ -1,7 +1,7 @@
 /**
  * Represents the global state slice.
  */
-import { ProductT } from "@/src/utils/types/common";
+import { ProductT, CartItemT } from "@/src/utils/types/common";
 import { StateCreator } from "zustand";
 
 /**
@@ -11,10 +11,10 @@ import { StateCreator } from "zustand";
 export type GlobalSlice = {
   isLoading: boolean;
   cartCount: number;
-  cartItems: ProductT[];
+  cartItems: CartItemT[];
   setLoading: (value: boolean) => void;
   setCartCount: (value: number) => void;
-  setCartItems: (value: ProductT[]) => void;
+  setCartItems: (value: CartItemT[]) => void;
   decreaseItemQuantity: (productId: number) => void;
   increaseItemQuantity: (productId: number) => void;
   removeAllOfItemFromCart: (productId: number) => void;
@@ -26,7 +26,7 @@ export const createGlobalSlice: StateCreator<GlobalSlice> = (set, get) => ({
   cartItems: [],
   setLoading: (value: boolean) => set(() => ({ isLoading: value })),
   setCartCount: (value: number) => set(() => ({ cartCount: value })),
-  setCartItems: (value: ProductT[]) =>
+  setCartItems: (value: CartItemT[]) =>
     set(() => ({
       cartItems: value,
       cartCount: value.length,
@@ -62,7 +62,7 @@ export const createGlobalSlice: StateCreator<GlobalSlice> = (set, get) => ({
       (item) => item.id === productId
     ).length;
 
-    if ((productToAdd.quantity ?? 0) > currentQuantityInCart) {
+    if ((productToAdd.product?.quantity ?? 0) > currentQuantityInCart) {
       const newItems = [...currentItems, productToAdd];
       set({ cartItems: newItems, cartCount: newItems.length });
     } else {

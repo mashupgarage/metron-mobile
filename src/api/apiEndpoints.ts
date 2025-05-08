@@ -18,6 +18,10 @@ export const searchProduct = (query: string) => {
   return axiosClient.get(`/products/search`, { params: { q: query } });
 };
 
+export const fetchProductDetails = (id: number) => {
+  return axiosClient.get(`/products/${id}`);
+};
+
 /**
  * Fetch all available products in the system.
  * @returns Axios promise resolving to an array of all products.
@@ -106,6 +110,14 @@ export const addToCart = (
     product_id: productId,
     product_item_id: product_item_id,
   });
+};
+
+export const removeFromCart = (userId: UserT["id"], cartItemId: number) => {
+  return axiosClient.delete(`/users/${userId}/cart_items/${cartItemId}`);
+};
+
+export const getCartItems = (userId: UserT["id"]) => {
+  return axiosClient.get(`/users/${userId}/cart_items`);
 };
 
 // =========================

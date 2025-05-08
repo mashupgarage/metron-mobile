@@ -20,6 +20,9 @@ import {
   addToReservation,
   addToWantList,
   getWantList,
+  addToCart,
+  fetchCartItems,
+  fetchProductDetails,
 } from "@/src/api/apiEndpoints";
 
 export default function Product(props: {
@@ -46,17 +49,49 @@ export default function Product(props: {
     ? localReservationList.some((r) => r.product?.id === product.id)
     : false;
 
+  const [productItems, setProductItems] = React.useState<any[]>([]);
+  const [selectedProductItemId, setSelectedProductItemId] = React.useState<
+    number | null
+  >(null);
   const [quantity, setQuantity] = React.useState(1);
   const [quantityError, setQuantityError] = React.useState(false);
 
-  // Helper to check if quantity is valid
-  const isQuantityValid = quantity >= 1 && quantity <= product.quantity;
+  // Only count available NM items for cart logic
+  const availableNMItems = productItems.filter(
+    (item) => item.available && item.condition === "NM"
+  );
+  const maxQuantity = availableNMItems.length;
+  const isQuantityValid = quantity >= 1 && quantity <= maxQuantity;
 
   const store = useBoundStore();
   const navigation = useNavigation();
   const toast = useToast();
-
   const [isWanted, setIsWanted] = React.useState(false);
+
+  React.useEffect(() => {
+    // Fetch product details to get normalized_product_items
+    fetchProductDetails(product.id)
+      .then((res) => {
+        const details = res.data;
+        // Flatten all product items from normalized_product_items
+        let items: any[] = [];
+        if (details.normalized_product_items) {
+          Object.values(details.normalized_product_items).forEach(
+            (arr: any) => {
+              items = items.concat(arr);
+            }
+          );
+        }
+        setProductItems(items);
+        // Pick the first available item as default
+        const firstAvailable = items.find((item) => item.available);
+        setSelectedProductItemId(firstAvailable ? firstAvailable.id : null);
+      })
+      .catch(() => {
+        setProductItems([]);
+        setSelectedProductItemId(null);
+      });
+  }, [product.id]);
 
   React.useEffect(() => {
     getWantList()
@@ -67,18 +102,53 @@ export default function Product(props: {
       .catch(() => setIsWanted(false));
   }, [product.id]);
 
-  const handleAddToCart = () => {
-    if (product && (product.quantity ?? 0) > 0) {
-      const currentCartItems = store.cartItems;
-      // Add the selected quantity to cart
-      let newCartItems = [...currentCartItems];
+  const handleAddToCart = async () => {
+    if (!store.user || !store.user.id) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>You need to be logged in to add to cart.</ToastTitle>
+          </Toast>
+        ),
+      });
+      navigation.navigate("Auth" as never);
+      return;
+    }
+    if (maxQuantity === 0) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Product out of stock or invalid.</ToastTitle>
+          </Toast>
+        ),
+      });
+      return;
+    }
+    if (!isQuantityValid) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>
+              Not enough available NM items to add to cart.
+            </ToastTitle>
+          </Toast>
+        ),
+      });
+      return;
+    }
+    try {
+      // Add the first N NM product items to the cart
       for (let i = 0; i < quantity; i++) {
-        newCartItems.push(product);
+        await addToCart(store.user.id, product.id, availableNMItems[i].id);
       }
-      store.setCartItems(newCartItems as []);
-      console.log(`${product.title} x${quantity} added to cart.`);
-
-      // Show success toast
+      // Fetch the updated cart from backend
+      const res = await fetchCartItems(store.user.id);
+      if (res?.data) {
+        store.setCartItems(res.data);
+      }
       toast.show({
         placement: "top",
         render: ({ id }) => {
@@ -90,13 +160,19 @@ export default function Product(props: {
           );
         },
       });
-    } else {
-      console.log("Product out of stock or invalid.");
+    } catch (error) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Failed to add to cart.</ToastTitle>
+          </Toast>
+        ),
+      });
     }
   };
 
   // Reservation handler for reservations entry point
-  // (use isAlreadyReserved from above)
   const handleAddToReservation = () => {
     if (fromReservations && isAlreadyReserved) {
       toast.show({
@@ -112,14 +188,14 @@ export default function Product(props: {
       });
       return;
     }
-    if (product && (product.quantity ?? 0) > 0) {
+    if (maxQuantity > 0 && isQuantityValid) {
       addToReservation(product.id, quantity, reservationId)
         .then((res) => {
           // Dynamically update localReservationList so button disables and count updates
           setLocalReservationList((prev) => [
             ...prev,
             {
-              ...res.data.reservation, // If your API returns the new reservation in this field
+              ...res.data.reservation,
               product,
             },
           ]);
@@ -135,7 +211,7 @@ export default function Product(props: {
             },
           });
         })
-        .catch((err) => {
+        .catch(() => {
           toast.show({
             placement: "top",
             render: ({ id }) => {
@@ -149,11 +225,17 @@ export default function Product(props: {
           });
         });
     } else {
-      console.log("Product out of stock or invalid.");
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Product out of stock or invalid.</ToastTitle>
+          </Toast>
+        ),
+      });
     }
   };
 
-  console.log(product);
   // Count of reserved products
   const reservedCount = Array.isArray(localReservationList)
     ? localReservationList.length
@@ -202,7 +284,7 @@ export default function Product(props: {
                 <Text className="font-bold 2xl mt-4 mb-2">
                   Buy this product
                 </Text>
-                <Text>{product?.quantity ?? 0} copies remaining</Text>
+                <Text>{maxQuantity} copies remaining</Text>
               </Box>
             }
           />
@@ -213,7 +295,7 @@ export default function Product(props: {
               alignItems: "center",
             }}
           >
-            {(product?.quantity ?? 0) > 1 && (
+            {maxQuantity > 1 && (
               <TextInput
                 style={{
                   borderWidth: 1,
@@ -233,27 +315,27 @@ export default function Product(props: {
                   let val = Number(text.replace(/[^0-9]/g, ""));
                   if (isNaN(val)) val = 0;
                   setQuantity(val);
-                  setQuantityError(val < 1 || val > product.quantity);
+                  setQuantityError(val < 1 || val > maxQuantity);
                 }}
-                editable={(product?.quantity ?? 0) > 1}
+                editable={maxQuantity > 1}
                 maxLength={3}
                 placeholder="Qty"
                 underlineColorAndroid="transparent"
                 selectionColor={quantityError ? "#e53935" : undefined}
               />
             )}
-            {(product?.quantity ?? 0) !== 0 ? (
+            {maxQuantity > 0 ? (
               <Button
                 onPress={
                   fromReservations ? handleAddToReservation : handleAddToCart
                 }
                 disabled={
-                  (product?.quantity ?? 0) <= 0 ||
+                  maxQuantity <= 0 ||
                   !isQuantityValid ||
                   (fromReservations && isAlreadyReserved)
                 }
                 style={[
-                  (product?.quantity ?? 0) <= 0 ||
+                  maxQuantity <= 0 ||
                   quantityError ||
                   quantity < 1 ||
                   (fromReservations && isAlreadyReserved)

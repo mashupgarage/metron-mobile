@@ -188,12 +188,7 @@ export default function ReservationBoxScreen() {
     };
 
     return (
-      <Pressable
-        style={styles.gridItemContainer}
-        onPress={() => {
-          console.log("Pressed reservation:", reservation.product?.title);
-        }}
-      >
+      <View style={styles.gridItemContainer}>
         {hasImageError ? (
           // Show placeholder when there's an error or no URL
           <View style={styles.placeholderContainer}>
@@ -229,17 +224,21 @@ export default function ReservationBoxScreen() {
               {reservation.product.creators}
             </Text>
           )}
-          {reservation.product.issue_number && (
+          {reservation.product.issue_number ? (
             <Text style={styles.gridItemIssue}>
               Issue: {reservation.product.issue_number}
             </Text>
+          ) : (
+            <View style={{ height: 15 }} />
           )}
           <View style={styles.reservationInfo}>
             <Text style={styles.reservationQuantity}>
               Qty: {reservation.quantity || 1}
             </Text>
             <Text style={styles.reservationStatus}>
-              {reservation.status || "Pending"}
+              {reservation.status === "for_approval"
+                ? "For Approval"
+                : reservation.status || "Pending"}
             </Text>
           </View>
 
@@ -254,16 +253,21 @@ export default function ReservationBoxScreen() {
             </Text>
 
             {isAvailable && (
-              <TouchableOpacity
-                style={styles.addToCartButton}
+              <Pressable
+                style={
+                  reservation.status === "for_approval"
+                    ? styles.addToCartDisabled
+                    : styles.addToCartButton
+                }
                 onPress={handleAddToCart}
+                disabled={reservation.status === "for_approval"}
               >
                 <Text style={styles.addToCartText}>Add to Cart</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>
-      </Pressable>
+      </View>
     );
   };
 
@@ -410,6 +414,13 @@ const styles = StyleSheet.create({
   },
   addToCartButton: {
     backgroundColor: "#1A237E",
+    padding: 8,
+    borderRadius: 4,
+    alignItems: "center",
+    marginTop: 4,
+  },
+  addToCartDisabled: {
+    backgroundColor: "#ccc",
     padding: 8,
     borderRadius: 4,
     alignItems: "center",

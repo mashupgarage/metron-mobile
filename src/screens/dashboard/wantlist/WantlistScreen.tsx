@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { Box } from "lucide-react-native";
+import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast";
 
 // Helper function to construct image URL from cover_file_name
 const getCoverUrl = (
@@ -55,6 +56,7 @@ interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
 export default function WantlistScreen() {
   const store = useBoundStore();
   const navigation = useNavigation();
+  const toast = useToast();
   const [wantlistItems, setWantlistItems] = useState<ExtendedWantListItemT[]>(
     []
   );
@@ -161,12 +163,21 @@ export default function WantlistScreen() {
           store.user.id,
           wantlistItem.product.id,
           wantlistItem.id
-        );
+        ).then((res) => {
+          console.log("add to cart", res.data);
+        });
 
-        Alert.alert(
-          "Success",
-          `${wantlistItem.product.title} has been added to your cart`
-        );
+        toast.show({
+          placement: "top",
+          render: ({ id }) => {
+            const toastId = "toast-" + id;
+            return (
+              <Toast nativeID={toastId} action="success">
+                <ToastTitle>Successfully added to cart!</ToastTitle>
+              </Toast>
+            );
+          },
+        });
       } catch (error) {
         // Enhanced error logging
         console.error("Failed to add to cart. Details:", {
