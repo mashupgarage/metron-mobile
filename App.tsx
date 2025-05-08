@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import "./global.css";
-
+import { useFonts } from "expo-font";
+import { InterFonts } from "./src/assets/fonts";
 import { useColorScheme } from "react-native";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import { View } from "react-native";
@@ -18,12 +19,13 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const store = useBoundStore();
-
+  const [fontsLoaded] = useFonts(InterFonts);
   console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     loadAuthTokenToAxios();
     store.setOnboardingDone(true);
   }, []);
+
   return (
     <SafeAreaProvider>
       <View
@@ -36,23 +38,25 @@ export default function App() {
           justifyContent: "center",
         }}
       >
-        <GluestackUIProvider mode="system">
-          <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Dashboard"
-                options={{ headerShown: false }}
-                component={DashboardStack}
-              />
-              <Stack.Screen
-                name="Auth"
-                options={{ headerShown: false }}
-                component={AuthStack}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-          <StatusBar style="auto" />
-        </GluestackUIProvider>
+        {fontsLoaded && (
+          <GluestackUIProvider mode="system">
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Dashboard"
+                  options={{ headerShown: false }}
+                  component={DashboardStack}
+                />
+                <Stack.Screen
+                  name="Auth"
+                  options={{ headerShown: false }}
+                  component={AuthStack}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+            <StatusBar style="auto" />
+          </GluestackUIProvider>
+        )}
       </View>
     </SafeAreaProvider>
   );

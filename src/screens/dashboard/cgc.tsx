@@ -333,7 +333,7 @@ export default function CGC() {
               message us at @gradingph on Facebook during business hours.
             </Text>
 
-            <Box className="items-center justify-center mx-6 my-6">
+            <Box className="items-center justify-center mx-6 my-6 mb-24">
               <Button
                 onPress={() => {
                   navigation.navigate("CGCSubmit");
