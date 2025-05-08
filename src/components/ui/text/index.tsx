@@ -1,11 +1,15 @@
 import React from 'react';
-
 import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 import { Text as RNText } from 'react-native';
 import { textStyle } from './styles';
+import { useTheme } from '@gluestack-ui/themed';
+
+export type TextVariant = 'body' | 'heading' | 'mono';
 
 type ITextProps = React.ComponentProps<typeof RNText> &
-  VariantProps<typeof textStyle>;
+  VariantProps<typeof textStyle> & {
+    variant?: TextVariant;
+  };
 
 const Text = React.forwardRef<React.ElementRef<typeof RNText>, ITextProps>(
   (
@@ -19,10 +23,17 @@ const Text = React.forwardRef<React.ElementRef<typeof RNText>, ITextProps>(
       sub,
       italic,
       highlight,
+      style,
+      variant = 'body',
       ...props
     },
     ref
   ) => {
+    // Use Gluestack theme fonts
+    const theme = useTheme();
+    // Fallbacks for fontFamily
+    const fontFamily = theme?.fonts?.[variant] || theme?.fonts?.body || 'System';
+
     return (
       <RNText
         className={textStyle({
@@ -36,6 +47,7 @@ const Text = React.forwardRef<React.ElementRef<typeof RNText>, ITextProps>(
           highlight,
           class: className,
         })}
+        style={[{ fontFamily }, style]}
         {...props}
         ref={ref}
       />

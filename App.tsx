@@ -43,15 +43,7 @@ export default function App() {
           justifyContent: "center",
         }}
       >
-        <GluestackUIProvider mode="system" config={{
-          theme: {
-            fonts: {
-              body: 'Inter-Regular',
-              heading: 'Inter-Bold',
-              mono: 'Inter-Light',
-            },
-          },
-        }}>
+        <GluestackUIProvider mode="system">
           <NavigationContainer>
             <Stack.Navigator>
               <Stack.Screen

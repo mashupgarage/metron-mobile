@@ -2,7 +2,6 @@
 import { vars } from "nativewind";
 
 export const config = {
-  // #14377d
   light: vars({
     "--color-primary-0": "20 55 125",
     "--color-primary-50": "18 50 113",
@@ -307,4 +306,9 @@ export const config = {
     "--color-indicator-info": "161 199 245",
     "--color-indicator-error": "232 70 69",
   }),
+  fonts: {
+    body: 'Inter-Regular',
+    heading: 'Inter-Bold',
+    mono: 'Inter-Light',
+  },
 };
