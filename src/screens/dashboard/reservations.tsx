@@ -8,15 +8,9 @@ import ComicOdysseyIcon from "@/src/assets/icon.png";
 import React, { useEffect, useState } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
 import { ProductT } from "@/src/utils/types/common";
-import {
-  ClipboardCheck,
-  ClipboardIcon,
-  ClipboardPaste,
-  ClipboardX,
-  LucideListCollapse,
-  Menu,
-} from "lucide-react-native";
+import { ClipboardCheck, Menu } from "lucide-react-native";
 import DashboardLayout from "./_layout";
+import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 import {
   fetchProducts,
   fetchProductsByReleaseId,
@@ -24,6 +18,7 @@ import {
   addToWantList,
   getWantList,
   getReservationList,
+  addToReservation,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
@@ -43,10 +38,15 @@ interface Release {
 
 export default function ReservationsScreen() {
   const store = useBoundStore();
+  const toast = useToast();
   const [wantedProductIds, setWantedProductIds] = useState<number[]>([]);
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
+  // List of product IDs that are already reserved
+  const reservedProductIds = products
+    .filter((p) => p.meta_attributes?.reserved)
+    .map((p) => p.id);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
@@ -186,24 +186,50 @@ export default function ReservationsScreen() {
     setSelectedProducts([]);
   };
 
-  const confirmReservation = () => {
+  const confirmReservation = async () => {
     if (selectedProducts.length === 0) return;
-    setProducts((prev) =>
-      prev.map((product) => {
-        if (selectedProducts.includes(product.id)) {
-          return {
-            ...product,
-            meta_attributes: {
-              ...product.meta_attributes,
-              reserved: true,
-            },
-          };
-        }
-        return product;
-      })
-    );
-    setIsMultiSelectMode(false);
-    setSelectedProducts([]);
+    try {
+      // Save all selected products to reservation (parallel)
+      await Promise.all(
+        selectedProducts.map((productId) =>
+          addToReservation(productId, 1, selectedReleaseId)
+        )
+      );
+      setProducts((prev) =>
+        prev.map((product) => {
+          if (selectedProducts.includes(product.id)) {
+            return {
+              ...product,
+              meta_attributes: {
+                ...product.meta_attributes,
+                reserved: true,
+              },
+            };
+          }
+          return product;
+        })
+      );
+      setIsMultiSelectMode(false);
+      setSelectedProducts([]);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="success">
+            <ToastTitle>Reserved successfully!</ToastTitle>
+          </Toast>
+        ),
+      });
+    } catch (e) {
+      console.log(e);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Failed to reserve products.</ToastTitle>
+          </Toast>
+        ),
+      });
+    }
   };
 
   const isProductReserved = (product: ProductT) => {
@@ -406,7 +432,9 @@ export default function ReservationsScreen() {
                   <Pressable
                     onPress={() => {
                       if (isMultiSelectMode) {
-                        toggleProductSelection(product.id);
+                        if (!reservedProductIds.includes(product.id)) {
+                          toggleProductSelection(product.id);
+                        }
                       } else {
                         getReservationList(store.user?.id).then((res) => {
                           const reservationList = res.data.reservations;
@@ -422,6 +450,10 @@ export default function ReservationsScreen() {
                     }}
                     style={({ pressed }) => [
                       { opacity: pressed ? 0.7 : 1 },
+                      isMultiSelectMode &&
+                      reservedProductIds.includes(product.id)
+                        ? { opacity: 0.4 }
+                        : {},
                       isMultiSelectMode && isSelected
                         ? {
                             borderWidth: 4,
@@ -460,13 +492,7 @@ export default function ReservationsScreen() {
                           </Text>
                         </View>
                         <View className="flex-row justify-between items-center mt-1">
-                          <View style={{ alignItems: "flex-end" }}>
-                            <Text className="mr-4">
-                              {getQuantityLeft(product) === 0
-                                ? "Out of Stock"
-                                : `${getQuantityLeft(product)} left`}
-                            </Text>
-                          </View>
+                          <View style={{ alignItems: "flex-end" }}></View>
                         </View>
                       </View>
                     </Box>

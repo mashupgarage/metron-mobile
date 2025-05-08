@@ -288,6 +288,61 @@ export default function Product(props: {
               </Box>
             }
           />
+          {maxQuantity >= 1 && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginHorizontal: 12,
+                alignItems: "center",
+                marginBottom: 8,
+              }}
+            >
+              <Button
+                onPress={async () => {
+                  try {
+                    await addToWantList(product.id);
+                    setIsWanted(true);
+                    toast.show({
+                      placement: "top",
+                      render: ({ id }) => {
+                        const toastId = "toast-" + id;
+                        return (
+                          <Toast nativeID={toastId} action="success">
+                            <ToastTitle>Product added to want list!</ToastTitle>
+                          </Toast>
+                        );
+                      },
+                    });
+                  } catch (err) {
+                    console.log("error", err);
+                    toast.show({
+                      placement: "top",
+                      render: ({ id }) => {
+                        const toastId = "toast-" + id;
+                        return (
+                          <Toast nativeID={toastId} action="error">
+                            <ToastTitle>Failed to add to want list.</ToastTitle>
+                          </Toast>
+                        );
+                      },
+                    });
+                  }
+                }}
+                disabled={isWanted}
+                style={[
+                  { flex: 1 },
+                  isWanted ? { backgroundColor: "#cccccc" } : undefined,
+                ]}
+                size="xl"
+              >
+                <ButtonText>
+                  {isWanted
+                    ? "Already on want list"
+                    : "Add to want list instead"}
+                </ButtonText>
+              </Button>
+            </View>
+          )}
           <View
             style={{
               flexDirection: "row",
