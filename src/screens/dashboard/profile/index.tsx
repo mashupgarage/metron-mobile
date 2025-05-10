@@ -46,11 +46,8 @@ export default function Profile(props: { navigation: any }) {
       // Fetch real orders count
       getReservationList(store.user.id)
         .then((res) => {
-          setOrdersCount(
-            Array.isArray(res.data)
-              ? res.data.length
-              : res.data.reservations.length || 0
-          );
+          console.log(res.data);
+          setOrdersCount(res.data.metadata?.total_count || 0);
         })
         .catch(() => setOrdersCount(0));
 

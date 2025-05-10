@@ -185,14 +185,26 @@ export const getWantList = async () => {
 };
 
 /**
- * Fetch the reservation box (reservations) for a specific user.
+ * Fetch the reservation box (reservations) for a specific user, paginated.
  * @param userId - The user ID whose reservation box to fetch.
- * @returns Axios promise resolving to the user's reservation list.
+ * @param page - Page number (default: 1)
+ * @param limit - Number of items per page (default: 10)
+ * @returns Axios promise resolving to the user's reservation list and metadata.
  * @example
- * getReservationList(123).then(res => res.data)
+ * getReservationList(123, 2, 10).then(res => res.data)
  */
-export const getReservationList = async (userId: number) => {
-  return axiosClient.post(`/reservation_box/${userId}/reservations`);
+export const getReservationList = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10
+) => {
+  return axiosClient.get(`/reservation_box/${userId}/reservations`, {
+    params: {
+      // status: "",
+      page,
+      limit,
+    },
+  });
 };
 
 /**
