@@ -12,12 +12,11 @@ import {
 } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 import { useBoundStore } from "@/src/store";
-import { getWantList, addToCart } from "@/src/api/apiEndpoints";
+import { getWantList, addToCart, fetchCartItems } from "@/src/api/apiEndpoints";
 import { WantListItemT } from "@/src/utils/types/common";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
-import { Box } from "lucide-react-native";
 import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast";
 
 // Helper function to construct image URL from cover_file_name
@@ -163,20 +162,22 @@ export default function WantlistScreen() {
           store.user.id,
           wantlistItem.product.id,
           wantlistItem.id
-        ).then((res) => {
-          console.log("add to cart", res.data);
-        });
-
-        toast.show({
-          placement: "top",
-          render: ({ id }) => {
-            const toastId = "toast-" + id;
-            return (
-              <Toast nativeID={toastId} action="success">
-                <ToastTitle>Successfully added to cart!</ToastTitle>
-              </Toast>
-            );
-          },
+        ).then(async () => {
+          const res = await fetchCartItems(store.user.id);
+          if (res?.data) {
+            store.setCartItems(res.data);
+            toast.show({
+              placement: "top",
+              render: ({ id }) => {
+                const toastId = "toast-" + id;
+                return (
+                  <Toast nativeID={toastId} action="success">
+                    <ToastTitle>Successfully added to cart!</ToastTitle>
+                  </Toast>
+                );
+              },
+            });
+          }
         });
       } catch (error) {
         // Enhanced error logging
