@@ -185,6 +185,9 @@ export default function Profile(props: { navigation: any }) {
             onPress={() => {
               removeAuthToken();
               store.setOnboardingDone(false);
+              store.setCartItems([]);
+              store.setCartCount(0);
+              store.setCollectionCount(0);
               store.setUser(null);
             }}
           >
