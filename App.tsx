@@ -23,7 +23,6 @@ export default function App() {
   console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     loadAuthTokenToAxios();
-    store.setOnboardingDone(true);
   }, []);
 
   return (

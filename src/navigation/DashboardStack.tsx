@@ -15,7 +15,8 @@ export function DashboardStack() {
 
   return (
     <Stack.Navigator>
-      {store.isOnboardingDone === false && store.user === null ? (
+      {store.isOnboardingDone === false &&
+      store.user?.primary_address === null ? (
         <Stack.Screen
           name="Onboarding"
           options={screenOption}

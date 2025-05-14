@@ -52,7 +52,7 @@ export default function SignIn(props: {
                   if (res.data) {
                     // Save auth_token using AsyncStorage and update Axios
                     saveAuthToken(res.data.auth_token).then(() => {
-                      fetchUserProfile()
+                      fetchUserProfile(res.data.id)
                         .then((res) => {
                           console.log("profile fetched", res.data);
                           setUser(res.data);

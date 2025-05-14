@@ -189,6 +189,7 @@ export default function Profile(props: { navigation: any }) {
             style={styles.settingItem}
             onPress={() => {
               removeAuthToken();
+              store.setOnboardingDone(false);
               store.setUser(null);
             }}
           >
