@@ -112,6 +112,18 @@ export const fetchUserProfile = (userId: UserT["id"]) => {
 };
 
 /**
+ * Update the current user's profile information.
+ * @param userId - The user ID.
+ * @param payload - The user profile update payload.
+ * @returns Axios promise resolving to the updated user profile data.
+ * @example
+ * updateUserProfile(123, { email: 'user@email.com' }).then(res => res.data)
+ */
+export const updateUserProfile = (userId: UserT["id"], payload: any) => {
+  return axiosClient.put(`/users/${userId}`, payload);
+};
+
+/**
  * Fetch all cart items for a given user.
  * @param userId - The user ID.
  * @returns Axios promise resolving to the user's cart items.
@@ -270,4 +282,8 @@ export const getMyCollection = async (userId: number) => {
       user_id: userId,
     },
   });
+};
+
+export const fetchAvailableBranches = async () => {
+  return axiosClient.get(`/locations`);
 };

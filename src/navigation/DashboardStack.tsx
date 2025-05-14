@@ -8,6 +8,7 @@ import CGCSubmitScreen from "../screens/dashboard/cgc-submit";
 import { useBoundStore } from "../store";
 import { screenOption } from "../utils/screenOption";
 import DashboardTabs from "./DashboardTabs";
+import EditProfile from "../screens/dashboard/edit-profile";
 
 const Stack = createStackNavigator();
 export function DashboardStack() {
@@ -49,6 +50,11 @@ export function DashboardStack() {
         name="CGCSubmit"
         options={screenOption}
         component={CGCSubmitScreen}
+      />
+      <Stack.Screen
+        name="EditProfile"
+        options={screenOption}
+        component={EditProfile}
       />
     </Stack.Navigator>
   );
