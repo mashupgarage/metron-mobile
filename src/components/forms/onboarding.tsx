@@ -38,7 +38,7 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
   setFulfillmentOption,
   size = "md",
 }) => {
-  const options = ["Pickup", "Delivery"];
+  const options = ["store", "delivery"];
   const branches = ["Robinsons Place Galeria"];
 
   return (
@@ -84,7 +84,7 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
               {options.map((option) => (
                 <SelectItem
                   key={option}
-                  label={option}
+                  label={option.toLocaleUpperCase()}
                   value={option}
                   onPress={() => {
                     setFulfillmentOption(option);

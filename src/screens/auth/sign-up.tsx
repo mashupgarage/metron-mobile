@@ -11,6 +11,9 @@ import SignUpForm from "@/src/components/forms/sign-up";
 import AuthLayout from "./_layout";
 import React from "react";
 import { useBoundStore } from "@/src/store";
+import { registerUser } from "@/src/api/apiEndpoints";
+import { useToast } from "@gluestack-ui/themed";
+import { Toast, ToastDescription, ToastTitle } from "@/src/components/ui/toast";
 
 export default function SignUp(props: {
   navigation: {
@@ -20,7 +23,7 @@ export default function SignUp(props: {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const store = useBoundStore();
+  const toast = useToast();
   const navigation = useNavigation<NavigationProp<AuthStackParams>>();
 
   return (
@@ -36,8 +39,51 @@ export default function SignUp(props: {
           setEmailValue={setEmail}
           setFullNameValue={setFullName}
           setPasswordValue={setPassword}
-          handleSubmit={(payload) => {
-            console.log("wow", payload);
+          handleSubmit={async (payload) => {
+            const fullNameArray = payload.fullName.split(" ");
+            const lastName = fullNameArray.pop();
+            const firstName = fullNameArray.join(" ");
+            const processedPayload = {
+              user: {
+                first_name: firstName,
+                last_name: lastName,
+                password: payload.password,
+                password_confirmation: payload.password,
+                email: payload.email,
+              },
+            };
+            const res = await registerUser(processedPayload);
+            if (res.status === 201) {
+              // show toast
+              toast.show({
+                placement: "top",
+                render: ({ id }) => {
+                  const toastId = "toast-" + id;
+                  return (
+                    <Toast nativeID={toastId} action="success">
+                      <ToastTitle>Successfully registered!</ToastTitle>
+                    </Toast>
+                  );
+                },
+              });
+              navigation.navigate("SignIn");
+            } else {
+              toast.show({
+                placement: "top",
+                render: ({ id }) => {
+                  const toastId = "toast-" + id;
+                  return (
+                    <Toast nativeID={toastId} action="error">
+                      <ToastTitle>Oops! Something went wrong.</ToastTitle>
+                      <ToastDescription>
+                        Failed to register the account. Please try again later
+                        or contact support.
+                      </ToastDescription>
+                    </Toast>
+                  );
+                },
+              });
+            }
           }}
         />
         <Divider text="or" />

@@ -72,13 +72,55 @@ export const authenticateUser = async (email: string, password: string) => {
 };
 
 /**
+ * Register a new user.
+ * @param payload - The user registration payload.
+ * @returns Axios promise resolving to the registration response.
+ * @throws Error if registration fails.
+ * @example
+ * registerUser({ email: 'user@email.com', password: 'password' }).then(res => ...)
+ */
+export const registerUser = async (payload: any) => {
+  try {
+    const authClient = axios.create({
+      baseURL: constants.expoConfig?.extra?.apiUrl,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    const response = await authClient.post("/api/v1/users", payload);
+
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Authentication error:", error);
+      throw new Error(error.response?.data?.error || "Authentication failed");
+    }
+    throw error;
+  }
+};
+
+/**
  * Fetch the current user's profile information.
  * @returns Axios promise resolving to the user profile data.
  * @example
  * fetchUserProfile().then(res => res.data)
  */
-export const fetchUserProfile = () => {
-  return axiosClient.get("/users.json");
+export const fetchUserProfile = (userId: UserT["id"]) => {
+  return axiosClient.get(`/users/${userId}`);
+};
+
+/**
+ * Update the current user's profile information.
+ * @param userId - The user ID.
+ * @param payload - The user profile update payload.
+ * @returns Axios promise resolving to the updated user profile data.
+ * @example
+ * updateUserProfile(123, { email: 'user@email.com' }).then(res => res.data)
+ */
+export const updateUserProfile = (userId: UserT["id"], payload: any) => {
+  return axiosClient.put(`/users/${userId}`, payload);
 };
 
 /**
@@ -240,4 +282,8 @@ export const getMyCollection = async (userId: number) => {
       user_id: userId,
     },
   });
+};
+
+export const fetchAvailableBranches = async () => {
+  return axiosClient.get(`/locations`);
 };
