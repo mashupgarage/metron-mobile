@@ -206,24 +206,6 @@ export default function ReservationsScreen() {
     }
   }, [releaseDates]);
 
-  // Format for displaying dates
-  const formatReleaseDate = () => {
-    const now = new Date();
-    const month = now
-      .toLocaleString("default", { month: "short" })
-      .toUpperCase();
-    const day = now.getDate();
-    const nextWeek = new Date(now);
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    const nextMonth = nextWeek
-      .toLocaleString("default", { month: "short" })
-      .toUpperCase();
-    const nextDay = nextWeek.getDate();
-    const year = nextWeek.getFullYear();
-
-    return `${month} ${day}/${nextMonth} ${nextDay} ${year}`;
-  };
-
   const toggleProductSelection = (productId: number) => {
     // Prevent selecting if viewing a past release
     if (isOldRelease()) {
@@ -259,11 +241,6 @@ export default function ReservationsScreen() {
         return [...prev, productId];
       }
     });
-  };
-
-  const exitMultiSelectMode = () => {
-    setIsMultiSelectMode(false);
-    setSelectedProducts([]);
   };
 
   const showConfirmationDialog = () => {
@@ -382,12 +359,6 @@ export default function ReservationsScreen() {
         ),
       });
     }
-  };
-
-  const toggleProductInConfirmation = (productId: number) => {
-    setConfirmationProducts((prevProducts) =>
-      prevProducts.filter((p) => p.id !== productId)
-    );
   };
 
   // Track product IDs to be removed from confirmation
@@ -904,7 +875,9 @@ export default function ReservationsScreen() {
                     </Pressable>
                   </View>
                   <TouchableOpacity
-                    className={`px-3 ${isWanted ? 'opacity-50' : 'opacity-100'}`}
+                    className={`px-3 ${
+                      isWanted ? "opacity-50" : "opacity-100"
+                    }`}
                     disabled={isWanted}
                     onPress={async () => {
                       try {
@@ -938,7 +911,6 @@ export default function ReservationsScreen() {
         >
           <View className="flex-1 justify-center items-center bg-black/50">
             <View className="w-[90%] max-h-[80%] bg-white rounded-xl p-5 shadow-lg">
-
               <Text className="text-lg font-bold mb-2.5">
                 Please Confirm the products you want to request for this
                 release.
