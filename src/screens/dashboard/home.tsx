@@ -14,6 +14,7 @@ import {
   useNavigation,
   DrawerActions,
   useRoute,
+  RouteProp,
 } from "@react-navigation/native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { HStack } from "@/src/components/ui/hstack";
@@ -21,69 +22,33 @@ import { Button } from "@/src/components/ui/button";
 import { Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
 import { useEffect, useState } from "react";
-import {
-  fetchProducts,
-  fetchReleases,
-  fetchUserProfile,
-} from "@/src/api/apiEndpoints";
+import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 
 export default function Home() {
   const store = useBoundStore();
-  const route = useRoute();
+  const route = useRoute<RouteProp<DashboardStackParams, "Home">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
 
   useEffect(() => {
-    console.log(
-      "ROUTE ------------------------------------------>",
-      route.params
-    );
-    if (route.params?.category_id) {
-      fetchProducts(route.params?.category_id)
-        .then((res) => {
-          store.setProducts(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      fetchUserProfile(store.user?.id)
-        .then((res) => {
-          store.setUser(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      fetchProducts()
-        .then((res) => {
-          store.setProducts(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      fetchUserProfile(store.user?.id)
-        .then((res) => {
-          store.setUser(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [route.params]);
-
-  useEffect(() => {
-    fetchReleases()
+    fetchProducts()
       .then((res) => {
-        store.setReleases(res.data);
+        store.setProducts(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+
+    fetchUserProfile(store.user?.id)
+      .then((res) => {
+        store.setUser(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [route.params]);
 
   return (
     <Box className="h-screen w-full pb-24">

@@ -24,18 +24,18 @@ import { mockedCarouselItems } from "@/src/utils/mock";
 import { useEffect, useState } from "react";
 import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 
-export default function Comics() {
+export default function Novels() {
   const store = useBoundStore();
-  const route = useRoute<RouteProp<DashboardStackParams, "Comics">>();
+  const route = useRoute<RouteProp<DashboardStackParams, "Novels">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
 
   useEffect(() => {
-    fetchProducts(6)
+    fetchProducts(2)
       .then((res) => {
-        store.setComics(res.data);
+        store.setNovels(res.data);
       })
       .catch((err) => {
         console.log(err);
@@ -53,7 +53,7 @@ export default function Comics() {
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.comics}
+        data={store.novels}
         scrollEnabled
         ListHeaderComponent={
           <Box>
@@ -79,7 +79,7 @@ export default function Comics() {
             <HStack className="justify-between mr-2 ml-2">
               <Box className="p-2">
                 <Text className="text-primary-400 text-2xl font-bold ">
-                  Latest Comics
+                  Latest Novels
                 </Text>
                 <Text>{store.products.length} products total</Text>
               </Box>
