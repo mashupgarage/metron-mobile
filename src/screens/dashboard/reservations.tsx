@@ -1,14 +1,19 @@
 import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
-import { View, TouchableOpacity } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 // @ts-ignore
 import ComicOdysseyIcon from "@/src/assets/icon.png";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
-import { ProductT } from "@/src/utils/types/common";
-import { ClipboardCheck, Menu } from "lucide-react-native";
+import { ProductT, SearchOptions } from "@/src/utils/types/common";
+import { ClipboardCheck, Menu, Search, X } from "lucide-react-native";
 import DashboardLayout from "./_layout";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
 import {
@@ -19,12 +24,15 @@ import {
   getWantList,
   getReservationList,
   addToReservation,
+  searchReservationProducts,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 
 import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import { useBoundStore } from "@/src/store";
+import { debounce } from "lodash";
+import Constants from "expo-constants";
 
 interface Release {
   id: number;
@@ -43,19 +51,22 @@ export default function ReservationsScreen() {
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
-  // List of product IDs that are already reserved
   const reservedProductIds = products
     .filter((p) => p.meta_attributes?.reserved)
     .map((p) => p.id);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false); // NEW
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedReleaseId, setSelectedReleaseId] = useState<number | null>(
     null
   );
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
   const incrementWantlistCount = useWantListStore(
     (state) => state.incrementWantlistCount
@@ -88,7 +99,6 @@ export default function ReservationsScreen() {
     }
   };
 
-  // Find the latest release (by date) with status 'published' or 'closed'
   const getLatestRelease = (entries: Release[]): Release | null => {
     if (!entries || entries.length === 0) return null;
     const validStatuses = ["publish", "close"];
@@ -134,7 +144,6 @@ export default function ReservationsScreen() {
     }
   };
 
-  // On mount: fetch release dates, then select latest and load its releases
   useEffect(() => {
     const initialize = async () => {
       await fetchReleaseDatesFromAPI();
@@ -142,7 +151,6 @@ export default function ReservationsScreen() {
     initialize();
   }, []);
 
-  // When releaseDates are loaded, select latest published/closed and load its releases
   useEffect(() => {
     if (releaseDates.length > 0) {
       const latest = getLatestRelease(releaseDates);
@@ -263,6 +271,97 @@ export default function ReservationsScreen() {
     loadProductsByRelease(id);
   };
 
+  // Perform search with debounce
+  const performSearch = useCallback(
+    debounce(async (query: string) => {
+      console.log("Performing search for:", query);
+      if (!query.trim()) {
+        // If search is cleared, reload products by release
+        loadProductsByRelease(selectedReleaseId);
+        return;
+      }
+
+      setIsSearching(true);
+      try {
+        const options: SearchOptions = {};
+        if (selectedReleaseId) {
+          options.release_id = selectedReleaseId;
+        }
+
+        console.log("Sending search request with options:", options);
+        const response = await searchReservationProducts(query, options);
+        console.log(
+          "Search response received, first item:",
+          JSON.stringify(response.data.reservations[0], null, 2)
+        );
+
+        // Map the search response to products format with unique IDs for list rendering
+        const searchProducts = response.data.reservations.map((item: any) => {
+          const baseUrl = Constants.expoConfig?.extra?.apiUrl || "";
+          const coverUrl =
+            item.product.cover_url ||
+            `${baseUrl}/products/${item.product.id}/cover?v=${new Date(
+              item.product.cover_updated_at
+            ).getTime()}`;
+
+          return {
+            ...item.product,
+            meta_attributes: {
+              ...item.product.meta_attributes,
+              reserved: item.reserved,
+            },
+            quantity: item.quantity,
+            formatted_price: item.price,
+            // Add cover URL for images
+            cover_url: coverUrl,
+            // Use this for unique list keys
+            _uniqueKey: `${item.product.id}-${item.id}`,
+          };
+        });
+
+        setProducts(searchProducts);
+      } catch (err) {
+        console.error("Search failed:", err);
+        toast.show({
+          placement: "top",
+          render: ({ id }) => (
+            <Toast nativeID={"toast-" + id} action="error">
+              <ToastTitle>Search failed. Please try again.</ToastTitle>
+            </Toast>
+          ),
+        });
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500),
+    [selectedReleaseId]
+  );
+
+  // Handle search input changes
+  const handleSearchChange = (text: string) => {
+    console.log("Search input changed:", text);
+    setSearchQuery(text);
+    // Don't call performSearch here if text is empty to prevent loops
+    if (text.trim()) {
+      performSearch(text);
+    } else if (text === "") {
+      console.log("Search cleared, reloading products");
+      loadProductsByRelease(selectedReleaseId);
+    }
+  };
+
+  // Clear search and reset to release products
+  const clearSearch = () => {
+    console.log("Clear search called");
+    setSearchQuery("");
+    setShowSearchBar(false);
+
+    if (products.length === 0 || searchQuery.trim() !== "") {
+      console.log("Reloading products after clear search");
+      loadProductsByRelease(selectedReleaseId);
+    }
+  };
+
   return (
     <DashboardLayout>
       <Box className="h-screen w-full">
@@ -281,43 +380,83 @@ export default function ReservationsScreen() {
           onShowAllReleases={clearFilters}
         />
         <View className="ml-4 mr-4">
-          <View className="flex-row justify-between items-center mb-4">
-            <Text className="font-bold text-lg">
-              {formatDateHuman(selectedDate)}
-            </Text>
-            <View className="flex-row items-center">
-              <TouchableOpacity
-                onPress={() => {
-                  if (isMultiSelectMode) {
-                    setIsMultiSelectMode(false);
-                    setSelectedProducts([]);
-                  } else {
-                    setIsMultiSelectMode(true);
-                  }
-                }}
-              >
-                <Text className="mr-4">
-                  {isMultiSelectMode ? (
-                    "Cancel"
-                  ) : (
-                    <ClipboardCheck size={24} color="#333" />
-                  )}
-                </Text>
-              </TouchableOpacity>
-              <>
-                {selectedProducts.length > 0 && (
-                  <Pressable onPress={confirmReservation}>
-                    <Text className="font-bold">
-                      Confirm ({selectedProducts.length})
-                    </Text>
-                  </Pressable>
+          {showSearchBar ? (
+            <View className="flex-row items-center mb-4">
+              <View className="flex-1 flex-row items-center border border-gray-300 rounded-lg px-2 py-1">
+                <Search size={18} color="#666" />
+                <TextInput
+                  className="flex-1 ml-2 py-1"
+                  placeholder="Search comics..."
+                  value={searchQuery}
+                  onChangeText={handleSearchChange}
+                  onSubmitEditing={() => {
+                    console.log("Search submitted:", searchQuery);
+                    if (searchQuery.trim()) {
+                      performSearch.cancel();
+                      performSearch(searchQuery);
+                    }
+                  }}
+                  returnKeyType="search"
+                  autoFocus
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity onPress={clearSearch}>
+                    <X size={18} color="#666" />
+                  </TouchableOpacity>
                 )}
-              </>
-              <TouchableOpacity onPress={toggleDrawer} className="p-2">
-                <Menu size={24} color="#333" />
+              </View>
+              <TouchableOpacity
+                className="ml-2 p-2"
+                onPress={() => setShowSearchBar(false)}
+              >
+                <Text>Cancel</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          ) : (
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="font-bold text-lg">
+                {formatDateHuman(selectedDate)}
+              </Text>
+              <View className="flex-row items-center">
+                <TouchableOpacity
+                  className="mr-4"
+                  onPress={() => setShowSearchBar(true)}
+                >
+                  <Search size={24} color="#333" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (isMultiSelectMode) {
+                      setIsMultiSelectMode(false);
+                      setSelectedProducts([]);
+                    } else {
+                      setIsMultiSelectMode(true);
+                    }
+                  }}
+                >
+                  <Text className="mr-4">
+                    {isMultiSelectMode ? (
+                      "Cancel"
+                    ) : (
+                      <ClipboardCheck size={24} color="#333" />
+                    )}
+                  </Text>
+                </TouchableOpacity>
+                <>
+                  {selectedProducts.length > 0 && (
+                    <Pressable onPress={confirmReservation}>
+                      <Text className="font-bold">
+                        Confirm ({selectedProducts.length})
+                      </Text>
+                    </Pressable>
+                  )}
+                </>
+                <TouchableOpacity onPress={toggleDrawer} className="p-2">
+                  <Menu size={24} color="#333" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
           <Text className="mb-2 text-sm">
             {(() => {
               const selectedRelease = releaseDates.find(
@@ -366,11 +505,23 @@ export default function ReservationsScreen() {
             }
             return null;
           })()}
+
+          {isSearching && (
+            <View className="items-center py-2">
+              <ActivityIndicator size="small" color="#1A237E" />
+            </View>
+          )}
+
+          {searchQuery.length > 0 && !isSearching && products.length === 0 && (
+            <View className="items-center py-4">
+              <Text>No products found matching "{searchQuery}"</Text>
+            </View>
+          )}
         </View>
         <MasonryList
           data={products}
           scrollEnabled
-          loading={loading}
+          loading={loading && !isSearching}
           ListEmptyComponent={
             loading ? (
               <View className="flex mt-56 mb-4 flex-col items-center" />
@@ -385,9 +536,15 @@ export default function ReservationsScreen() {
                     source={ComicOdysseyIcon}
                   />
                   <Text className="mt-4 mb-2">
-                    the reservation list is already closed or was not found.
+                    {searchQuery.length > 0
+                      ? `No results found for "${searchQuery}"`
+                      : "The reservation list is already closed or was not found."}
                   </Text>
-                  <Text>Please come back on Friday for the new releases!</Text>
+                  {searchQuery.length === 0 && (
+                    <Text>
+                      Please come back on Friday for the new releases!
+                    </Text>
+                  )}
                 </>
               </View>
             )
@@ -402,12 +559,17 @@ export default function ReservationsScreen() {
                 source={ComicOdysseyIcon}
               />
               <Text className="mt-4 text-center mb-2">
-                Hang tight, we're loading the latest releases!
+                {isSearching
+                  ? `Searching for "${searchQuery}"...`
+                  : "Hang tight, we're loading the latest releases!"}
               </Text>
             </>
           }
           numColumns={2}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item: any) => {
+            // Use _uniqueKey from search results if available, otherwise use product id
+            return item._uniqueKey || item.id.toString();
+          }}
           contentContainerStyle={{
             padding: 12,
           }}
@@ -465,21 +627,43 @@ export default function ReservationsScreen() {
                   >
                     <Box className="mb-2">
                       <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
-                        <Image
-                          source={{ uri: product.cover_url }}
-                          alt={product.id.toString()}
-                          className="h-48 w-full rounded-md"
-                          resizeMode="cover"
-                          style={
-                            isMultiSelectMode && isSelected
-                              ? {
-                                  borderWidth: 2,
-                                  borderColor: "#1A237E",
-                                  borderRadius: 8,
-                                }
-                              : {}
-                          }
-                        />
+                        {product.cover_url && !imageErrors[product.id] ? (
+                          // Show actual image if URL exists and no error
+                          <Image
+                            source={{ uri: product.cover_url }}
+                            alt={product.id.toString()}
+                            className="h-48 w-full rounded-md"
+                            resizeMode="cover"
+                            onError={() => {
+                              console.log(
+                                `Failed to load image for product: ${product.id}`
+                              );
+                              setImageErrors((prev) => ({
+                                ...prev,
+                                [product.id]: true,
+                              }));
+                            }}
+                            style={
+                              isMultiSelectMode && isSelected
+                                ? {
+                                    borderWidth: 2,
+                                    borderColor: "#1A237E",
+                                    borderRadius: 8,
+                                  }
+                                : {}
+                            }
+                          />
+                        ) : (
+                          // Show placeholder when URL is missing or there was an error
+                          <View className="h-48 w-full rounded-md bg-gray-200 flex items-center justify-center">
+                            <Image
+                              source={ComicOdysseyIcon}
+                              alt="Placeholder"
+                              className="w-32 h-32 opacity-70"
+                              resizeMode="contain"
+                            />
+                          </View>
+                        )}
                         <View className="mt-2">
                           <Text numberOfLines={1} className="font-bold">
                             {product.title}
