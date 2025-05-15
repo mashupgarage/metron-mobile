@@ -130,3 +130,20 @@ export type ReservationItemT = {
     issue_number?: string;
   };
 };
+
+// Search-related types
+export interface SearchOptions {
+  category_id?: number;
+  user_id?: number;
+  status?: string;
+  [key: string]: any;
+}
+
+export interface SearchResponse {
+  reservations: Array<{
+    product: ProductT;
+    reserved: boolean;
+    quantity: number;
+    price: string;
+  }>;
+}
