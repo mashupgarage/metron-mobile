@@ -16,10 +16,11 @@ import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { HStack } from "@/src/components/ui/hstack";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { Filter, Menu } from "lucide-react-native";
-import { mockData, mockedCarouselItems } from "@/src/utils/mock";
-import { useState } from "react";
+import { mockedCarouselItems } from "@/src/utils/mock";
+import { useEffect, useState } from "react";
 import { Modal, ModalBackdrop, ModalContent } from "@/src/components/ui/modal";
 import { FilterModal } from "@/src/components/modal/filter";
+import { fetchProducts } from "@/src/api/apiEndpoints";
 
 export default function Comics() {
   const store = useBoundStore();
@@ -28,7 +29,20 @@ export default function Comics() {
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
-  const [products, setProducts] = useState<ProductT[]>(mockData);
+  const [products, setProducts] = useState<ProductT[]>([]);
+
+  useEffect(() => {
+    fetchProducts(6)
+      .then((res) => {
+        const result = res;
+        const rest = { ...result, data: [] };
+        console.log("products", result);
+        setProducts(res.data);
+      })
+      .catch((err) => {
+        console.log("products error", err);
+      });
+  }, []);
 
   return (
     <Box className="h-screen w-full pb-24">
@@ -92,7 +106,7 @@ export default function Comics() {
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <ModalBackdrop />
         <ModalContent>
-          <FilterModal
+          {/* <FilterModal
             byTypeOptions={[
               {
                 label: "Graphic Novel",
@@ -161,7 +175,7 @@ export default function Comics() {
                 value: "all",
               },
             ]}
-          />
+          /> */}
         </ModalContent>
       </Modal>
     </Box>

@@ -13,6 +13,7 @@ import {
   NavigationProp,
   useNavigation,
   DrawerActions,
+  useRoute,
 } from "@react-navigation/native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { HStack } from "@/src/components/ui/hstack";
@@ -28,28 +29,51 @@ import {
 
 export default function Home() {
   const store = useBoundStore();
+  const route = useRoute();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
 
   useEffect(() => {
-    fetchProducts()
-      .then((res) => {
-        store.setProducts(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    console.log(
+      "ROUTE ------------------------------------------>",
+      route.params
+    );
+    if (route.params?.category_id) {
+      fetchProducts(route.params?.category_id)
+        .then((res) => {
+          store.setProducts(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
-    fetchUserProfile(store.user?.id)
-      .then((res) => {
-        store.setUser(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+      fetchUserProfile(store.user?.id)
+        .then((res) => {
+          store.setUser(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      fetchProducts()
+        .then((res) => {
+          store.setProducts(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      fetchUserProfile(store.user?.id)
+        .then((res) => {
+          store.setUser(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [route.params]);
 
   useEffect(() => {
     fetchReleases()

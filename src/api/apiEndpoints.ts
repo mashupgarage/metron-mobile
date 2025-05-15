@@ -1,7 +1,12 @@
 import axios from "axios";
 import axiosClient from "./client";
 import constants from "expo-constants";
-import { UserT, ProductT, SearchOptions, SearchResponse } from "../utils/types/common";
+import {
+  UserT,
+  ProductT,
+  SearchOptions,
+  SearchResponse,
+} from "../utils/types/common";
 
 // =========================
 // Product-related Endpoints
@@ -28,8 +33,22 @@ export const fetchProductDetails = (id: number) => {
  * @example
  * fetchProducts().then(res => res.data)
  */
-export const fetchProducts = () => {
+export const fetchProducts = (category_id?: number) => {
+  if (category_id !== undefined) {
+    return axiosClient.get(`/marketplace/catalog_products?c=${category_id}`);
+  }
   return axiosClient.get("/marketplace/catalog_products");
+};
+
+// =========================
+// User-related Endpoints
+// =========================
+
+/**
+ * Authenticate a user with their email and password.
+ * @param email - The user's email address.
+ * @param password - The user's password.
+  );
 };
 
 // =========================
@@ -269,6 +288,20 @@ export const addToReservation = (
   });
 };
 
+export const confirmReservationList = (
+  releaseId: number,
+  reservationIds: number[],
+  productIds: number[]
+) => {
+  return axiosClient.post(`releases/${releaseId}/reservation_lists`, {
+    reservation_list: {
+      release_id: releaseId,
+      reservation_ids: reservationIds,
+      product_ids: productIds,
+    },
+  });
+};
+
 /**
  * Fetch the authenticated user's collection (orders).
  * @param userId - The user ID whose collection to fetch.
@@ -284,7 +317,6 @@ export const getMyCollection = async (userId: number) => {
   });
 };
 
-
 /**
  * Search for products in reservations with optional filters.
  * @param productName - The product name to search for
@@ -296,18 +328,18 @@ export const searchReservationProducts = (
   options: SearchOptions = {}
 ): Promise<{ data: SearchResponse }> => {
   const searchParams = new URLSearchParams();
-  searchParams.append('search[product]', productName);
-  
+  searchParams.append("search[product]", productName);
+
   Object.entries(options).forEach(([key, value]) => {
     if (value !== undefined) {
       searchParams.append(`search[${key}]`, String(value));
     }
   });
-  
-  return axiosClient.get('/search/reservations', { 
-    params: searchParams 
+
+  return axiosClient.get("/search/reservations", {
+    params: searchParams,
   });
-}
+};
 
 export const fetchAvailableBranches = async () => {
   return axiosClient.get(`/locations`);
