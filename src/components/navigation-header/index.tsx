@@ -9,8 +9,7 @@ const NavigationHeader = ({
   showCartButton = false,
 }) => {
   const navigation = useNavigation();
-  const store = useBoundStore();
-
+  const cartCount = useBoundStore((state) => state.cartItems.length);
   return (
     <View className="mb-4 flex">
       {showBackButton && (
@@ -35,7 +34,7 @@ const NavigationHeader = ({
             className="absolute right-4"
             variant="link"
           >
-            {store.cartItems.length > 0 && (
+            {cartCount > 0 && (
               <Dot
                 className="absolute"
                 style={{ right: -50, top: -9, zIndex: 1 }}

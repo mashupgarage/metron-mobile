@@ -46,11 +46,7 @@ export default function Profile(props: { navigation: any }) {
       // Fetch real orders count
       getReservationList(store.user.id)
         .then((res) => {
-          setOrdersCount(
-            Array.isArray(res.data)
-              ? res.data.length
-              : res.data.reservations.length || 0
-          );
+          setOrdersCount(res.data.metadata?.total_count || 0);
         })
         .catch(() => setOrdersCount(0));
 
@@ -72,13 +68,7 @@ export default function Profile(props: { navigation: any }) {
   }
 
   const handleEditProfile = () => {
-    // Implement edit profile functionality
-    console.log("Edit profile pressed");
-  };
-
-  const handleOrderPress = (orderId: string) => {
-    // Implement order detail navigation
-    console.log(`Order ${orderId} pressed`);
+    props.navigation.navigate("EditProfile");
   };
 
   const handleSettingPress = (setting: string) => {
@@ -95,7 +85,7 @@ export default function Profile(props: { navigation: any }) {
           onPress={() => handleSettingPress("Settings")}
         >
           <TouchableOpacity onPress={handleEditProfile}>
-            <Text>Edit Profile</Text>
+            <Text className="font-semibold">Edit Profile</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
@@ -163,6 +153,7 @@ export default function Profile(props: { navigation: any }) {
           {/* Settings Items */}
 
           <TouchableOpacity
+            disabled
             style={styles.settingItem}
             onPress={() => handleSettingPress("Help Center")}
           >
@@ -175,6 +166,7 @@ export default function Profile(props: { navigation: any }) {
 
           <TouchableOpacity
             style={styles.settingItem}
+            disabled
             onPress={() => handleSettingPress("About")}
           >
             <View style={styles.settingLeft}>
@@ -192,6 +184,10 @@ export default function Profile(props: { navigation: any }) {
             style={styles.settingItem}
             onPress={() => {
               removeAuthToken();
+              store.setOnboardingDone(false);
+              store.setCartItems([]);
+              store.setCartCount(0);
+              store.setCollectionCount(0);
               store.setUser(null);
             }}
           >

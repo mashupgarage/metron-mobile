@@ -20,10 +20,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const store = useBoundStore();
   const [fontsLoaded] = useFonts(InterFonts);
-  console.log(Constants.expoConfig.extra.apiUrl);
   useEffect(() => {
     loadAuthTokenToAxios();
-    store.setOnboardingDone(true);
   }, []);
 
   return (

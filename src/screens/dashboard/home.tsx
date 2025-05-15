@@ -42,7 +42,7 @@ export default function Home() {
         console.log(err);
       });
 
-    fetchUserProfile()
+    fetchUserProfile(store.user?.id)
       .then((res) => {
         store.setUser(res.data);
       })

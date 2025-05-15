@@ -17,7 +17,7 @@ export type UserSlice = {
 
 export const createUserSlice: StateCreator<UserSlice> = (set) => ({
   user: null,
-  isOnboardingDone: false,
+  isOnboardingDone: true,
   setOnboardingDone: (isDone: boolean) => set({ isOnboardingDone: isDone }),
   setUser: (payload: UserT) => set({ user: payload }),
 });

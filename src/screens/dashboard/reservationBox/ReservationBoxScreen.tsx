@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,10 @@ import {
   StyleSheet,
   SafeAreaView,
   ActivityIndicator,
-  Pressable,
   TouchableOpacity,
   Alert,
+  FlatList,
 } from "react-native";
-import MasonryList from "@react-native-seoul/masonry-list";
 import { useBoundStore } from "@/src/store";
 import { getReservationList, addToCart } from "@/src/api/apiEndpoints";
 import { ReservationItemT } from "@/src/utils/types/common";
@@ -18,24 +17,8 @@ import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 
-// Helper function to construct image URL from cover_file_name
-const getCoverUrl = (
-  coverFileName: string | undefined,
-  productId?: number
-): string => {
-  if (!coverFileName) return "";
+const PAGE_SIZE = 10;
 
-  // Try format with just the filename
-  return `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`;
-};
-
-// For large images if needed
-const getLargeImageUrl = (coverFileName: string | undefined): string => {
-  if (!coverFileName) return "";
-  return `https://assets.comic-odyssey.com/products/covers/original/${coverFileName}`;
-};
-
-// Extended ReservationItem type to include quantity for products
 interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
   product?: {
     id: number;
@@ -53,6 +36,10 @@ interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
     quantity?: number;
   };
 }
+const getCoverUrl = (coverFileName?: string) =>
+  coverFileName
+    ? `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`
+    : "";
 
 export default function ReservationBoxScreen() {
   const store = useBoundStore();
@@ -62,27 +49,27 @@ export default function ReservationBoxScreen() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
+  // Initial load
   useEffect(() => {
     if (!store.user) {
       // @ts-ignore
       navigation.replace("Auth", { screen: "SignIn" });
       return;
     }
-
     setLoading(true);
-    getReservationList(store.user.id)
+    getReservationList(store.user.id, 1, PAGE_SIZE)
       .then((res) => {
-        // Log the response to check the structure
-        console.log(
-          "Reservation API Response:",
-          JSON.stringify(res.data.reservations?.[0] || {})
-        );
-
-        // Get the reservations from the response
         const reservationData = res.data.reservations || [];
         setReservations(reservationData);
+        setPage(1);
+        setTotalPages(res.data.metadata?.total_pages || 1);
+        setTotalCount(res.data.metadata?.total_count || reservationData.length);
         setError(null);
       })
       .catch((err) => {
@@ -123,19 +110,19 @@ export default function ReservationBoxScreen() {
     );
   }
 
-  const renderGridItem = ({ item, i }: { item: unknown; i: number }) => {
-    const reservation = item as ExtendedReservationItemT;
+  const renderGridItem = ({ item }: { item: ExtendedReservationItemT }) => {
+    const reservation = item;
 
     // Check if item has product
     if (!reservation.product) {
-      console.log("Missing product for reservation:", reservation);
+      // console.log("Missing product for reservation:", reservation);
       return null; // Skip rendering this item
     }
 
     // Get cover URL
     const coverUrl = getCoverUrl(
-      reservation.product.cover_file_name,
-      reservation.product.id
+      reservation.product.cover_file_name
+      // reservation.product.id
     );
     const productId = reservation.product.id;
     const hasImageError = imageErrors[productId] || !coverUrl;
@@ -147,10 +134,10 @@ export default function ReservationBoxScreen() {
 
     // Log for debugging
     if (!coverUrl) {
-      console.log(
-        "Cannot construct image URL because cover_file_name is missing:",
-        reservation.product.title
-      );
+      // console.log(
+      //   "Cannot construct image URL because cover_file_name is missing:",
+      //   reservation.product.title
+      // );
     }
 
     const handleAddToCart = async () => {
@@ -205,7 +192,7 @@ export default function ReservationBoxScreen() {
             style={styles.gridItemImage}
             resizeMode="cover"
             onError={() => {
-              console.log("Image failed to load:", coverUrl);
+              // console.log("Image failed to load:", coverUrl);
               setImageErrors((prev) => ({ ...prev, [productId]: true }));
             }}
           />
@@ -244,16 +231,8 @@ export default function ReservationBoxScreen() {
 
           {/* Availability indicator and Add to Cart button */}
           <View style={styles.availabilityContainer}>
-            <Text
-              style={
-                isAvailable ? styles.availableText : styles.unavailableText
-              }
-            >
-              {isAvailable ? "Available" : "Out of Stock"}
-            </Text>
-
             {isAvailable && (
-              <Pressable
+              <TouchableOpacity
                 style={
                   reservation.status === "for_approval"
                     ? styles.addToCartDisabled
@@ -263,7 +242,7 @@ export default function ReservationBoxScreen() {
                 disabled={reservation.status === "for_approval"}
               >
                 <Text style={styles.addToCartText}>Add to Cart</Text>
-              </Pressable>
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -284,14 +263,66 @@ export default function ReservationBoxScreen() {
         <Text style={styles.headerTitle}>Reservation Box</Text>
         <View style={styles.rightHeaderPlaceholder} />
       </View>
-      <MasonryList
+      <FlatList
         data={reservations}
         renderItem={renderGridItem}
         numColumns={2}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.masonryListContainer}
         showsVerticalScrollIndicator={false}
+        onEndReached={async () => {
+          if (isFetchingMore || page >= totalPages) return;
+          setIsFetchingMore(true);
+          try {
+            const nextPage = page + 1;
+            console.log("Fetching page:", nextPage);
+            const res = await getReservationList(
+              store.user.id,
+              nextPage,
+              PAGE_SIZE
+            );
+            // console.log('API returned reservations:', res.data.reservations);
+            const newReservations = res.data.reservations || [];
+            setReservations((prev) => {
+              console.log("Previous reservations count:", prev.length);
+              const existingIds = new Set(prev.map((item) => item.id));
+              const filtered = newReservations.filter(
+                (item) => !existingIds.has(item.id)
+              );
+              console.log("Filtered new reservations count:", filtered.length);
+              const combined = [...prev, ...filtered];
+              console.log(
+                "Combined reservations count after append:",
+                combined.length
+              );
+              return combined;
+            });
+            setPage(nextPage);
+            setTotalPages(res.data.metadata?.total_pages || totalPages);
+            setTotalCount(res.data.metadata?.total_count || totalCount);
+          } catch (err) {
+            console.error("Failed to fetch more reservations:", err);
+          } finally {
+            setIsFetchingMore(false);
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetchingMore && page < totalPages ? (
+            <ActivityIndicator
+              size="small"
+              color="#0000ff"
+              style={{ margin: 16 }}
+            />
+          ) : null
+        }
       />
+      <View style={{ alignItems: "center", marginVertical: 8 }}>
+        <Text style={{ color: "#888" }}>
+          Showing {Math.min(reservations.length, totalCount)} of {totalCount}{" "}
+          reserved items
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
@@ -438,22 +469,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   errorText: {
-    fontSize: 16,
-    color: "red",
+    fontSize: 14,
+    color: "#dc3545",
+    marginTop: 8,
     textAlign: "center",
   },
   placeholderContainer: {
-    width: "100%",
-    height: 150,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    backgroundColor: "#f0f0f0",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 40,
   },
   placeholderImage: {
-    width: "60%",
-    height: "60%",
-    opacity: 0.7,
+    width: 120,
+    height: 120,
+    marginBottom: 18,
+    opacity: 0.2,
   },
 });

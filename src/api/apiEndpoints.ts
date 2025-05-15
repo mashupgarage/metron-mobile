@@ -72,13 +72,55 @@ export const authenticateUser = async (email: string, password: string) => {
 };
 
 /**
+ * Register a new user.
+ * @param payload - The user registration payload.
+ * @returns Axios promise resolving to the registration response.
+ * @throws Error if registration fails.
+ * @example
+ * registerUser({ email: 'user@email.com', password: 'password' }).then(res => ...)
+ */
+export const registerUser = async (payload: any) => {
+  try {
+    const authClient = axios.create({
+      baseURL: constants.expoConfig?.extra?.apiUrl,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    const response = await authClient.post("/api/v1/users", payload);
+
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("Authentication error:", error);
+      throw new Error(error.response?.data?.error || "Authentication failed");
+    }
+    throw error;
+  }
+};
+
+/**
  * Fetch the current user's profile information.
  * @returns Axios promise resolving to the user profile data.
  * @example
  * fetchUserProfile().then(res => res.data)
  */
-export const fetchUserProfile = () => {
-  return axiosClient.get("/users.json");
+export const fetchUserProfile = (userId: UserT["id"]) => {
+  return axiosClient.get(`/users/${userId}`);
+};
+
+/**
+ * Update the current user's profile information.
+ * @param userId - The user ID.
+ * @param payload - The user profile update payload.
+ * @returns Axios promise resolving to the updated user profile data.
+ * @example
+ * updateUserProfile(123, { email: 'user@email.com' }).then(res => res.data)
+ */
+export const updateUserProfile = (userId: UserT["id"], payload: any) => {
+  return axiosClient.put(`/users/${userId}`, payload);
 };
 
 /**
@@ -185,14 +227,26 @@ export const getWantList = async () => {
 };
 
 /**
- * Fetch the reservation box (reservations) for a specific user.
+ * Fetch the reservation box (reservations) for a specific user, paginated.
  * @param userId - The user ID whose reservation box to fetch.
- * @returns Axios promise resolving to the user's reservation list.
+ * @param page - Page number (default: 1)
+ * @param limit - Number of items per page (default: 10)
+ * @returns Axios promise resolving to the user's reservation list and metadata.
  * @example
- * getReservationList(123).then(res => res.data)
+ * getReservationList(123, 2, 10).then(res => res.data)
  */
-export const getReservationList = async (userId: number) => {
-  return axiosClient.post(`/reservation_box/${userId}/reservations`);
+export const getReservationList = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10
+) => {
+  return axiosClient.get(`/reservation_box/${userId}/reservations`, {
+    params: {
+      // status: "",
+      page,
+      limit,
+    },
+  });
 };
 
 /**
@@ -230,6 +284,7 @@ export const getMyCollection = async (userId: number) => {
   });
 };
 
+
 /**
  * Search for products in reservations with optional filters.
  * @param productName - The product name to search for
@@ -252,4 +307,8 @@ export const searchReservationProducts = (
   return axiosClient.get('/search/reservations', { 
     params: searchParams 
   });
+}
+
+export const fetchAvailableBranches = async () => {
+  return axiosClient.get(`/locations`);
 };

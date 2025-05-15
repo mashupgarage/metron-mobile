@@ -9,9 +9,10 @@ import { useState } from "react";
 
 export default function Onboarding() {
   const store = useBoundStore();
-  const [phone, setPhone] = useState("");
-  const [option, setOption] = useState("");
-  const [branch, setBranch] = useState("");
+
+  const [phone, setPhone] = useState(store.user?.contact_number || "");
+  const [option, setOption] = useState(store.user?.default_fulfillment || "");
+  const [branch, setBranch] = useState(store.user?.branch_name || "");
 
   return (
     <DashboardLayout>
