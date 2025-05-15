@@ -640,20 +640,11 @@ export default function ReservationsScreen() {
                 selectedReleaseId !== latest.id
               ) {
                 return (
-                  <View
-                    style={{
-                      backgroundColor: "#FFF7D6",
-                      borderRadius: 6,
-                      padding: 10,
-                      marginBottom: 10,
-                      borderWidth: 1,
-                      borderColor: "#FFE29C",
-                    }}
-                  >
-                    <Text style={{ color: "#7A5C00" }}>
+                  <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
+                    <Text className="text-amber-800">
                       This is a past release. To browse the current release,{" "}
                       <Text
-                        style={{ fontWeight: "bold", color: "#1A237E" }}
+                        className="font-bold text-indigo-900"
                         onPress={() => {
                           const latest = getLatestRelease(releaseDates);
                           if (latest) {
@@ -902,13 +893,7 @@ export default function ReservationsScreen() {
                               {userReservationProductIds.includes(
                                 product.id
                               ) && (
-                                <Text
-                                  style={{
-                                    color: "#FF9800",
-                                    fontWeight: "bold",
-                                    fontSize: 12,
-                                  }}
-                                >
+                                <Text className="text-orange-500 font-bold text-xs">
                                   Already Reserved
                                 </Text>
                               )}
@@ -919,10 +904,7 @@ export default function ReservationsScreen() {
                     </Pressable>
                   </View>
                   <TouchableOpacity
-                    style={{
-                      paddingHorizontal: 12,
-                      opacity: isWanted ? 0.5 : 1,
-                    }}
+                    className={`px-3 ${isWanted ? 'opacity-50' : 'opacity-100'}`}
                     disabled={isWanted}
                     onPress={async () => {
                       try {
@@ -936,7 +918,7 @@ export default function ReservationsScreen() {
                       }
                     }}
                   >
-                    <Text style={{ color: "#1A237E", fontWeight: "bold" }}>
+                    <Text className="text-indigo-900 font-bold">
                       {isWanted ? "Wanted!" : "I want this"}
                     </Text>
                   </TouchableOpacity>
@@ -954,46 +936,19 @@ export default function ReservationsScreen() {
           visible={showConfirmationModal}
           onRequestClose={() => setShowConfirmationModal(false)}
         >
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "rgba(0,0,0,0.5)",
-            }}
-          >
-            <View
-              style={{
-                width: "90%",
-                maxHeight: "80%",
-                backgroundColor: "white",
-                borderRadius: 10,
-                padding: 20,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-              }}
-            >
-              <Text
-                style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}
-              >
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <View className="w-[90%] max-h-[80%] bg-white rounded-xl p-5 shadow-lg">
+
+              <Text className="text-lg font-bold mb-2.5">
                 Please Confirm the products you want to request for this
                 release.
               </Text>
 
-              <ScrollView style={{ maxHeight: 400 }}>
+              <ScrollView className="max-h-[400px]">
                 {confirmationProducts.map((product) => (
                   <View
                     key={product.id}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      padding: 10,
-                      borderBottomWidth: 1,
-                      borderBottomColor: "#EEEEEE",
-                    }}
+                    className="flex-row items-center p-2.5 border-b border-gray-200"
                   >
                     <Checkbox
                       value={product.id.toString()}
@@ -1009,37 +964,23 @@ export default function ReservationsScreen() {
                       </CheckboxIndicator>
                     </Checkbox>
 
-                    <View
-                      style={{
-                        marginHorizontal: 10,
-                        flex: 1,
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
-                    >
+                    <View className="mx-2.5 flex-1 flex-row items-center">
                       {product.cover_url ? (
                         <Image
                           source={{ uri: product.cover_url }}
                           alt={product.title}
-                          style={{ width: 40, height: 60, marginRight: 10 }}
+                          className="w-10 h-[60px] mr-2.5"
                           resizeMode="cover"
                         />
                       ) : (
-                        <View
-                          style={{
-                            width: 40,
-                            height: 60,
-                            backgroundColor: "#F5F5F5",
-                            marginRight: 10,
-                          }}
-                        />
+                        <View className="w-10 h-[60px] bg-gray-100 mr-2.5" />
                       )}
 
-                      <View style={{ flex: 1, marginLeft: 12 }}>
-                        <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+                      <View className="flex-1 ml-3">
+                        <Text numberOfLines={1} className="font-bold">
                           {product.title}
                         </Text>
-                        <Text style={{ color: "#009688" }}>
+                        <Text className="text-teal-600">
                           {product.formatted_price}
                         </Text>
                       </View>
@@ -1048,37 +989,20 @@ export default function ReservationsScreen() {
                 ))}
               </ScrollView>
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  marginTop: 20,
-                }}
-              >
+              <View className="flex-row justify-between mt-5">
                 <TouchableOpacity
                   onPress={() => setShowConfirmationModal(false)}
-                  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                    borderWidth: 1,
-                    borderColor: "#1A237E",
-                    borderRadius: 4,
-                  }}
+                  className="py-2.5 px-5 border border-indigo-900 rounded"
                 >
-                  <Text style={{ color: "#1A237E" }}>Cancel</Text>
+                  <Text className="text-indigo-900">Cancel</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={confirmReservation}
-                  style={{
-                    paddingVertical: 10,
-                    paddingHorizontal: 20,
-                    backgroundColor: "#1A237E",
-                    borderRadius: 4,
-                  }}
+                  className="py-2.5 px-5 bg-indigo-900 rounded"
                   disabled={confirmationProducts.length === 0}
                 >
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
+                  <Text className="text-white font-bold">
                     Confirm ({confirmationProducts.length})
                   </Text>
                 </TouchableOpacity>
