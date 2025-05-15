@@ -1,7 +1,7 @@
 import axios from "axios";
 import axiosClient from "./client";
 import constants from "expo-constants";
-import { UserT } from "../utils/types/common";
+import { UserT, ProductT, SearchOptions, SearchResponse } from "../utils/types/common";
 
 // =========================
 // Product-related Endpoints
@@ -283,6 +283,31 @@ export const getMyCollection = async (userId: number) => {
     },
   });
 };
+
+
+/**
+ * Search for products in reservations with optional filters.
+ * @param productName - The product name to search for
+ * @param options - Optional search parameters
+ * @returns Promise with search results
+ */
+export const searchReservationProducts = (
+  productName: string,
+  options: SearchOptions = {}
+): Promise<{ data: SearchResponse }> => {
+  const searchParams = new URLSearchParams();
+  searchParams.append('search[product]', productName);
+  
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined) {
+      searchParams.append(`search[${key}]`, String(value));
+    }
+  });
+  
+  return axiosClient.get('/search/reservations', { 
+    params: searchParams 
+  });
+}
 
 export const fetchAvailableBranches = async () => {
   return axiosClient.get(`/locations`);
