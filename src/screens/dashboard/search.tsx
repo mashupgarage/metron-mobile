@@ -13,6 +13,7 @@ export default function Search() {
           source={{
             uri: "https://i.namu.wiki/i/i8pFObUYpfyr8yr4pgmE0JMrvSnMGNN4fY5n3vTz4azQhS-IfDZ3txCoNTxpFTzR-eE2CyJZemmtkpa71ijVaA.gif",
           }}
+          alt="scv_spinning"
         />
       </View>
       <StatusBar style="auto" />

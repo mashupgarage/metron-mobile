@@ -21,6 +21,7 @@ export default function App() {
   const store = useBoundStore();
   const [fontsLoaded] = useFonts(InterFonts);
   useEffect(() => {
+    // store.setProducts([]);
     loadAuthTokenToAxios();
   }, []);
 

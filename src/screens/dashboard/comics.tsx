@@ -2,8 +2,7 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { Dimensions, useColorScheme, View } from "react-native";
-import Carousel from "react-native-reanimated-carousel";
+import { useColorScheme, View } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 
 import ProductCard from "@/src/components/product";
@@ -35,7 +34,12 @@ export default function Comics() {
   useEffect(() => {
     fetchProducts(6)
       .then((res) => {
-        store.setComics(res.data);
+        const list = {
+          products: res.data.products,
+          total_count: res.data.total_count,
+          total_pages: res.data.total_pages,
+        };
+        store.setComics(list);
       })
       .catch((err) => {
         console.log(err);
@@ -53,27 +57,15 @@ export default function Comics() {
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.comics}
+        data={store.comics_list.products}
         scrollEnabled
         ListHeaderComponent={
           <Box>
             <Box className="h-48">
-              <Carousel
-                loop
-                width={Dimensions.get("window").width}
-                height={200}
-                autoPlay
-                autoPlayInterval={5000}
-                scrollAnimationDuration={1000}
-                data={carouselItems}
-                renderItem={({ item, index }) => (
-                  <Image
-                    key={index}
-                    className="w-full h-48"
-                    source={{ uri: item.img_url }}
-                    alt={item.name}
-                  />
-                )}
+              <Image
+                className="w-full h-48"
+                source={{ uri: carouselItems[0].img_url }}
+                alt={carouselItems[0].name}
               />
             </Box>
             <HStack className="justify-between mr-2 ml-2">
@@ -81,7 +73,7 @@ export default function Comics() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Comics
                 </Text>
-                <Text>{store.products.length} products total</Text>
+                <Text>{store.comics_list.total_count} products total</Text>
               </Box>
               <Box className="p-2">
                 <Button

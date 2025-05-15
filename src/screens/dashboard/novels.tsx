@@ -35,7 +35,12 @@ export default function Novels() {
   useEffect(() => {
     fetchProducts(2)
       .then((res) => {
-        store.setNovels(res.data);
+        const list = {
+          products: res.data.products,
+          total_count: res.data.total_count,
+          total_pages: res.data.total_pages,
+        };
+        store.setNovels(list);
       })
       .catch((err) => {
         console.log(err);
@@ -53,27 +58,15 @@ export default function Novels() {
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.novels}
+        data={store.novels_list.products}
         scrollEnabled
         ListHeaderComponent={
           <Box>
             <Box className="h-48">
-              <Carousel
-                loop
-                width={Dimensions.get("window").width}
-                height={200}
-                autoPlay
-                autoPlayInterval={5000}
-                scrollAnimationDuration={1000}
-                data={carouselItems}
-                renderItem={({ item, index }) => (
-                  <Image
-                    key={index}
-                    className="w-full h-48"
-                    source={{ uri: item.img_url }}
-                    alt={item.name}
-                  />
-                )}
+              <Image
+                className="w-full h-48"
+                source={{ uri: carouselItems[0].img_url }}
+                alt={carouselItems[0].name}
               />
             </Box>
             <HStack className="justify-between mr-2 ml-2">
@@ -81,7 +74,7 @@ export default function Novels() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Novels
                 </Text>
-                <Text>{store.products.length} products total</Text>
+                <Text>{store.novels_list.total_count} products total</Text>
               </Box>
               <Box className="p-2">
                 <Button

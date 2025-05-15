@@ -41,7 +41,7 @@ const DashboardTabs = () => {
 
   const iconDisplay = (route: string, color: string, size: number) => {
     switch (route) {
-      case "Home":
+      case "Marketplace":
         return <House color={color} size={size} />;
       case "Search":
         return <Search color={color} size={size} />;
@@ -80,7 +80,7 @@ const DashboardTabs = () => {
     <DashboardTab.Navigator>
       <DashboardTab.Screen
         options={{
-          ...screenConfig({ route: { name: "Home" } }),
+          ...screenConfig({ route: { name: "Marketplace" } }),
         }}
         name="Home"
         component={HomeDrawer}

@@ -6,11 +6,10 @@ import {
   SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
-  Alert,
   FlatList,
 } from "react-native";
 import { useBoundStore } from "@/src/store";
-import { getReservationList, addToCart } from "@/src/api/apiEndpoints";
+import { getReservationList } from "@/src/api/apiEndpoints";
 import { ReservationItemT } from "@/src/utils/types/common";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
@@ -65,6 +64,7 @@ export default function ReservationBoxScreen() {
     setLoading(true);
     getReservationList(store.user.id, 1, PAGE_SIZE)
       .then((res) => {
+        console.log("reservations", res.data);
         const reservationData = res.data.reservations || [];
         setReservations(reservationData);
         setPage(1);
