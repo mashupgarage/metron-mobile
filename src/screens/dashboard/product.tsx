@@ -299,33 +299,41 @@ export default function Product(props: {
             >
               <Button
                 onPress={async () => {
-                  try {
-                    await addToWantList(product.id);
-                    setIsWanted(true);
-                    toast.show({
-                      placement: "top",
-                      render: ({ id }) => {
-                        const toastId = "toast-" + id;
-                        return (
-                          <Toast nativeID={toastId} action="success">
-                            <ToastTitle>Product added to want list!</ToastTitle>
-                          </Toast>
-                        );
-                      },
-                    });
-                  } catch (err) {
-                    console.log("error", err);
-                    toast.show({
-                      placement: "top",
-                      render: ({ id }) => {
-                        const toastId = "toast-" + id;
-                        return (
-                          <Toast nativeID={toastId} action="error">
-                            <ToastTitle>Failed to add to want list.</ToastTitle>
-                          </Toast>
-                        );
-                      },
-                    });
+                  if (store.user !== null) {
+                    try {
+                      await addToWantList(product.id);
+                      setIsWanted(true);
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => {
+                          const toastId = "toast-" + id;
+                          return (
+                            <Toast nativeID={toastId} action="success">
+                              <ToastTitle>
+                                Product added to want list!
+                              </ToastTitle>
+                            </Toast>
+                          );
+                        },
+                      });
+                    } catch (err) {
+                      console.log("error", err);
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => {
+                          const toastId = "toast-" + id;
+                          return (
+                            <Toast nativeID={toastId} action="error">
+                              <ToastTitle>
+                                Failed to add to want list.
+                              </ToastTitle>
+                            </Toast>
+                          );
+                        },
+                      });
+                    }
+                  } else {
+                    navigation.navigate("Auth" as never);
                   }
                 }}
                 disabled={isWanted}
@@ -381,9 +389,13 @@ export default function Product(props: {
             )}
             {maxQuantity > 0 ? (
               <Button
-                onPress={
-                  fromReservations ? handleAddToReservation : handleAddToCart
-                }
+                onPress={() => {
+                  if (store.user !== null) {
+                    fromReservations ? handleAddToReservation : handleAddToCart;
+                  } else {
+                    navigation.navigate("Auth" as never);
+                  }
+                }}
                 disabled={
                   maxQuantity <= 0 ||
                   !isQuantityValid ||

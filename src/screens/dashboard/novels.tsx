@@ -2,7 +2,8 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { useColorScheme, View } from "react-native";
+import { Dimensions, useColorScheme, View } from "react-native";
+import Carousel from "react-native-reanimated-carousel";
 import MasonryList from "@react-native-seoul/masonry-list";
 
 import ProductCard from "@/src/components/product";
@@ -23,23 +24,23 @@ import { mockedCarouselItems } from "@/src/utils/mock";
 import { useEffect, useState } from "react";
 import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 
-export default function Comics() {
+export default function Novels() {
   const store = useBoundStore();
-  const route = useRoute<RouteProp<DashboardStackParams, "Comics">>();
+  const route = useRoute<RouteProp<DashboardStackParams, "Novels">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
 
   useEffect(() => {
-    fetchProducts(6)
+    fetchProducts(2)
       .then((res) => {
         const list = {
           products: res.data.products,
           total_count: res.data.total_count,
           total_pages: res.data.total_pages,
         };
-        store.setComics(list);
+        store.setNovels(list);
       })
       .catch((err) => {
         console.log(err);
@@ -57,7 +58,7 @@ export default function Comics() {
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.comics_list.products}
+        data={store.novels_list.products}
         scrollEnabled
         ListHeaderComponent={
           <Box>
@@ -71,9 +72,9 @@ export default function Comics() {
             <HStack className="justify-between mr-2 ml-2">
               <Box className="p-2">
                 <Text className="text-primary-400 text-2xl font-bold ">
-                  Latest Comics
+                  Latest Novels
                 </Text>
-                <Text>{store.comics_list.total_count} products total</Text>
+                <Text>{store.novels_list.total_count} products total</Text>
               </Box>
               <Box className="p-2">
                 <Button

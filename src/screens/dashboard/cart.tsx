@@ -32,14 +32,16 @@ export default function Cart() {
 
   useEffect(() => {
     console.log("fetching cart....", store.cartItems);
-    fetchCartItems(store.user.id)
-      .then((res) => {
-        console.log("cart items", res.data);
-        store.setCartItems(res.data);
-      })
-      .catch((err) => {
-        console.log("cart items error", err);
-      });
+    if (store.user !== null) {
+      fetchCartItems(store.user.id)
+        .then((res) => {
+          console.log("cart items", res.data);
+          store.setCartItems(res.data);
+        })
+        .catch((err) => {
+          console.log("cart items error", err);
+        });
+    }
   }, []);
 
   // Each cart item from the backend is already unique, so just add cartQuantity = 1 for each
