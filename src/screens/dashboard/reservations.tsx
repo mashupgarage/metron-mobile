@@ -24,6 +24,7 @@ import {
   getWantList,
   getReservationList,
   addToReservation,
+  confirmReservationList,
   searchReservationProducts,
 } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
@@ -51,9 +52,14 @@ export default function ReservationsScreen() {
   const navigation = useNavigation();
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
+  // Products already reserved in the current view
   const reservedProductIds = products
     .filter((p) => p.meta_attributes?.reserved)
     .map((p) => p.id);
+  // Products from the user's reservation list (across all releases)
+  const [userReservationProductIds, setUserReservationProductIds] = useState<
+    number[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
@@ -72,12 +78,30 @@ export default function ReservationsScreen() {
     (state) => state.incrementWantlistCount
   );
 
-  // Fetch want list on mount
   useEffect(() => {
     getWantList().then((res) => {
       const ids = res.data.want_lists.map((item: any) => item.product_id);
       setWantedProductIds(ids);
     });
+
+    // Get user's reservation list to prevent duplicate reservations
+    if (store.user?.id) {
+      getReservationList(store.user.id)
+        .then((res) => {
+          console.log("Reservation list response:", res.data.reservations);
+          const reservationProducts = res.data.reservations || [];
+          // Extract product IDs from the reservation items
+          // The response shows product as [Object], so we need to access product.id
+          const productIds = reservationProducts
+            .map((item: any) => item.product?.id)
+            .filter((id) => id !== undefined);
+          setUserReservationProductIds(productIds);
+          store.setOrdersCount(res.data.metadata?.total_count || 0);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch reservation list:", err);
+        });
+    }
   }, []);
 
   // Fetch all release dates from API
@@ -181,6 +205,20 @@ export default function ReservationsScreen() {
   };
 
   const toggleProductSelection = (productId: number) => {
+    // Prevent selecting if product is already in user's reservation list
+    if (userReservationProductIds.includes(productId)) {
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <Toast nativeID={"toast-" + id} action="warning">
+            <ToastTitle>Already in your reservation list</ToastTitle>
+          </Toast>
+        ),
+      });
+      return;
+    }
+
+    // Toggle selection for valid products
     setSelectedProducts((prev) => {
       if (prev.includes(productId)) {
         return prev.filter((id) => id !== productId);
@@ -189,6 +227,7 @@ export default function ReservationsScreen() {
       }
     });
   };
+
   const exitMultiSelectMode = () => {
     setIsMultiSelectMode(false);
     setSelectedProducts([]);
@@ -197,12 +236,20 @@ export default function ReservationsScreen() {
   const confirmReservation = async () => {
     if (selectedProducts.length === 0) return;
     try {
-      // Save all selected products to reservation (parallel)
-      await Promise.all(
+      // Step 1: Add all selected products to reservation list and collect reservation IDs
+      const addToReservationResponses = await Promise.all(
         selectedProducts.map((productId) =>
           addToReservation(productId, 1, selectedReleaseId)
         )
       );
+      
+      // Extract reservation IDs from the responses
+      const reservationIds = addToReservationResponses.map(response => response.data.id);
+      
+      // Step 2: Confirm the reservation by submitting it to the backend
+      await confirmReservationList(selectedReleaseId, reservationIds, selectedProducts);
+      
+      // Update local products state to show as reserved
       setProducts((prev) =>
         prev.map((product) => {
           if (selectedProducts.includes(product.id)) {
@@ -217,6 +264,13 @@ export default function ReservationsScreen() {
           return product;
         })
       );
+
+      // Also update the userReservationProductIds to mark these as already reserved
+      setUserReservationProductIds((prevIds) => [
+        ...prevIds,
+        ...selectedProducts,
+      ]);
+
       setIsMultiSelectMode(false);
       setSelectedProducts([]);
       toast.show({
@@ -227,6 +281,24 @@ export default function ReservationsScreen() {
           </Toast>
         ),
       });
+
+      // Refresh the full reservation list to ensure everything is in sync
+      if (store.user?.id) {
+        getReservationList(store.user.id)
+          .then((res) => {
+            const reservationProducts = res.data.reservations || [];
+            const productIds = reservationProducts
+              .map((item: any) => item.product?.id)
+              .filter((id) => id !== undefined);
+            setUserReservationProductIds(productIds);
+
+            // Update the global orders count in the store to reflect on the profile page
+            store.setOrdersCount(res.data.metadata?.total_count || 0);
+          })
+          .catch((err) => {
+            console.error("Failed to refresh reservation list:", err);
+          });
+      }
     } catch (e) {
       console.log(e);
       toast.show({
@@ -238,14 +310,6 @@ export default function ReservationsScreen() {
         ),
       });
     }
-  };
-
-  const isProductReserved = (product: ProductT) => {
-    return product.meta_attributes?.reserved === true;
-  };
-
-  const getQuantityLeft = (product: ProductT) => {
-    return product.quantity || 0;
   };
 
   const toggleDrawer = () => {
@@ -288,12 +352,7 @@ export default function ReservationsScreen() {
           options.release_id = selectedReleaseId;
         }
 
-        console.log("Sending search request with options:", options);
         const response = await searchReservationProducts(query, options);
-        console.log(
-          "Search response received, first item:",
-          JSON.stringify(response.data.reservations[0], null, 2)
-        );
 
         // Map the search response to products format with unique IDs for list rendering
         const searchProducts = response.data.reservations.map((item: any) => {
@@ -594,8 +653,26 @@ export default function ReservationsScreen() {
                   <Pressable
                     onPress={() => {
                       if (isMultiSelectMode) {
-                        if (!reservedProductIds.includes(product.id)) {
+                        // Prevent selecting already reserved products in the current view
+                        // or products that are already in the user's reservation list
+                        if (
+                          !reservedProductIds.includes(product.id) &&
+                          !userReservationProductIds.includes(product.id)
+                        ) {
                           toggleProductSelection(product.id);
+                        } else if (
+                          userReservationProductIds.includes(product.id)
+                        ) {
+                          toast.show({
+                            placement: "top",
+                            render: ({ id }) => (
+                              <Toast nativeID={"toast-" + id} action="warning">
+                                <ToastTitle>
+                                  Already in your reservation list
+                                </ToastTitle>
+                              </Toast>
+                            ),
+                          });
                         }
                       } else {
                         getReservationList(store.user?.id).then((res) => {
@@ -612,9 +689,21 @@ export default function ReservationsScreen() {
                     }}
                     style={({ pressed }) => [
                       { opacity: pressed ? 0.7 : 1 },
+                      // Reduce opacity for products that can't be selected (already reserved in UI or in user's list)
                       isMultiSelectMode &&
-                      reservedProductIds.includes(product.id)
+                      (reservedProductIds.includes(product.id) ||
+                        userReservationProductIds.includes(product.id))
                         ? { opacity: 0.4 }
+                        : {},
+                      // Show different visual styling for products already in user's reservation list
+                      isMultiSelectMode &&
+                      userReservationProductIds.includes(product.id)
+                        ? {
+                            borderWidth: 1,
+                            borderColor: "#FF9800",
+                            borderRadius: 12,
+                            backgroundColor: "rgba(255, 152, 0, 0.1)",
+                          }
                         : {},
                       isMultiSelectMode && isSelected
                         ? {
@@ -630,7 +719,11 @@ export default function ReservationsScreen() {
                         {product.cover_url && !imageErrors[product.id] ? (
                           // Show actual image if URL exists and no error
                           <Image
-                            source={{ uri: product.cover_url }}
+                            source={{
+                              uri:
+                                product.cover_url ??
+                                `https://assets.comic-odyssey.com/products/covers/small/${product.cover_file_name}`,
+                            }}
                             alt={product.id.toString()}
                             className="h-48 w-full rounded-md"
                             resizeMode="cover"
@@ -676,7 +769,19 @@ export default function ReservationsScreen() {
                           </Text>
                         </View>
                         <View className="flex-row justify-between items-center mt-1">
-                          <View style={{ alignItems: "flex-end" }}></View>
+                          <View style={{ alignItems: "flex-end" }}>
+                            {userReservationProductIds.includes(product.id) && (
+                              <Text
+                                style={{
+                                  color: "#FF9800",
+                                  fontWeight: "bold",
+                                  fontSize: 12,
+                                }}
+                              >
+                                Already Reserved
+                              </Text>
+                            )}
+                          </View>
                         </View>
                       </View>
                     </Box>

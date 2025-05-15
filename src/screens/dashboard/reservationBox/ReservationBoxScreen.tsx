@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Image,
-  StyleSheet,
   SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
@@ -16,6 +15,7 @@ import { ReservationItemT } from "@/src/utils/types/common";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
+import { styles } from "./style";
 
 const PAGE_SIZE = 10;
 
@@ -140,40 +140,6 @@ export default function ReservationBoxScreen() {
       // );
     }
 
-    const handleAddToCart = async () => {
-      try {
-        if (!store.user || !store.user.id) {
-          Alert.alert("Error", "You need to be logged in to add items to cart");
-          return;
-        }
-
-        await addToCart(store.user.id, reservation.product.id, reservation.id);
-
-        Alert.alert(
-          "Success",
-          `${reservation.product.title} has been added to your cart`
-        );
-      } catch (error) {
-        // Enhanced error logging
-        console.error("Failed to add to cart. Details:", {
-          error: error,
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown error",
-          errorName: error instanceof Error ? error.name : "Unknown error type",
-          productId: reservation.product.id,
-          productTitle: reservation.product.title,
-          userId: store.user?.id,
-        });
-
-        Alert.alert(
-          "Error",
-          `Failed to add item to cart: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`
-        );
-      }
-    };
-
     return (
       <View style={styles.gridItemContainer}>
         {hasImageError ? (
@@ -188,7 +154,11 @@ export default function ReservationBoxScreen() {
         ) : (
           // Try to load actual image
           <Image
-            source={{ uri: coverUrl }}
+            source={{
+              uri:
+                coverUrl ??
+                `https://assets.comic-odyssey.com/products/covers/medium/${reservation.product?.cover_file_name}`,
+            }}
             style={styles.gridItemImage}
             resizeMode="cover"
             onError={() => {
@@ -225,26 +195,30 @@ export default function ReservationBoxScreen() {
             <Text style={styles.reservationStatus}>
               {reservation.status === "for_approval"
                 ? "For Approval"
-                : reservation.status || "Pending"}
+                : reservation.status === "external"
+                ? "Short"
+                : reservation.status === "void"
+                ? "Void"
+                : reservation.status === "internal"
+                ? "Damaged/Lost"
+                : "Approved"}
             </Text>
           </View>
 
           {/* Availability indicator and Add to Cart button */}
-          <View style={styles.availabilityContainer}>
-            {isAvailable && (
-              <TouchableOpacity
-                style={
-                  reservation.status === "for_approval"
-                    ? styles.addToCartDisabled
-                    : styles.addToCartButton
-                }
-                onPress={handleAddToCart}
-                disabled={reservation.status === "for_approval"}
-              >
-                <Text style={styles.addToCartText}>Add to Cart</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          {/* <View style={styles.availabilityContainer}>
+            <TouchableOpacity
+              style={
+                reservation.status === "for_approval"
+                  ? styles.addToCartDisabled
+                  : styles.addToCartButton
+              }
+              onPress={handleAddToCart}
+              disabled={reservation.status === "for_approval"}
+            >
+              <Text style={styles.addToCartText}>Add to Cart</Text>
+            </TouchableOpacity>
+          </View> */}
         </View>
       </View>
     );
@@ -275,7 +249,6 @@ export default function ReservationBoxScreen() {
           setIsFetchingMore(true);
           try {
             const nextPage = page + 1;
-            console.log("Fetching page:", nextPage);
             const res = await getReservationList(
               store.user.id,
               nextPage,
@@ -284,12 +257,10 @@ export default function ReservationBoxScreen() {
             // console.log('API returned reservations:', res.data.reservations);
             const newReservations = res.data.reservations || [];
             setReservations((prev) => {
-              console.log("Previous reservations count:", prev.length);
               const existingIds = new Set(prev.map((item) => item.id));
               const filtered = newReservations.filter(
                 (item) => !existingIds.has(item.id)
               );
-              console.log("Filtered new reservations count:", filtered.length);
               const combined = [...prev, ...filtered];
               console.log(
                 "Combined reservations count after append:",
@@ -326,164 +297,3 @@ export default function ReservationBoxScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    paddingTop: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    backgroundColor: "#ffffff",
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 16,
-    flex: 1,
-  },
-  rightHeaderPlaceholder: {
-    width: 40,
-  },
-  masonryListContainer: {
-    paddingHorizontal: 6,
-    paddingTop: 10,
-  },
-  gridItemContainer: {
-    flex: 1,
-    margin: 6,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-    overflow: "hidden",
-  },
-  gridItemImage: {
-    width: "100%",
-    height: 150,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  gridItemDetails: {
-    padding: 10,
-  },
-  gridItemTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 3,
-  },
-  gridItemPrice: {
-    fontSize: 13,
-    color: "#28a745",
-    fontWeight: "600",
-    marginBottom: 3,
-  },
-  gridItemCreators: {
-    fontSize: 12,
-    color: "#6c757d",
-    marginBottom: 5,
-  },
-  gridItemIssue: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 2,
-  },
-  reservationInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 5,
-    paddingTop: 5,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-  },
-  reservationQuantity: {
-    fontSize: 12,
-    color: "#333",
-  },
-  reservationStatus: {
-    fontSize: 12,
-    color: "#1A237E",
-    fontWeight: "500",
-  },
-  availabilityContainer: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-  },
-  availableText: {
-    fontSize: 12,
-    color: "#28a745",
-    fontWeight: "500",
-    marginBottom: 5,
-  },
-  unavailableText: {
-    fontSize: 12,
-    color: "#dc3545",
-    fontWeight: "500",
-  },
-  addToCartButton: {
-    backgroundColor: "#1A237E",
-    padding: 8,
-    borderRadius: 4,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  addToCartDisabled: {
-    backgroundColor: "#ccc",
-    padding: 8,
-    borderRadius: 4,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  addToCartText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  messageText: {
-    fontSize: 16,
-    color: "#555",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 14,
-    color: "#dc3545",
-    marginTop: 8,
-    textAlign: "center",
-  },
-  placeholderContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-  },
-  placeholderImage: {
-    width: 120,
-    height: 120,
-    marginBottom: 18,
-    opacity: 0.2,
-  },
-});
