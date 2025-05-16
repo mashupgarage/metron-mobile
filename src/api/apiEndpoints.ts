@@ -31,18 +31,20 @@ export const fetchProductDetails = (id: number) => {
  * Fetch available products in the system with pagination support.
  * @param category_id - Optional category ID to filter products
  * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of items per page (default: 10)
  * @returns Axios promise resolving to an array of products for that page
  * @example
  * fetchProducts(undefined, 2).then(res => res.data) // fetch page 2 of all products
  */
-export const fetchProducts = (category_id?: number, page: number = 1) => {
-  const params: Record<string, string | number> = { page };
+export const fetchProducts = (category_id?: number, page: number = 1, limit: number = 10) => {
+  const params: Record<string, string | number> = { page, limit };
   
   if (category_id !== undefined) {
     return axiosClient.get(`/marketplace/catalog_products`, { 
       params: { 
         c: category_id,
-        page
+        page,
+        limit
       } 
     });
   }
