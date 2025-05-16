@@ -54,10 +54,13 @@ export default function Comics() {
       });
   }, [route.params]);
 
+  // Ensure comics array exists to prevent "Cannot read property 'length' of undefined" error
+  const comics = store.comics_list?.products || [];
+
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.comics_list.products}
+        data={comics}
         scrollEnabled
         ListHeaderComponent={
           <Box>
@@ -73,7 +76,9 @@ export default function Comics() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Comics
                 </Text>
-                <Text>{store.comics_list.total_count} products total</Text>
+                <Text>
+                  {store.comics_list?.total_count || 0} products total
+                </Text>
               </Box>
               <Box className="p-2">
                 <Button

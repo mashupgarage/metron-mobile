@@ -2,7 +2,7 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { useColorScheme, View } from "react-native";
+import { useColorScheme, View, ActivityIndicator } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 
 import ProductCard from "@/src/components/product";
@@ -20,9 +20,11 @@ import { HStack } from "@/src/components/ui/hstack";
 import { Button } from "@/src/components/ui/button";
 import { Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 import Constants from "expo-constants";
+
+const PAGE_SIZE = 10; // Define standard page size
 
 export default function Home() {
   const store = useBoundStore();
@@ -31,25 +33,19 @@ export default function Home() {
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   console.log(
     "------------------------------------------------>",
     Constants.expoConfig.extra.apiUrl,
     "<------------------------------------------------"
   );
+
+  // Load first page of products when component mounts or route params change
   useEffect(() => {
-    fetchProducts()
-      .then((res) => {
-        const list = {
-          products: res.data.products,
-          total_count: res.data.total_count,
-          total_pages: res.data.total_pages,
-        };
-        store.setProducts(list);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    loadInitialProducts();
 
     fetchUserProfile(store.user?.id)
       .then((res) => {
@@ -60,11 +56,98 @@ export default function Home() {
       });
   }, [route.params]);
 
+  // Function to load initial products
+  const loadInitialProducts = useCallback(() => {
+    store.setProductsLoading(true);
+    setCurrentPage(1);
+
+    fetchProducts(undefined, 1, PAGE_SIZE)
+      .then((res) => {
+        const products = res.data.products || [];
+        const totalCount = res.data.total_count || 0;
+        const pages = res.data.total_pages || 1;
+
+        store.setProducts({
+          products: products,
+          total_count: totalCount,
+          total_pages: pages,
+        });
+
+        setTotalPages(pages);
+      })
+      .catch((err) => {
+        console.log("Failed to fetch products:", err);
+      })
+      .finally(() => {
+        store.setProductsLoading(false);
+      });
+  }, []);
+
+  // Function to load more products
+  const loadMoreProducts = useCallback(async () => {
+    // Don't fetch if already fetching, no more pages, or initial loading
+    if (
+      isFetchingMore ||
+      currentPage >= totalPages ||
+      store.products_list?.loading
+    ) {
+      return;
+    }
+
+    setIsFetchingMore(true);
+    const nextPage = currentPage + 1;
+
+    try {
+      const res = await fetchProducts(undefined, nextPage, PAGE_SIZE);
+      const newProducts = res.data.products || [];
+
+      // Update store with new products
+      store.appendProducts({
+        products: newProducts,
+        total_count: res.data.total_count,
+        total_pages: res.data.total_pages,
+        page: nextPage,
+      });
+
+      // Update local state
+      setCurrentPage(nextPage);
+    } catch (err) {
+      console.error("Failed to fetch more products:", err);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [currentPage, totalPages, isFetchingMore, store.products_list?.loading]);
+
+  // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
+  const products = store.products_list?.products || [];
+  const isLoading = store.products_list?.loading || false;
+  const totalCount = store.products_list?.total_count || 0;
+
+  // Footer component shown during loading or displaying count
+  const renderFooter = () => {
+    return (
+      <Box className="py-4 flex justify-center items-center">
+        {(isLoading || isFetchingMore) && (
+          <>
+            <ActivityIndicator size="small" color="#0000ff" />
+            <Text className="mt-2">Loading products...</Text>
+          </>
+        )}
+
+        <Text className="text-sm text-gray-500 mt-2">
+          Showing {products.length} of {totalCount} products
+        </Text>
+      </Box>
+    );
+  };
+
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.products_list.products}
+        data={products}
         scrollEnabled
+        onEndReached={loadMoreProducts}
+        onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <Box>
             <Box className="h-48">
@@ -79,7 +162,7 @@ export default function Home() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Products
                 </Text>
-                <Text>{store.products_list.total_count} products total</Text>
+                <Text>{totalCount} products total</Text>
               </Box>
               <Box className="p-2">
                 <Button
@@ -97,8 +180,9 @@ export default function Home() {
             </HStack>
           </Box>
         }
+        ListFooterComponent={renderFooter()}
         numColumns={2}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => `${item.id}_${index}`}
         renderItem={({ item, i }) => (
           <Pressable
             onPress={() => {

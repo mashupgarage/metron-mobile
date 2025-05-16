@@ -55,10 +55,13 @@ export default function Novels() {
       });
   }, [route.params]);
 
+  // Ensure novels array exists to prevent "Cannot read property 'length' of undefined" error
+  const novels = store.novels_list?.products || [];
+
   return (
     <Box className="h-screen w-full pb-24">
       <MasonryList
-        data={store.novels_list.products}
+        data={novels}
         scrollEnabled
         ListHeaderComponent={
           <Box>
@@ -74,7 +77,9 @@ export default function Novels() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Novels
                 </Text>
-                <Text>{store.novels_list.total_count} products total</Text>
+                <Text>
+                  {store.novels_list?.total_count || 0} products total
+                </Text>
               </Box>
               <Box className="p-2">
                 <Button
