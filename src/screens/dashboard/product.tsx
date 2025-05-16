@@ -103,6 +103,7 @@ export default function Product(props: {
   }, [product.id]);
 
   const handleAddToCart = async () => {
+    console.log("pressed");
     if (!store.user || !store.user.id) {
       toast.show({
         placement: "top",
@@ -391,7 +392,9 @@ export default function Product(props: {
               <Button
                 onPress={() => {
                   if (store.user !== null) {
-                    fromReservations ? handleAddToReservation : handleAddToCart;
+                    fromReservations
+                      ? handleAddToReservation()
+                      : handleAddToCart();
                   } else {
                     navigation.navigate("Auth" as never);
                   }
