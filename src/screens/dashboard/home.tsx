@@ -24,6 +24,8 @@ import { useCallback, useEffect, useState } from "react";
 import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 import Constants from "expo-constants";
 
+const PAGE_SIZE = 10; // Define standard page size
+
 export default function Home() {
   const store = useBoundStore();
   const route = useRoute<RouteProp<DashboardStackParams, "Home">>();
@@ -31,6 +33,9 @@ export default function Home() {
 
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   console.log(
     "------------------------------------------------>",
@@ -40,7 +45,7 @@ export default function Home() {
 
   // Load first page of products when component mounts or route params change
   useEffect(() => {
-    loadProducts(1);
+    loadInitialProducts();
 
     fetchUserProfile(store.user?.id)
       .then((res) => {
@@ -51,61 +56,87 @@ export default function Home() {
       });
   }, [route.params]);
 
-  // Function to load products for a specific page
-  const loadProducts = useCallback((page: number) => {
-    // Set loading state
+  // Function to load initial products
+  const loadInitialProducts = useCallback(() => {
     store.setProductsLoading(true);
+    setCurrentPage(1);
 
-    fetchProducts(undefined, page)
+    fetchProducts(undefined, 1, PAGE_SIZE)
       .then((res) => {
-        const list = {
-          products: res.data.products,
-          total_count: res.data.total_count,
-          total_pages: res.data.total_pages,
-          page: page,
-        };
+        const products = res.data.products || [];
+        const totalCount = res.data.total_count || 0;
+        const pages = res.data.total_pages || 1;
 
-        if (page === 1) {
-          // Reset the list for page 1
-          store.setProducts({
-            products: list.products,
-            total_count: list.total_count,
-            total_pages: list.total_pages,
-          });
-        } else {
-          // Append to existing list for subsequent pages
-          store.appendProducts(list);
-        }
+        store.setProducts({
+          products: products,
+          total_count: totalCount,
+          total_pages: pages,
+        });
+
+        setTotalPages(pages);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Failed to fetch products:", err);
+      })
+      .finally(() => {
         store.setProductsLoading(false);
       });
   }, []);
 
-  // Handle end of list reached event to load more products
-  const handleLoadMore = useCallback(() => {
-    const { current_page, total_pages, loading } = store.products_list;
+  // Function to load more products
+  const loadMoreProducts = useCallback(async () => {
+    // Don't fetch if already fetching, no more pages, or initial loading
+    if (
+      isFetchingMore ||
+      currentPage >= totalPages ||
+      store.products_list?.loading
+    ) {
+      return;
+    }
 
-    // Don't fetch if we're already loading or at the last page
-    if (loading || current_page >= total_pages) return;
+    setIsFetchingMore(true);
+    const nextPage = currentPage + 1;
 
-    // Load the next page
-    loadProducts(current_page + 1);
-  }, [store.products_list, loadProducts]);
+    try {
+      const res = await fetchProducts(undefined, nextPage, PAGE_SIZE);
+      const newProducts = res.data.products || [];
+
+      // Update store with new products
+      store.appendProducts({
+        products: newProducts,
+        total_count: res.data.total_count,
+        total_pages: res.data.total_pages,
+        page: nextPage,
+      });
+
+      // Update local state
+      setCurrentPage(nextPage);
+    } catch (err) {
+      console.error("Failed to fetch more products:", err);
+    } finally {
+      setIsFetchingMore(false);
+    }
+  }, [currentPage, totalPages, isFetchingMore, store.products_list?.loading]);
 
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
   const products = store.products_list?.products || [];
   const isLoading = store.products_list?.loading || false;
+  const totalCount = store.products_list?.total_count || 0;
 
-  // Footer component shown during loading
+  // Footer component shown during loading or displaying count
   const renderFooter = () => {
-    if (!isLoading) return null;
-
     return (
       <Box className="py-4 flex justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text className="mt-2">Loading more products...</Text>
+        {(isLoading || isFetchingMore) && (
+          <>
+            <ActivityIndicator size="small" color="#0000ff" />
+            <Text className="mt-2">Loading products...</Text>
+          </>
+        )}
+
+        <Text className="text-sm text-gray-500 mt-2">
+          Showing {products.length} of {totalCount} products
+        </Text>
       </Box>
     );
   };
@@ -115,7 +146,7 @@ export default function Home() {
       <MasonryList
         data={products}
         scrollEnabled
-        onEndReached={handleLoadMore}
+        onEndReached={loadMoreProducts}
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <Box>
@@ -131,9 +162,7 @@ export default function Home() {
                 <Text className="text-primary-400 text-2xl font-bold ">
                   Latest Products
                 </Text>
-                <Text>
-                  {store.products_list?.total_count || 0} products total
-                </Text>
+                <Text>{totalCount} products total</Text>
               </Box>
               <Box className="p-2">
                 <Button
