@@ -28,16 +28,25 @@ export const fetchProductDetails = (id: number) => {
 };
 
 /**
- * Fetch all available products in the system.
- * @returns Axios promise resolving to an array of all products.
+ * Fetch available products in the system with pagination support.
+ * @param category_id - Optional category ID to filter products
+ * @param page - Page number for pagination (default: 1)
+ * @returns Axios promise resolving to an array of products for that page
  * @example
- * fetchProducts().then(res => res.data)
+ * fetchProducts(undefined, 2).then(res => res.data) // fetch page 2 of all products
  */
-export const fetchProducts = (category_id?: number) => {
+export const fetchProducts = (category_id?: number, page: number = 1) => {
+  const params: Record<string, string | number> = { page };
+  
   if (category_id !== undefined) {
-    return axiosClient.get(`/marketplace/catalog_products?c=${category_id}`);
+    return axiosClient.get(`/marketplace/catalog_products`, { 
+      params: { 
+        c: category_id,
+        page
+      } 
+    });
   }
-  return axiosClient.get("/marketplace/catalog_products");
+  return axiosClient.get("/marketplace/catalog_products", { params });
 };
 
 // =========================
