@@ -215,7 +215,7 @@ export const fetchReleaseById = (id: number) => {
  * fetchProductsByReleaseId(1).then(res => res.data)
  */
 export const fetchProductsByReleaseId = (id: number) => {
-  return axiosClient.get(`/releases/${id}/products`);
+  return axiosClient.get(`/releases/${id}/products?meta=true`);
 };
 
 // =========================
