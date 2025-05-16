@@ -12,7 +12,6 @@ import { DashboardStack } from "./src/navigation/DashboardStack";
 import { useBoundStore } from "./src/store";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import Constants from "expo-constants";
 import { loadAuthTokenToAxios } from "./src/api/tokenManager";
 
 const Stack = createNativeStackNavigator();
@@ -21,7 +20,6 @@ export default function App() {
   const store = useBoundStore();
   const [fontsLoaded] = useFonts(InterFonts);
   useEffect(() => {
-    // store.setProducts([]);
     loadAuthTokenToAxios();
   }, []);
 
@@ -40,7 +38,7 @@ export default function App() {
         {fontsLoaded && (
           <GluestackUIProvider mode="system">
             <NavigationContainer>
-              <Stack.Navigator>
+              <Stack.Navigator id={undefined}>
                 <Stack.Screen
                   name="Dashboard"
                   options={{ headerShown: false }}

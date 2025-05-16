@@ -96,8 +96,7 @@ export const useReservationManager = () => {
         setProducts(response.data);
         setLoading(false);
       } else {
-        const response = await fetchProducts();
-        setProducts(response.data);
+        setProducts([]);
         setLoading(false);
       }
     } catch (err) {
