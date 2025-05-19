@@ -142,6 +142,7 @@ export default function Profile(props: { navigation: any }) {
                 // handle want list display
                 console.log("orders list", res.data);
               });
+              props.navigation.navigate("Collection");
             }}
           >
             <Ionicons name="cube-outline" size={24} color="#4285F4" />
