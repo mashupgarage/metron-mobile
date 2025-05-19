@@ -45,6 +45,7 @@ interface ExtendedProduct {
   description?: string;
   issue_number?: string;
   quantity?: number;
+  cover_url?: string;
 }
 
 // Extended WantListItem type
@@ -204,7 +205,25 @@ export default function WantlistScreen() {
       <Pressable
         style={styles.gridItemContainer}
         onPress={() => {
-          console.log("Pressed item:", wantlistItem.product?.title);
+          if (wantlistItem.product) {
+            // Create a sanitized copy of the product with a valid cover_url
+            const sanitizedProduct = {
+              ...wantlistItem.product,
+              // Ensure cover_url is a valid string URL
+              cover_url:
+                typeof wantlistItem.product.cover_url === "string" &&
+                wantlistItem.product.cover_url.trim() !== ""
+                  ? wantlistItem.product.cover_url
+                  : wantlistItem.product.cover_file_name
+                  ? `https://assets.comic-odyssey.com/products/covers/medium/${wantlistItem.product.cover_file_name}`
+                  : "",
+            };
+
+            // @ts-ignore
+            navigation.navigate("Product", {
+              product: sanitizedProduct,
+            });
+          }
         }}
       >
         {hasImageError ? (

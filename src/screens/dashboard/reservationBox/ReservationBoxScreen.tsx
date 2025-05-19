@@ -33,6 +33,7 @@ interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
     description?: string;
     issue_number?: string;
     quantity?: number;
+    cover_url?: string;
   };
 }
 const getCoverUrl = (coverFileName?: string) =>
@@ -141,7 +142,31 @@ export default function ReservationBoxScreen() {
     }
 
     return (
-      <View style={styles.gridItemContainer}>
+      <TouchableOpacity
+        style={styles.gridItemContainer}
+        onPress={() => {
+          if (reservation.product) {
+            // Create a sanitized copy of the product with a valid cover_url
+            const sanitizedProduct = {
+              ...reservation.product,
+              // Ensure cover_url is a valid string URL
+              cover_url:
+                typeof reservation.product.cover_url === "string" &&
+                reservation.product.cover_url.trim() !== ""
+                  ? reservation.product.cover_url
+                  : reservation.product.cover_file_name
+                  ? `https://assets.comic-odyssey.com/products/covers/medium/${reservation.product.cover_file_name}`
+                  : "",
+            };
+
+            // @ts-ignore
+            navigation.navigate("Product", {
+              product: sanitizedProduct,
+              fromReservations: true,
+            });
+          }
+        }}
+      >
         {hasImageError ? (
           // Show placeholder when there's an error or no URL
           <View style={styles.placeholderContainer}>
@@ -220,7 +245,7 @@ export default function ReservationBoxScreen() {
             </TouchableOpacity>
           </View> */}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
