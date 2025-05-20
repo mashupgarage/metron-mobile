@@ -30,7 +30,6 @@ export default function Search() {
 
   const handleSearch = async (page = 1) => {
     if (searchQuery.trim() === "") return;
-    console.log("searchQuery", searchQuery);
 
     if (page === 1) {
       setLoading(true);
@@ -41,11 +40,9 @@ export default function Search() {
 
     try {
       const response = await searchMarketplaceProducts(searchQuery, page);
-      console.log("Search API response:", response.data);
 
       // Check what structure the data is in and handle accordingly
       const productsArray = response.data.products || response.data.data || [];
-      console.log("Products array length:", productsArray.length);
 
       // Access products array correctly
       if (page === 1) {
@@ -68,17 +65,8 @@ export default function Search() {
       setTotalCount(totalItems);
       setHasMore(page < totalPagesValue);
       setCurrentPage(currentPageValue);
-
-      console.log("Updated state:", {
-        productsCount: productsArray.length,
-        totalCount: totalItems,
-        totalPages: totalPagesValue,
-        currentPage: currentPageValue,
-        hasMore: page < totalPagesValue,
-      });
     } catch (err) {
       setError("Failed to fetch search results. Please try again.");
-      console.error("Search error:", err);
     } finally {
       setLoading(false);
       setIsFetchingMore(false);
