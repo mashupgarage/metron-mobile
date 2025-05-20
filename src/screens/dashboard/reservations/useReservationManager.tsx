@@ -29,6 +29,9 @@ interface Release {
   customers_count: number;
 }
 
+// Define standard page size
+const PAGE_SIZE = 10;
+
 export const useReservationManager = () => {
   const store = useBoundStore();
   const toast = useToast();
@@ -64,10 +67,29 @@ export const useReservationManager = () => {
   );
   const [uncheckedProducts, setUncheckedProducts] = useState<number[]>([]);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+
   // Computed properties
-  const reservedProductIds = products
-    .filter((p) => p.meta_attributes?.reserved)
-    .map((p) => p.id);
+  const reservedProductIds = (() => {
+    // Check if products is an array
+    if (Array.isArray(products)) {
+      return products
+        .filter((p) => p.meta_attributes?.reserved)
+        .map((p) => p.id);
+    }
+    // If products is an object with some properties, try to handle it
+    else if (products && typeof products === "object") {
+      console.log("Products is an object, not an array:", products);
+      return [];
+    }
+    // Default empty array
+    return [];
+  })();
 
   // API Interactions
   const fetchReleaseDatesFromAPI = async () => {
@@ -88,23 +110,94 @@ export const useReservationManager = () => {
     }
   };
 
-  const loadProductsByRelease = async (id: number | null) => {
+  const loadProductsByRelease = async (
+    id: number | null,
+    page = 1,
+    resetList = true
+  ) => {
     try {
-      setLoading(true);
+      // Only show full loading indicator on first page or reset
+      if (page === 1 || resetList) {
+        setLoading(true);
+      } else {
+        setIsFetchingMore(true);
+      }
+
       if (id) {
-        const response = await fetchProductsByReleaseId(id);
-        setProducts(response.data);
-        setLoading(false);
+        const response = await fetchProductsByReleaseId(id, page, PAGE_SIZE);
+        console.log("API Response type:", typeof response.data);
+        console.log("Is response.data an array?", Array.isArray(response.data));
+
+        // Extract products and pagination info
+        let productsArray: ProductT[] = [];
+        let totalItems = 0;
+        let totalPagesCount = 1;
+        let currentPageValue = page;
+
+        if (Array.isArray(response.data)) {
+          productsArray = response.data;
+          // If it's just an array, assume it's the full list
+          totalItems = response.data.length;
+        } else if (response.data && typeof response.data === "object") {
+          console.log("Response data structure:", Object.keys(response.data));
+
+          // Check for common API response patterns
+          if ("products" in response.data) {
+            productsArray = response.data.products;
+            totalItems = response.data.total_count || productsArray.length;
+            totalPagesCount = response.data.total_pages || 1;
+            currentPageValue = response.data.current_page || page;
+          } else if ("data" in response.data) {
+            productsArray = response.data.data;
+            totalItems = response.data.meta?.total || productsArray.length;
+            totalPagesCount = response.data.meta?.last_page || 1;
+            currentPageValue = response.data.meta?.current_page || page;
+          } else {
+            // Try to convert to array if no recognized structure
+            console.log("Converting response data to array");
+            productsArray = Object.values(response.data || {}) as ProductT[];
+            totalItems = productsArray.length;
+          }
+        }
+
+        // Update state based on whether we're appending or replacing
+        if (page === 1 || resetList) {
+          setProducts(productsArray);
+        } else {
+          setProducts((prevProducts) => [...prevProducts, ...productsArray]);
+        }
+
+        // Update pagination state
+        setTotalCount(totalItems);
+        setTotalPages(totalPagesCount);
+        setCurrentPage(currentPageValue);
+        setHasMore(currentPageValue < totalPagesCount);
       } else {
         setProducts([]);
-        setLoading(false);
+        setTotalCount(0);
+        setTotalPages(1);
+        setCurrentPage(1);
+        setHasMore(false);
       }
     } catch (err) {
       console.error("Failed to fetch releases:", err);
       setError("Failed to load releases");
+    } finally {
       setLoading(false);
+      setIsFetchingMore(false);
     }
   };
+
+  // Function to load more products (next page)
+  const loadMoreProducts = useCallback(() => {
+    // Don't fetch if already fetching, no more pages, or initial loading
+    if (isFetchingMore || loading || !hasMore || !selectedReleaseId) {
+      return;
+    }
+
+    console.log(`Loading more products: page ${currentPage + 1}`);
+    loadProductsByRelease(selectedReleaseId, currentPage + 1, false);
+  }, [currentPage, hasMore, isFetchingMore, loading, selectedReleaseId]);
 
   // Helper functions
   const getLatestRelease = (entries: Release[]): Release | null => {
@@ -147,7 +240,7 @@ export const useReservationManager = () => {
     if (latest) {
       setSelectedReleaseId(latest.id);
       setSelectedDate(latest.release_date);
-      loadProductsByRelease(latest.id);
+      loadProductsByRelease(latest.id, 1, true);
     } else {
       setSelectedReleaseId(null);
       setSelectedDate("");
@@ -159,7 +252,9 @@ export const useReservationManager = () => {
     setSelectedDate(date);
     setSelectedReleaseId(id);
     setShowDrawer(false);
-    loadProductsByRelease(id);
+    // Reset to page 1 when selecting a new date
+    setCurrentPage(1);
+    loadProductsByRelease(id, 1, true);
   };
 
   // Selection & Reservation handling
@@ -226,9 +321,18 @@ export const useReservationManager = () => {
     if (selectedProducts.length === 0) return;
 
     // Get the selected product objects from the products list
-    const productsToConfirm = products.filter((product) =>
-      selectedProducts.includes(product.id)
-    );
+    let productsToConfirm = [];
+
+    // Check if products is an array
+    if (Array.isArray(products)) {
+      productsToConfirm = products.filter((product) =>
+        selectedProducts.includes(product.id)
+      );
+    }
+    // If products is an object, log it for debugging
+    else if (products && typeof products === "object") {
+      console.log("Products is an object in showConfirmationDialog:", products);
+    }
 
     // Reset unchecked products list when opening modal
     setUncheckedProducts([]);
@@ -369,7 +473,7 @@ export const useReservationManager = () => {
       console.log("Performing search for:", query);
       if (!query.trim()) {
         // If search is cleared, reload products by release
-        loadProductsByRelease(selectedReleaseId);
+        loadProductsByRelease(selectedReleaseId, 1, true);
         return;
       }
 
@@ -407,6 +511,10 @@ export const useReservationManager = () => {
         });
 
         setProducts(searchProducts);
+        setCurrentPage(1);
+        setTotalCount(searchProducts.length);
+        setTotalPages(1);
+        setHasMore(false);
       } catch (err) {
         console.error("Search failed:", err);
         toast.show({
@@ -432,7 +540,7 @@ export const useReservationManager = () => {
       performSearch(text);
     } else if (text === "") {
       console.log("Search cleared, reloading products");
-      loadProductsByRelease(selectedReleaseId);
+      loadProductsByRelease(selectedReleaseId, 1, true);
     }
   };
 
@@ -441,9 +549,15 @@ export const useReservationManager = () => {
     setSearchQuery("");
     setShowSearchBar(false);
 
-    if (products.length === 0 || searchQuery.trim() !== "") {
+    // Check if products is an array before checking its length
+    const shouldReloadProducts =
+      !Array.isArray(products) ||
+      products.length === 0 ||
+      searchQuery.trim() !== "";
+
+    if (shouldReloadProducts) {
       console.log("Reloading products after clear search");
-      loadProductsByRelease(selectedReleaseId);
+      loadProductsByRelease(selectedReleaseId, 1, true);
     }
   };
 
@@ -487,7 +601,7 @@ export const useReservationManager = () => {
       if (latest) {
         setSelectedDate(latest.release_date);
         setSelectedReleaseId(latest.id);
-        loadProductsByRelease(latest.id);
+        loadProductsByRelease(latest.id, 1, true);
       }
     }
   }, [releaseDates]);
@@ -504,6 +618,17 @@ export const useReservationManager = () => {
         reservationList,
       });
     });
+  };
+
+  // Footer component to show loading state and progress
+  const renderFooter = () => {
+    if (!Array.isArray(products) || products.length === 0) return null;
+
+    return {
+      loading: loading || isFetchingMore,
+      productCount: products.length,
+      totalCount: totalCount,
+    };
   };
 
   return {
@@ -528,6 +653,13 @@ export const useReservationManager = () => {
     confirmationProducts,
     uncheckedProducts,
 
+    // Pagination state
+    isFetchingMore,
+    currentPage,
+    totalPages,
+    totalCount,
+    hasMore,
+
     // UI State Setters
     setImageErrors,
     setShowSearchBar,
@@ -537,6 +669,8 @@ export const useReservationManager = () => {
     fetchReleaseDatesFromAPI,
     loadProductsByRelease,
     getLatestRelease,
+    loadMoreProducts,
+    renderFooter,
 
     // UI Methods
     formatDateHuman,

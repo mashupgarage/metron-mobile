@@ -105,6 +105,11 @@ export default function ReservationsScreen() {
     handleSearchChange,
     clearSearch,
     performSearch,
+
+    // Pagination
+    loadMoreProducts,
+    isFetchingMore,
+    totalCount,
   } = useReservationManager();
 
   const navigation = useNavigation();
@@ -135,7 +140,7 @@ export default function ReservationsScreen() {
         <Box className="h-screen w-full">
           <ReleasesDrawer
             visible={showDrawer}
-            releaseDates={releaseDates
+            releaseDates={(Array.isArray(releaseDates) ? releaseDates : [])
               .filter((release) => release.status !== "draft")
               .map((release) => ({
                 id: release.id,
@@ -284,22 +289,44 @@ export default function ReservationsScreen() {
 
             {searchQuery.length > 0 &&
               !isSearching &&
-              products.length === 0 && (
+              (!Array.isArray(products) || products.length === 0) && (
                 <View className="items-center py-4">
                   <Text>No products found matching "{searchQuery}"</Text>
                 </View>
               )}
           </View>
           <MasonryList
-            data={products}
+            data={(() => {
+              // Add debugging to see what products actually is
+              if (!Array.isArray(products)) {
+                console.log(
+                  "Products is not an array in MasonryList:",
+                  products
+                );
+                // If it's an object but not an array, try to convert it
+                if (products && typeof products === "object") {
+                  // If it has values or entries properties (like an object map)
+                  if ("values" in products) {
+                    console.log(
+                      "Attempting to convert products object to array"
+                    );
+                    return Object.values(products);
+                  }
+                }
+                return [];
+              }
+              return products;
+            })()}
             scrollEnabled
             loading={loading && !isSearching}
+            onEndReached={loadMoreProducts}
+            onEndReachedThreshold={0.5}
             ListEmptyComponent={
               loading ? (
                 <View className="flex mt-56 mb-4 flex-col items-center" />
               ) : (
                 <View className="flex mt-56 mb-4 flex-col items-center">
-                  <>
+                  <View>
                     <Image
                       alt="Comic Odyssey Icon"
                       key="closed"
@@ -317,12 +344,28 @@ export default function ReservationsScreen() {
                         Please come back on Friday for the new releases!
                       </Text>
                     )}
-                  </>
+                  </View>
                 </View>
               )
             }
+            ListFooterComponent={
+              <Box className="py-4 flex justify-center items-center">
+                {(loading || isFetchingMore) && (
+                  <View>
+                    <ActivityIndicator size="small" color="#1A237E" />
+                    <Text className="mt-2">Loading products...</Text>
+                  </View>
+                )}
+
+                {Array.isArray(products) && products.length > 0 && (
+                  <Text className="text-sm text-gray-500 mt-2">
+                    Showing {products.length} of {totalCount} products
+                  </Text>
+                )}
+              </Box>
+            }
             LoadingView={
-              <>
+              <View>
                 <Image
                   alt="Comic Odyssey Icon"
                   key="loading"
@@ -335,12 +378,12 @@ export default function ReservationsScreen() {
                     ? `Searching for "${searchQuery}"...`
                     : "Hang tight, we're loading the latest releases!"}
                 </Text>
-              </>
+              </View>
             }
             numColumns={2}
             keyExtractor={(item: any) => {
               // Use _uniqueKey from search results if available, otherwise use product id
-              return item._uniqueKey || item.id.toString();
+              return item._uniqueKey || `${item.id}_${Date.now()}`;
             }}
             contentContainerStyle={{
               padding: 12,
