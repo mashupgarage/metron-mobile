@@ -247,12 +247,20 @@ export const fetchReleaseById = (id: number) => {
 /**
  * Fetch all products associated with a specific release.
  * @param id - The release ID.
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of items per page (default: 10)
  * @returns Axios promise resolving to an array of product objects for the release.
  * @example
  * fetchProductsByReleaseId(1).then(res => res.data)
  */
-export const fetchProductsByReleaseId = (id: number) => {
-  return axiosClient.get(`/releases/${id}/products?meta=true`);
+export const fetchProductsByReleaseId = (id: number, page: number = 1, limit: number = 10) => {
+  return axiosClient.get(`/releases/${id}/products`, {
+    params: {
+      meta: true,
+      page,
+      limit
+    }
+  });
 };
 
 // =========================
