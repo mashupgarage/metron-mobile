@@ -51,6 +51,32 @@ export const fetchProducts = (category_id?: number, page: number = 1, limit: num
   return axiosClient.get("/marketplace/catalog_products", { params });
 };
 
+/**
+ * Search for products in the marketplace with pagination support.
+ * @param query - The search query to filter products.
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of items per page (default: 10)
+ * @param category_id - Optional category ID to filter products
+ */
+export const searchMarketplaceProducts = (
+  query: string, 
+  page: number = 1, 
+  limit: number = 10,
+  category_id?: number
+) => {
+  const params: Record<string, string | number> = { 
+    q: query,
+    page,
+    limit
+  };
+  
+  if (category_id !== undefined) {
+    params.c = category_id;
+  }
+  
+  return axiosClient.get(`/marketplace/catalog_products`, { params });
+};
+
 // =========================
 // User-related Endpoints
 // =========================
