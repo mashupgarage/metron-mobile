@@ -51,6 +51,32 @@ export const fetchProducts = (category_id?: number, page: number = 1, limit: num
   return axiosClient.get("/marketplace/catalog_products", { params });
 };
 
+/**
+ * Search for products in the marketplace with pagination support.
+ * @param query - The search query to filter products.
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of items per page (default: 10)
+ * @param category_id - Optional category ID to filter products
+ */
+export const searchMarketplaceProducts = (
+  query: string, 
+  page: number = 1, 
+  limit: number = 10,
+  category_id?: number
+) => {
+  const params: Record<string, string | number> = { 
+    q: query,
+    page,
+    limit
+  };
+  
+  if (category_id !== undefined) {
+    params.c = category_id;
+  }
+  
+  return axiosClient.get(`/marketplace/catalog_products`, { params });
+};
+
 // =========================
 // User-related Endpoints
 // =========================
@@ -221,12 +247,20 @@ export const fetchReleaseById = (id: number) => {
 /**
  * Fetch all products associated with a specific release.
  * @param id - The release ID.
+ * @param page - Page number for pagination (default: 1)
+ * @param limit - Number of items per page (default: 10)
  * @returns Axios promise resolving to an array of product objects for the release.
  * @example
  * fetchProductsByReleaseId(1).then(res => res.data)
  */
-export const fetchProductsByReleaseId = (id: number) => {
-  return axiosClient.get(`/releases/${id}/products?meta=true`);
+export const fetchProductsByReleaseId = (id: number, page: number = 1, limit: number = 10) => {
+  return axiosClient.get(`/releases/${id}/products`, {
+    params: {
+      meta: true,
+      page,
+      limit
+    }
+  });
 };
 
 // =========================
