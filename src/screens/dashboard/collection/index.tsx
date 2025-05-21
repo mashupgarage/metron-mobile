@@ -1,120 +1,202 @@
-import NavigationHeader from "@/src/components/navigation-header";
-import { useBoundStore } from "@/src/store";
-import React, { useEffect } from "react";
-import { View, Text, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { Box } from "@/src/components/ui/box";
+import ProductCard from "@/src/components/product";
+import { getUserCollection } from "@/src/api/apiEndpoints";
+import { useBoundStore } from "@/src/store";
 
-// Mock data - replace with real data from your store or API
-const stats = {
-  year: 2025,
-  reservations: 0,
-  items: 0,
-  pages: 0,
-  series: 0,
+const categories = ["All", "Comics", "Novels"];
+
+// Map category names to IDs (based on usage in comics.tsx and novels.tsx)
+const CATEGORY_ID_MAP: Record<string, number | null> = {
+  All: null,
+  Comics: 6,
+  Novels: 2,
 };
 
 const CollectionScreen = () => {
   const store = useBoundStore();
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(null);
+  const [orderedProducts, setOrderedProducts] = useState<any[]>([]);
+  const [wantlistedProducts, setWantlistedProducts] = useState<any[]>([]);
+  const [seriesCount, setSeriesCount] = useState(0);
+  const [collectedSeries, setCollectedSeries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch collection from API
   useEffect(() => {
-    store.setHasSeenCollectionSummary(false);
+    setLoading(true);
+    getUserCollection(store.user.id ?? 0)
+      .then((res) => {
+        console.log("collected_series", res.data.collected_series);
+
+        setOrderedProducts(res.data.ordered_products || []);
+        setWantlistedProducts(res.data.wantlisted_products || []);
+        setSeriesCount(res.data.series_count || 0);
+        setCollectedSeries(res.data.collected_series || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to load collection");
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <SafeAreaView>
-      <NavigationHeader />
-      <FlatList
-        data={[]}
-        style={{ marginTop: 24, marginHorizontal: 16 }}
-        renderItem={() => null}
-        keyExtractor={(item) => item.id.toString()}
-        ListHeaderComponent={() => (
-          <View>
-            {/* Year in Review Summary Card */}
-            {/* {!store.hasSeenCollectionSummary && (
-              <View className="bg-white p-4 rounded-lg shadow mb-4">
-                <Text className="text-lg font-semibold mb-2">
-                  A Message from the Sandman
-                </Text>
-                <Text className="text-sm mb-2">
-                  Hi <Text className="font-bold">{store.user?.full_name}</Text>,
-                </Text>
-                <Text className="text-sm mb-2">Greetings Earth dweller!</Text>
-                <Text className="text-sm mb-2 ">
-                  Looks like you had a big year last {stats.year}! 🎉 🥳 You{" "}
-                  <Text className="font-bold mb-2">
-                    reserved {stats.reservations}
-                  </Text>{" "}
-                  times with about{" "}
-                  <Text className="font-bold">{stats.items}</Text> items.{" "}
-                  <Text>That's approximately </Text>
-                  <Text className="font-bold">{stats.pages}</Text>
-                  <Text> pages </Text>
-                  of comic book awesomeness. Do you even read 😁 all of them?
-                </Text>
-                <Text className="text-sm mb-2">
-                  You've collected about{" "}
-                  <Text className="font-bold">{stats.series} series</Text> 🧐.
-                  You can browse your collections any time.
-                </Text>
-                <Text className="text-sm mb-2 mt-4">
-                  We want to take this opportunity to thank you, for your
-                  continued support and patronage. It is because of people like
-                  you that we love doing this.
-                </Text>
+  const stats = [
+    {
+      label: "Series ",
+      value: seriesCount,
+      icon: "layers",
+      color: "#0284c7",
+    },
+    {
+      label: "Collected",
+      value: orderedProducts.length,
+      icon: "book",
+      color: "#0284c7",
+    },
+  ];
 
-                <Text
-                  className="text-md text-right text-blue-500 mt-2"
-                  onPress={() => store.setHasSeenCollectionSummary(true)}
-                >
-                  Dismiss
-                </Text>
-              </View>
-            )} */}
-            <View className="mt-4">
-              <Text className="text-lg font-semibold mb-2">
-                Your Collection
-              </Text>
-              <View className="flex-row justify-between mb-6">
-                {/* Purchased Books Card */}
-                <View className="flex-1 bg-blue-50 rounded-lg p-4 mr-2">
-                  <View className="items-center">
-                    <View className="bg-blue-500 w-10 h-10 rounded-lg items-center justify-center mb-2">
-                      <Text className="text-white text-xl">🛍️</Text>
-                    </View>
-                    <Text className="text-gray-600 text-base">Purchased</Text>
-                    <Text className="text-black text-4xl font-bold mt-2">
-                      {stats.items}
-                    </Text>
-                  </View>
-                </View>
-                {/* Reserved Books Card */}
-                <View className="flex-1 bg-purple-50 rounded-lg p-4 ml-2">
-                  <View className="items-center">
-                    <View className="bg-purple-500 w-10 h-10 rounded-lg items-center justify-center mb-2">
-                      <Text className="text-white text-xl">🔖</Text>
-                    </View>
-                    <Text className="text-gray-600 text-base">Reserved</Text>
-                    <Text className="text-black text-4xl font-bold mt-2">
-                      {stats.reservations}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              <Text className="text-sm text-gray-500 mb-8">
-                These are products you've reserved since we launched our
-                reservation system. This will help you browse through your
-                personal collection, find out what's missing and get a chance to
-                complete them by buying or adding to your want list so we can
-                fill them in as soon as it becomes available.
-              </Text>
-            </View>
-          </View>
+  // Filtering logic for orderedProducts
+  let filteredItems =
+    selectedCategory === "All"
+      ? orderedProducts
+      : orderedProducts.filter(
+          (item) => item.category_id === CATEGORY_ID_MAP[selectedCategory]
+        );
+
+  // Further filter by selected series if any
+  if (selectedSeriesId !== null) {
+    filteredItems = filteredItems.filter(
+      (item) => item.series_id === selectedSeriesId
+    );
+  }
+
+  // Filtering logic for collectedSeries
+  const filteredSeries =
+    selectedCategory === "All"
+      ? collectedSeries
+      : collectedSeries.filter(
+          (series) => series.category_id === CATEGORY_ID_MAP[selectedCategory]
+        );
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      {/* Header */}
+      <Box className="flex-row items-center justify-between px-4 pt-4">
+        <Text style={{ fontSize: 24, fontWeight: "bold" }}>Collection</Text>
+        <Box className="flex-row"></Box>
+      </Box>
+
+      {/* Stats Cards */}
+      <Box className="flex-row justify-between px-4 mt-5">
+        {stats.map((s, i) => (
+          <Box
+            key={s.label}
+            className="items-center flex-1 mx-1"
+            style={{
+              backgroundColor: s.color + "22",
+              borderRadius: 16,
+              padding: 16,
+            }}
+          >
+            {/* <Icon as={s.icon} size="md" color={s.color} /> */}
+            <Text style={{ fontWeight: "bold", fontSize: 20, marginTop: 8 }}>
+              {s.value}
+            </Text>
+            <Text style={{ color: s.color, marginTop: 2 }}>{s.label}</Text>
+          </Box>
+        ))}
+      </Box>
+
+      {/* Category Pills */}
+      <Box className="flex-row px-4 mt-5 mb-4">
+        {categories.map((cat) => (
+          <TouchableOpacity
+            key={cat}
+            onPress={() => setSelectedCategory(cat)}
+            style={{
+              backgroundColor: selectedCategory === cat ? "#8667F2" : "#F1F1F1",
+              paddingHorizontal: 18,
+              paddingVertical: 7,
+              borderRadius: 20,
+              marginRight: 10,
+            }}
+          >
+            <Text
+              style={{
+                color: selectedCategory === cat ? "#fff" : "#222",
+                fontWeight: "bold",
+              }}
+            >
+              {cat}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </Box>
+
+      {/* Collection Grid */}
+      <FlatList
+        data={filteredItems}
+        numColumns={2}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 16 }}
+        renderItem={({ item }) => (
+          <Box className="flex-1 mx-4 mb-4 max-w-[45%]">
+            <ProductCard product={item as any} />
+          </Box>
         )}
-        ListEmptyComponent={() => (
-          <View className="flex-1 mt-4 items-center justify-center">
-            <Text className="text-gray-500">No collections found.</Text>
-          </View>
-        )}
+        ListHeaderComponent={
+          <>
+            {/* Most Collected Series */}
+            <Text className="text-2xl font-bold mt-4 mb-2 ml-4">
+              Collected Series
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ paddingLeft: 8, marginBottom: 16 }}
+            >
+              {collectedSeries.length === 0 ? (
+                <Box className="ml-2 flex-1 h-20 items-center justify-center">
+                  <Text className="text-gray-500 italic">
+                    No collected series yet.
+                  </Text>
+                </Box>
+              ) : (
+                collectedSeries.map((s) => (
+                  <TouchableOpacity
+                    key={s.id}
+                    onPress={() =>
+                      setSelectedSeriesId(
+                        selectedSeriesId === s.id ? null : s.id
+                      )
+                    }
+                    style={{
+                      marginLeft: 8,
+                      backgroundColor:
+                        selectedSeriesId === s.id ? "#0284c7" : "#38bdf8",
+                      padding: 16,
+                      borderRadius: 12,
+                      minWidth: 80,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Text
+                      numberOfLines={1}
+                      style={{ fontWeight: "bold", color: "#fff" }}
+                    >
+                      {s.title}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              )}
+            </ScrollView>
+          </>
+        }
       />
     </SafeAreaView>
   );

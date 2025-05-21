@@ -15,6 +15,7 @@ import {
   getMyCollection,
   getReservationList,
   getWantList,
+  getUserCollection,
 } from "@/src/api/apiEndpoints";
 import { profileStyles } from "./style";
 import { removeAuthToken } from "@/src/api/tokenManager";
@@ -26,7 +27,8 @@ export default function Profile(props: { navigation: any }) {
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
   // Use dedicated slices for ordersCount and collectionCount
   const ordersCount = store.ordersCount ?? 0;
-  const collectionCount = store.collectionCount ?? 0;
+  const [orderedProducts, setOrderedProducts] = useState<any[]>([]);
+  const collectionCount = orderedProducts.length ?? 0;
   const setOrdersCount = (count: number) => store.setOrdersCount(count);
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
@@ -43,23 +45,29 @@ export default function Profile(props: { navigation: any }) {
           setWantlistCount(0);
         });
 
-      // Fetch real orders count
+      // Fetch real orders count (filter out 'fill' status)
       getReservationList(store.user.id)
         .then((res) => {
-          setOrdersCount(res.data.metadata?.total_count || 0);
+          const filtered = (res.data.reservations || []).filter(
+            (item) => item.status !== "fill"
+          );
+          setOrdersCount(filtered.length);
         })
         .catch(() => setOrdersCount(0));
 
-      // Fetch real collection count
-      getMyCollection(store.user.id)
+      // Fetch real collection count from getUserCollection, filter out 'fill' status
+      getUserCollection(store.user.id)
         .then((res) => {
-          setCollectionCount(
-            Array.isArray(res.data)
-              ? res.data.length
-              : res.data.collection?.length || 0
+          const products = (res.data.ordered_products || []).filter(
+            (item: any) => item.status !== "fill"
           );
+          setOrderedProducts(products);
+          setCollectionCount(products.length);
         })
-        .catch(() => setCollectionCount(0));
+        .catch(() => {
+          setOrderedProducts([]);
+          setCollectionCount(0);
+        });
     }
   }, [store.user, props.navigation]);
 
@@ -107,7 +115,7 @@ export default function Profile(props: { navigation: any }) {
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{collectionCount}</Text>
-            <Text style={styles.statLabel}>My Collection</Text>
+            <Text style={styles.statLabel}>Owned</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{wantlistCount}</Text>
@@ -140,7 +148,6 @@ export default function Profile(props: { navigation: any }) {
               console.log("clicked");
               getMyCollection(store.user?.id).then((res) => {
                 // handle want list display
-                console.log("orders list", res.data);
               });
               props.navigation.navigate("Collection");
             }}
