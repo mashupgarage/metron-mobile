@@ -78,10 +78,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
           <View className="p-4 border-b flex-row justify-between items-center">
             <Text className="text-xl font-bold">Release History</Text>
             <TouchableOpacity onPress={onClose}>
-              <X
-                size={24}
-                color={useColorScheme() === "dark" ? "#dadada" : "#333"}
-              />
+              <X size={24} color={colorScheme === "dark" ? "white" : "black"} />
             </TouchableOpacity>
           </View>
 

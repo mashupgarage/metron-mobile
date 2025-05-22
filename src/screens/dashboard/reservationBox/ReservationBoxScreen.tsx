@@ -310,7 +310,11 @@ export default function ReservationBoxScreen() {
           className="p-2 rounded-full"
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color={colorScheme === "dark" ? "white" : "black"}
+          />
         </TouchableOpacity>
 
         <View className="w-8" />

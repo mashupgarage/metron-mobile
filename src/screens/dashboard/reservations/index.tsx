@@ -19,17 +19,7 @@ import { ProductT } from "@/src/utils/types/common";
 import { ClipboardCheck, Menu, Search, X, Check } from "lucide-react-native";
 import DashboardLayout from "../_layout";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
-import {
-  fetchProducts,
-  fetchProductsByReleaseId,
-  fetchReleases,
-  addToWantList,
-  getWantList,
-  getReservationList,
-  addToReservation,
-  confirmReservationList,
-  searchReservationProducts,
-} from "@/src/api/apiEndpoints";
+import { getReservationList } from "@/src/api/apiEndpoints";
 import ReleasesDrawer from "@/src/components/ReleasesDrawer";
 import {
   Checkbox,
@@ -43,6 +33,7 @@ import { useBoundStore } from "@/src/store";
 import { useReservationManager } from "./useReservationManager";
 
 export default function ReservationsScreen() {
+  const colorScheme = useColorScheme();
   const store = useBoundStore();
   const toast = useToast();
 
@@ -143,11 +134,20 @@ export default function ReservationsScreen() {
             {showSearchBar ? (
               <View className="flex-row items-center mb-4">
                 <View className="flex-1 flex-row items-center border border-gray-300 rounded-lg px-2 py-1">
-                  <Search size={18} color="#666" />
+                  <Search
+                    size={18}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                  />
                   <TextInput
                     className="flex-1 ml-2 py-1"
                     placeholder="Search comics..."
                     value={searchQuery}
+                    style={{
+                      color: colorScheme === "dark" ? "white" : "black",
+                    }}
+                    placeholderTextColor={
+                      colorScheme === "dark" ? "white" : "black"
+                    }
                     onChangeText={handleSearchChange}
                     onSubmitEditing={() => {
                       console.log("Search submitted:", searchQuery);
@@ -227,7 +227,7 @@ export default function ReservationsScreen() {
                   <TouchableOpacity onPress={toggleDrawer} className="p-2">
                     <Menu
                       size={24}
-                      color={useColorScheme() === "dark" ? "#dadada" : "#333"}
+                      color={colorScheme === "dark" ? "#dadada" : "#333"}
                     />
                   </TouchableOpacity>
                 </View>

@@ -33,39 +33,36 @@ export default function Profile(props: { navigation: any }) {
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
   useEffect(() => {
-    if (store.user === null) {
+    if (!store.user) {
       props.navigation.replace("Auth", { screen: "SignIn" });
-    } else {
-      // Fetch wantlist count on mount
-      getWantList()
-        .then((res) => {
-          setWantlistCount(res.data.want_lists.length);
-        })
-        .catch((err) => {
-          setWantlistCount(0);
-        });
-
-      // Fetch real orders count (filter out 'fill' status)
-      getReservationList(store.user.id)
-        .then((res) => {
-          console.log("actual reservation", res.data.metadata?.total_count);
-          setOrdersCount(res.data.metadata?.total_count ?? 0);
-        })
-        .catch(() => setOrdersCount(0));
-
-      // Fetch real collection count from getUserCollection, filter out 'fill' status
-      getUserCollection(store.user.id)
-        .then((res) => {
-          console.log("actual collection", res.data);
-          setCollectionCount(res.data.ordered_products.length);
-        })
-        .catch(() => {
-          setCollectionCount(0);
-        });
+      return;
     }
+    // Fetch wantlist count on mount
+    getWantList()
+      .then((res) => {
+        setWantlistCount(res.data.want_lists.length);
+      })
+      .catch(() => {
+        setWantlistCount(0);
+      });
+    getMyCollection(store.user.id)
+      .then((res) => {
+        setOrdersCount(res.data.orders.length);
+      })
+      .catch(() => {
+        setOrdersCount(0);
+      });
+    getUserCollection(store.user.id)
+      .then((res) => {
+        console.log("actual collection", res.data);
+        setCollectionCount(res.data.ordered_products.length);
+      })
+      .catch(() => {
+        setCollectionCount(0);
+      });
   }, [store.user, props.navigation]);
 
-  if (store.user === null) {
+  if (!store.user) {
     return null; // or a loading spinner
   }
 
