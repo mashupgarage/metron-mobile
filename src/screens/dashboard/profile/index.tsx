@@ -32,11 +32,18 @@ export default function Profile(props: { navigation: any }) {
   const setOrdersCount = (count: number) => store.setOrdersCount(count);
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
+  const [checkingUser, setCheckingUser] = useState(true);
+
   useEffect(() => {
+    // Stall and check user existence
     if (!store.user) {
-      props.navigation.replace("Auth", { screen: "SignIn" });
+      setCheckingUser(true);
+      setTimeout(() => {
+        props.navigation.replace("Auth", { screen: "SignIn" });
+      }, 300); // Small delay for loader effect
       return;
     }
+    setCheckingUser(false);
     // Fetch wantlist count on mount
     getWantList()
       .then((res) => {
@@ -62,8 +69,21 @@ export default function Profile(props: { navigation: any }) {
       });
   }, [store.user, props.navigation]);
 
-  if (!store.user) {
-    return null; // or a loading spinner
+  if (checkingUser) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff",
+        }}
+      >
+        <Text style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}>
+          Loading...
+        </Text>
+      </View>
+    );
   }
 
   const handleEditProfile = () => {
