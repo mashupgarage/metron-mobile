@@ -25,6 +25,7 @@ import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 
 export default function Comics() {
   const store = useBoundStore();
+  const colorScheme = useColorScheme();
   const route = useRoute<RouteProp<DashboardStackParams, "Comics">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
@@ -60,7 +61,7 @@ export default function Comics() {
   return (
     <Box
       style={{
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+        backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
       }}
       className="h-screen w-full pb-24"
     >
@@ -94,7 +95,7 @@ export default function Comics() {
                 >
                   <Menu
                     size={24}
-                    color={useColorScheme() === "dark" ? "#FFFFFF" : "#202020"}
+                    color={colorScheme === "dark" ? "#FFFFFF" : "#181718"}
                   />
                 </Button>
               </Box>

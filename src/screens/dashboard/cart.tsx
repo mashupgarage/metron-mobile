@@ -142,7 +142,7 @@ export default function Cart() {
   }) => (
     <Box
       className={`flex-row items-center p-2 border-b ${
-        colorScheme === "dark" ? "border-b-[#333]" : "border-b-gray-200"
+        colorScheme === "dark" ? "border-b-mdark-surface" : "border-b-gray-200"
       }`}
     >
       <Checkbox
@@ -164,21 +164,21 @@ export default function Cart() {
         <View className="flex-1 mt-6">
           <Text
             className={`font-semibold ${
-              colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
           >
             {item.product.title}
           </Text>
           <Text
             className={`${
-              colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
           >
             NM: {item.product_item_id}
           </Text>
           <Text
             className={`${
-              colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
           >
             Price:{" "}
@@ -204,12 +204,12 @@ export default function Cart() {
   return (
     <SafeAreaView
       className={`flex-1 ${
-        colorScheme === "dark" ? "bg-[#1e1e1e]" : "bg-white"
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
       }`}
     >
       <Text
         className={`text-2xl font-bold m-4 text-left ${
-          colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+          colorScheme === "dark" ? "text-mdark-text" : "text-[#222]"
         }`}
       >
         Your Cart{" "}
@@ -233,7 +233,7 @@ export default function Cart() {
       {groupedCartItems.length > 0 && (
         <View
           className={`absolute left-0 right-0 bottom-0 ${
-            colorScheme === "dark" ? "bg-[#1e1e1e]" : "bg-white"
+            colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
           } pb-4 pt-2 items-center`}
         >
           <View className="flex-row mx-1">

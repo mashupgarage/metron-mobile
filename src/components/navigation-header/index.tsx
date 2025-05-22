@@ -9,6 +9,7 @@ const NavigationHeader = ({
   showCartButton = false,
 }) => {
   const navigation = useNavigation();
+  const colorScheme = useColorScheme();
   const cartCount = useBoundStore((state) => state.cartItems.length);
   return (
     <View className="mb-4 flex">
@@ -20,9 +21,7 @@ const NavigationHeader = ({
           className="absolute ml-4"
           variant="link"
         >
-          <ArrowLeft
-            color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
-          />
+          <ArrowLeft color={colorScheme === "dark" ? "#FFFFFF" : "#181718"} />
           <ButtonText>Back</ButtonText>
         </Button>
       )}
@@ -45,7 +44,7 @@ const NavigationHeader = ({
               />
             )}
             <ShoppingBag
-              color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
+              color={colorScheme === "dark" ? "#FFFFFF" : "#181718"}
             />
             <ButtonText>My Cart</ButtonText>
           </Button>

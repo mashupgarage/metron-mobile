@@ -15,7 +15,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
 
   return (
     <Box className="mb-2">
-      <View style={{ padding: 4, margin: 4, marginBottom: 0 }}>
+      <View style={{ paddingHorizontal: 12, margin: 4, marginBottom: 0 }}>
         <Image
           source={{ uri: product.cover_url }}
           alt={product.id.toString()}

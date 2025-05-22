@@ -34,7 +34,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
   onShowAllReleases,
 }) => {
   const drawerAnimation = useRef(new Animated.Value(-300)).current;
-
+  const colorScheme = useColorScheme();
   useEffect(() => {
     if (visible) {
       Animated.timing(drawerAnimation, {
@@ -68,7 +68,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
             left: 0,
             bottom: 0,
             width: 300,
-            backgroundColor: useColorScheme() === "dark" ? "#1e1e1e" : "#fff",
+            backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
             zIndex: 2,
             transform: [{ translateX: drawerAnimation }],
           },
@@ -99,15 +99,26 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
             {releaseDates.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                className={`flex-row justify-between items-center p-4 border-b border-b-[#e0e0e0] ${
+                className={`flex-row justify-between items-center p-4 border-b ${
                   item.id === selectedReleaseId ? "bg-primary-50" : ""
                 }`}
+                style={{
+                  backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
+                }}
                 onPress={() => {
                   onSelectDate(item.id, item.date);
                 }}
               >
-                <Text className="text-[#333333] text-base">{item.date}</Text>
-                <View className="bg-[rgb(43,100,207)] rounded px-2 py-0.5">
+                <Text className="text-base">{item.date}</Text>
+                <View
+                  style={{
+                    backgroundColor:
+                      colorScheme === "dark"
+                        ? "rgb(23,90,160)"
+                        : "rgb(43,100,207)",
+                  }}
+                  className=" rounded px-2 py-0.5"
+                >
                   <Text className="text-white text-sm">{item.count}</Text>
                 </View>
               </TouchableOpacity>

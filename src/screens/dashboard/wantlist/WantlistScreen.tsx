@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   SafeAreaView,
   ActivityIndicator,
   Pressable,
@@ -53,7 +52,10 @@ interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
   product?: ExtendedProduct;
 }
 
-export default function WantlistScreen() {
+import { useColorScheme } from "react-native";
+
+const WantlistScreen = () => {
+  const colorScheme = useColorScheme();
   const store = useBoundStore();
   const navigation = useNavigation();
   const toast = useToast();
@@ -96,26 +98,59 @@ export default function WantlistScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.messageText}>Loading your want list...</Text>
+      <SafeAreaView
+        className={`flex-1 justify-center items-center ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
+          Loading your want list...
+        </Text>
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
+      <SafeAreaView
+        className={`flex-1 ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-red-500"
+          }
+        >
+          {error}
+        </Text>
       </SafeAreaView>
     );
   }
 
   if (wantlistItems.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.messageText}>Your want list is empty.</Text>
-        <Text style={styles.messageText}>
+      <SafeAreaView
+        className={`flex-1 ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
+          Your want list is empty.
+        </Text>
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
           Add items you want by tapping "I want this" on product pages.
         </Text>
       </SafeAreaView>
@@ -203,7 +238,7 @@ export default function WantlistScreen() {
 
     return (
       <Pressable
-        style={styles.gridItemContainer}
+        className={`m-2 rounded-xl overflow-hidden bg-mdark-surface shadow-md flex-1`}
         onPress={() => {
           if (wantlistItem.product) {
             // Create a sanitized copy of the product with a valid cover_url
@@ -228,10 +263,10 @@ export default function WantlistScreen() {
       >
         {hasImageError ? (
           // Show placeholder when there's an error or no URL
-          <View style={styles.placeholderContainer}>
+          <View className="w-full h-44 items-center justify-center bg-gray-100 dark:bg-mdark-surface rounded-xl">
             <Image
               source={require("@/src/assets/icon.png")}
-              style={styles.placeholderImage}
+              className="w-20 h-20 opacity-60"
               resizeMode="contain"
             />
           </View>
@@ -239,7 +274,7 @@ export default function WantlistScreen() {
           // Try to load actual image
           <Image
             source={{ uri: coverUrl }}
-            style={styles.gridItemImage}
+            className="w-full h-44 rounded-t-xl"
             resizeMode="cover"
             onError={() => {
               console.log("Image failed to load:", coverUrl);
@@ -247,31 +282,44 @@ export default function WantlistScreen() {
             }}
           />
         )}
-        <View style={styles.gridItemDetails}>
-          <Text style={styles.gridItemTitle} numberOfLines={1}>
+        <View className="p-3">
+          <Text
+            className={`text-lg font-bold mb-1 ${
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+            }`}
+            numberOfLines={1}
+          >
             {wantlistItem.product.title}
           </Text>
-          <Text style={styles.gridItemPrice}>
+          <Text
+            className={`text-base font-semibold mb-1 ${
+              colorScheme === "dark"
+                ? "text-mdark-textSecondary"
+                : "text-gray-600"
+            }`}
+          >
             {wantlistItem.product.cover_price
               ? `$${wantlistItem.product.cover_price}`
               : "Price unavailable"}
           </Text>
           {wantlistItem.product.creators && (
-            <Text style={styles.gridItemCreators} numberOfLines={1}>
+            <Text className="text-xs text-gray-400 mb-1" numberOfLines={1}>
               {wantlistItem.product.creators}
             </Text>
           )}
           {wantlistItem.product.issue_number && (
-            <Text style={styles.gridItemIssue}>
+            <Text className="text-xs text-gray-400 mb-1">
               Issue: {wantlistItem.product.issue_number}
             </Text>
           )}
 
           {/* Availability indicator and Add to Cart button */}
-          <View style={styles.availabilityContainer}>
+          <View className="flex-row justify-between items-center mt-2">
             <Text
-              style={
-                isAvailable ? styles.availableText : styles.unavailableText
+              className={
+                isAvailable
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-red-600 dark:text-red-400"
               }
             >
               {isAvailable ? "Available" : "Out of Stock"}
@@ -279,10 +327,12 @@ export default function WantlistScreen() {
 
             {isAvailable && (
               <TouchableOpacity
-                style={styles.addToCartButton}
+                className="mt-0 px-2 py-1 rounded-lg "
                 onPress={handleAddToCart}
               >
-                <Text style={styles.addToCartText}>Add to Cart</Text>
+                <Text className="text-white font-bold text-center">
+                  Add to Cart
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -292,26 +342,39 @@ export default function WantlistScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      className={`flex-1 pt-4 ${
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+      }`}
+    >
       <StatusBar style="auto" />
       {/* Information Section */}
-      <View style={styles.infoContainer}>
-        <View style={styles.infoHeader}>
+      <View className="px-4 pt-2 pb-4">
+        <View className="flex-row items-center mb-2">
           <TouchableOpacity
-            style={styles.infoBackButton}
+            className="p-2 rounded-full"
             onPress={() => navigation.goBack()}
           >
-            <Ionicons name="arrow-back" size={24} color="#333" />
+            <Ionicons
+              name="arrow-back"
+              size={24}
+              color={colorScheme === "dark" ? "white" : "black"}
+            />
           </TouchableOpacity>
-          <Text style={styles.infoTitle}>Your Want List</Text>
         </View>
-        <Text style={styles.infoText}>
+        <Text
+          className={`text-xs mb-2 ${
+            colorScheme === "dark"
+              ? "text-mdark-textSecondary"
+              : "text-gray-600"
+          }`}
+        >
           This is your want list. Visit this page regularly to view the status
           of your want list. You will also get notified as soon as the product
           becomes available.
         </Text>
-        <View style={styles.noteContainer}>
-          <Text style={styles.noteText}>
+        <View className="bg-yellow-100 dark:bg-yellow-900 rounded-md p-2 mt-2">
+          <Text className="text-xs text-yellow-700 dark:text-yellow-200">
             Please note that products are first pay, first serve basis.
           </Text>
         </View>
@@ -322,186 +385,11 @@ export default function WantlistScreen() {
         renderItem={renderGridItem}
         numColumns={2}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.masonryListContainer}
+        contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    paddingTop: 20,
-    paddingBottom: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    backgroundColor: "#ffffff",
-  },
-  backButton: {
-    padding: 8,
-  },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#333",
-    marginLeft: 16,
-    flex: 1,
-  },
-  rightHeaderPlaceholder: {
-    width: 40, // Same width as back button for symmetry
-  },
-  masonryListContainer: {
-    paddingHorizontal: 6,
-    paddingTop: 10,
-    backgroundColor: "#ffffff",
-  },
-  gridItemContainer: {
-    flex: 1,
-    margin: 8,
-    marginBottom: 2,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-    overflow: "hidden",
-    padding: 4,
-  },
-  gridItemImage: {
-    width: "100%",
-    height: 192,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  gridItemDetails: {
-    padding: 10,
-    marginTop: 2,
-  },
-  gridItemTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 3,
-  },
-  gridItemPrice: {
-    fontSize: 13,
-    color: "#28a745",
-    fontWeight: "600",
-    marginBottom: 3,
-  },
-  gridItemCreators: {
-    fontSize: 12,
-    color: "#6c757d",
-  },
-  gridItemIssue: {
-    fontSize: 12,
-    color: "#555",
-    marginTop: 2,
-  },
-  messageText: {
-    fontSize: 16,
-    color: "#555",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 16,
-    color: "red",
-    textAlign: "center",
-  },
-  infoContainer: {
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  infoHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  infoBackButton: {
-    padding: 4,
-    marginRight: 8,
-  },
-  infoTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#333",
-    marginBottom: 12,
-    lineHeight: 20,
-  },
-  noteContainer: {
-    backgroundColor: "#FFF9E6",
-    borderRadius: 6,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#F0E0A0",
-  },
-  noteText: {
-    fontSize: 14,
-    color: "#8B6E00",
-  },
-  availabilityContainer: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
-  },
-  availableText: {
-    fontSize: 12,
-    color: "#28a745",
-    fontWeight: "500",
-    marginBottom: 5,
-  },
-  unavailableText: {
-    fontSize: 12,
-    color: "#dc3545",
-    fontWeight: "500",
-  },
-  addToCartButton: {
-    backgroundColor: "#1A237E",
-    padding: 8,
-    borderRadius: 4,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  addToCartText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  placeholderContainer: {
-    width: "100%",
-    height: 192,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderImage: {
-    width: "60%",
-    height: "60%",
-    opacity: 0.7,
-  },
-});
+export default WantlistScreen;

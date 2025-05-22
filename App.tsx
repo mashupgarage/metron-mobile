@@ -37,6 +37,7 @@ export default function App() {
       >
         {fontsLoaded && (
           <GluestackUIProvider mode="system">
+            <StatusBar style="auto" />
             <NavigationContainer>
               <Stack.Navigator id={undefined}>
                 <Stack.Screen

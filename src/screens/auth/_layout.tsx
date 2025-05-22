@@ -13,10 +13,11 @@ const AuthLayout = ({
   showBackButton: boolean;
   navigation: any;
 }) => {
+  const colorScheme = useColorScheme();
   return (
     <ScrollView
       style={{
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+        backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
       }}
     >
       {showBackButton && (
@@ -27,9 +28,7 @@ const AuthLayout = ({
           className="absolute ml-4 top-16 p-0"
           variant="link"
         >
-          <ArrowLeft
-            color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
-          />
+          <ArrowLeft color={colorScheme === "dark" ? "#FFFFFF" : "#181718"} />
           <ButtonText>Back</ButtonText>
         </Button>
       )}

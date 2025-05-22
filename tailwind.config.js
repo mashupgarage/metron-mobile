@@ -19,6 +19,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // --- Material Design Dark Theme Overrides ---
+        // These will be used for dark mode via Tailwind/NativeWind
+        mdark: {
+          background: '#121212', // main background
+          surface: '#1E1E1E',   // cards, surfaces
+          primary: '#BB86FC',   // primary accent
+          primaryVariant: '#3700B3',
+          secondary: '#03DAC6',
+          error: '#CF6679',
+          text: '#FFFFFF', // high emphasis
+          textSecondary: '#B3B3B3', // medium emphasis
+        },
         primary: {
           0: 'rgb(var(--color-primary-0)/<alpha-value>)',
           50: 'rgb(var(--color-primary-50)/<alpha-value>)',

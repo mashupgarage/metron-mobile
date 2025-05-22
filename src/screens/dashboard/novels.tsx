@@ -26,6 +26,7 @@ import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
 
 export default function Novels() {
   const store = useBoundStore();
+  const colorScheme = useColorScheme();
   const route = useRoute<RouteProp<DashboardStackParams, "Novels">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
@@ -59,12 +60,7 @@ export default function Novels() {
   const novels = store.novels_list?.products || [];
 
   return (
-    <Box
-      style={{
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
-      }}
-      className="h-screen w-full pb-24"
-    >
+    <Box className="h-screen w-full pb-24 bg-mdark-background dark:bg-white">
       <MasonryList
         data={novels}
         scrollEnabled
@@ -95,7 +91,7 @@ export default function Novels() {
                 >
                   <Menu
                     size={24}
-                    color={useColorScheme() === "dark" ? "#FFFFFF" : "#202020"}
+                    color={colorScheme === "dark" ? "#FFFFFF" : "#181718"}
                   />
                 </Button>
               </Box>

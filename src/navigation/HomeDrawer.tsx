@@ -15,14 +15,13 @@ const HomeDrawer = () => {
       initialRouteName="Marketplace"
       screenOptions={{
         headerShown: false,
-        drawerStyle: {
-          backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
-        },
-        drawerContentStyle: {
-          backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
-        },
+        drawerContentStyle: [
+          colorScheme === "dark"
+            ? { backgroundColor: "#121212" }
+            : { backgroundColor: "#fff" },
+        ],
         drawerLabelStyle: {
-          color: colorScheme === "dark" ? "#dadada" : "#222",
+          color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
         },
       }}
     >

@@ -8,13 +8,13 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { useColorScheme } from "react-native";
 import { useBoundStore } from "@/src/store";
 import { getReservationList } from "@/src/api/apiEndpoints";
 import { ReservationItemT } from "@/src/utils/types/common";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "./style";
 
 const PAGE_SIZE = 10;
 
@@ -42,6 +42,7 @@ const getCoverUrl = (coverFileName?: string) =>
     : "";
 
 export default function ReservationBoxScreen() {
+  const colorScheme = useColorScheme();
   const store = useBoundStore();
   const navigation = useNavigation();
   const [reservations, setReservations] = useState<ExtendedReservationItemT[]>(
@@ -87,26 +88,61 @@ export default function ReservationBoxScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.messageText}>Loading your reservations...</Text>
+      <SafeAreaView
+        style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        className={`flex-1 ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          style={{ alignSelf: "center" }}
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
+          Loading your reservations...
+        </Text>
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
+      <SafeAreaView
+        className={`flex-1 ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-red-500"
+          }
+        >
+          {error}
+        </Text>
       </SafeAreaView>
     );
   }
 
   if (reservations.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.messageText}>Your reservation box is empty.</Text>
-        <Text style={styles.messageText}>
+      <SafeAreaView
+        className={`flex-1 ${
+          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+        }`}
+      >
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
+          Your reservation box is empty.
+        </Text>
+        <Text
+          className={
+            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+          }
+        >
           Add items to your reservation box by visiting the Reservations tab.
         </Text>
       </SafeAreaView>
@@ -145,7 +181,7 @@ export default function ReservationBoxScreen() {
 
     return (
       <TouchableOpacity
-        style={styles.gridItemContainer}
+        className={`m-2 rounded-xl max-w-[48%] overflow-hidden bg-mdark-surface shadow-md flex-1`}
         onPress={() => {
           if (reservation.product) {
             // Create a sanitized copy of the product with a valid cover_url
@@ -171,10 +207,10 @@ export default function ReservationBoxScreen() {
       >
         {hasImageError ? (
           // Show placeholder when there's an error or no URL
-          <View style={styles.placeholderContainer}>
+          <View className="w-full h-44 items-center justify-center bg-gray-100 dark:bg-mdark-surface rounded-xl">
             <Image
               source={require("@/src/assets/icon.png")}
-              style={styles.placeholderImage}
+              className="w-20 h-20 opacity-60"
               resizeMode="contain"
             />
           </View>
@@ -186,7 +222,7 @@ export default function ReservationBoxScreen() {
                 coverUrl ??
                 `https://assets.comic-odyssey.com/products/covers/medium/${reservation.product?.cover_file_name}`,
             }}
-            style={styles.gridItemImage}
+            className="w-full h-44 rounded-t-xl"
             resizeMode="cover"
             onError={() => {
               // console.log("Image failed to load:", coverUrl);
@@ -194,32 +230,43 @@ export default function ReservationBoxScreen() {
             }}
           />
         )}
-        <View style={styles.gridItemDetails}>
-          <Text style={styles.gridItemTitle} numberOfLines={1}>
+        <View className="p-3">
+          <Text
+            className={`text-lg font-bold mb-1 ${
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+            }`}
+            numberOfLines={1}
+          >
             {reservation.product.title}
           </Text>
-          <Text style={styles.gridItemPrice}>
+          <Text
+            className={`text-base font-semibold mb-1 ${
+              colorScheme === "dark"
+                ? "text-mdark-textSecondary"
+                : "text-gray-600"
+            }`}
+          >
             {reservation.product.cover_price
               ? `$${reservation.product.cover_price}`
               : "Price unavailable"}
           </Text>
           {reservation.product.creators && (
-            <Text style={styles.gridItemCreators} numberOfLines={1}>
+            <Text className="text-xs text-gray-400 mb-1" numberOfLines={1}>
               {reservation.product.creators}
             </Text>
           )}
           {reservation.product.issue_number ? (
-            <Text style={styles.gridItemIssue}>
+            <Text className="text-xs text-gray-400 mb-1">
               Issue: {reservation.product.issue_number}
             </Text>
           ) : (
             <View style={{ height: 15 }} />
           )}
-          <View style={styles.reservationInfo}>
-            <Text style={styles.reservationQuantity}>
+          <View className="flex-row justify-between items-center mt-2">
+            <Text className="text-xs text-gray-400">
               Qty: {reservation.quantity || 1}
             </Text>
-            <Text style={styles.reservationStatus}>
+            <Text className="text-xs font-semibold text-primary-400">
               {reservation.status === "for_approval"
                 ? "For Approval"
                 : reservation.status === "external"
@@ -252,24 +299,28 @@ export default function ReservationBoxScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      className={`flex-1 pt-4 ${
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+      }`}
+    >
       <StatusBar style="auto" />
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-between px-4 py-3 border-b border-mdark-surface bg-mdark-background">
         <TouchableOpacity
-          style={styles.backButton}
+          className="p-2 rounded-full"
           onPress={() => navigation.goBack()}
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Reservation Box</Text>
-        <View style={styles.rightHeaderPlaceholder} />
+
+        <View className="w-8" />
       </View>
       <FlatList
         data={reservations}
         renderItem={renderGridItem}
         numColumns={2}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={styles.masonryListContainer}
+        contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
         onEndReached={async () => {
           if (isFetchingMore || page >= totalPages) return;
@@ -318,7 +369,7 @@ export default function ReservationBoxScreen() {
         }
       />
       <View style={{ alignItems: "center", marginVertical: 8 }}>
-        <Text style={{ color: "#888" }}>
+        <Text className="text-xs text-gray-400">
           Showing {Math.min(reservations.length, totalCount)} of {totalCount}{" "}
           reserved items
         </Text>

@@ -5,12 +5,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const DashboardLayout = ({ children }: { children: React.ReactElement }) => {
   const safeArea = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
   return (
     <Box
       style={{
         paddingTop: safeArea.top,
         marginBottom: safeArea.bottom,
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+        backgroundColor: colorScheme === "dark" ? "#121212" : "#dadada",
       }}
     >
       <React.Fragment>{children}</React.Fragment>

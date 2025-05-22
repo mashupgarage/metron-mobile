@@ -84,22 +84,24 @@ export default function Profile(props: { navigation: any }) {
         paddingTop: 24,
       }}
       className={`flex-1 ${
-        colorScheme === "dark" ? "bg-[#1e1e1e]" : "bg-white"
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
       }`}
     >
       <View
         className={`flex-row items-center justify-between py-4 px-5 border-b ${
-          colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
+          colorScheme === "dark"
+            ? "border-b-mdark-surface"
+            : "border-b-gray-200"
         }`}
       >
         {/* <Text className="text-xl font-semibold">Profile</Text> */}
         <View />
         <TouchableOpacity onPress={handleEditProfile}>
-          <Text className="font-semibold text-primary-600">Edit Profile</Text>
+          <Text className="font-semibold text-primary-600">Edit</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1">
+      <ScrollView className="flex-1 pb-32">
         <View className="items-center py-6">
           <Image
             source={{ uri: "https://picsum.photos/200" }}
@@ -107,14 +109,16 @@ export default function Profile(props: { navigation: any }) {
           />
           <Text
             className={`text-xl font-bold mb-1 ${
-              colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
           >
             {store.user?.full_name}
           </Text>
           <Text
             className={`text-base ${
-              colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+              colorScheme === "dark"
+                ? "text-mdark-textSecondary"
+                : "text-gray-500"
             }`}
           >
             {store.user?.email}
@@ -125,14 +129,16 @@ export default function Profile(props: { navigation: any }) {
           <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
             >
               {ordersCount}
             </Text>
             <Text
               className={`text-base ${
-                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+                colorScheme === "dark"
+                  ? "text-mdark-textSecondary"
+                  : "text-gray-500"
               }`}
             >
               Orders
@@ -141,14 +147,16 @@ export default function Profile(props: { navigation: any }) {
           <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
             >
               {collectionCount}
             </Text>
             <Text
               className={`text-base ${
-                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+                colorScheme === "dark"
+                  ? "text-mdark-textSecondary"
+                  : "text-gray-500"
               }`}
             >
               Series Collections
@@ -157,14 +165,16 @@ export default function Profile(props: { navigation: any }) {
           <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
             >
               {wantlistCount}
             </Text>
             <Text
               className={`text-base ${
-                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+                colorScheme === "dark"
+                  ? "text-mdark-textSecondary"
+                  : "text-gray-500"
               }`}
             >
               Wantlist
@@ -174,8 +184,8 @@ export default function Profile(props: { navigation: any }) {
 
         <View className="flex-row flex-wrap justify-between px-4 py-6">
           <TouchableOpacity
-            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
             onPress={() => {
               props.navigation.navigate("ReservationBoxScreen");
@@ -188,15 +198,15 @@ export default function Profile(props: { navigation: any }) {
             />
             <Text
               className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
             >
               Reservation Box
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
             onPress={() => {
               props.navigation.navigate("WantlistScreen");
@@ -209,15 +219,16 @@ export default function Profile(props: { navigation: any }) {
             />
             <Text
               className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
             >
               Wantlist
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+          {/* <TouchableOpacity
+            disabled
+            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
             onPress={async () => {
               console.log("clicked");
@@ -239,45 +250,45 @@ export default function Profile(props: { navigation: any }) {
             >
               My Collection
             </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="px-4 pb-8">
-          <TouchableOpacity
-            className={`flex-row items-center justify-between py-4 border-b ${
-              colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
-            }`}
-            onPress={() => {
-              removeAuthToken();
-              store.setOnboardingDone(true);
-              store.setCartItems([]);
-              store.setCartCount(0);
-              store.setCollectionCount(0);
-              store.setUser(null);
-            }}
-          >
-            <View className="flex-row items-center">
-              <Ionicons
-                name="log-out-outline"
-                size={22}
-                color={colorScheme === "dark" ? "#dadada" : "#333"}
-              />
-              <Text
-                className={`ml-3 text-base ${
-                  colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
-                }`}
-              >
-                Logout
-              </Text>
-            </View>
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color={colorScheme === "dark" ? "#999" : "#999"}
-            />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </ScrollView>
+      {/* Logout Button at Bottom */}
+      <View className="px-4 pb-8 absolute left-0 right-0 bottom-0 bg-transparent">
+        <TouchableOpacity
+          className={`flex-row items-center justify-between py-4  ${
+            colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
+          }`}
+          onPress={() => {
+            removeAuthToken();
+            store.setOnboardingDone(true);
+            store.setCartItems([]);
+            store.setCartCount(0);
+            store.setCollectionCount(0);
+            store.setUser(null);
+          }}
+        >
+          <View className="flex-row items-center">
+            <Ionicons
+              name="log-out-outline"
+              size={22}
+              color={colorScheme === "dark" ? "#dadada" : "#333"}
+            />
+            <Text
+              className={`ml-3 text-base ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+              }`}
+            >
+              Logout
+            </Text>
+          </View>
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color={colorScheme === "dark" ? "#999" : "#999"}
+          />
+        </TouchableOpacity>
+      </View>
       <StatusBar style="auto" />
     </SafeAreaView>
   );

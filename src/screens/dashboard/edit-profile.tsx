@@ -4,6 +4,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  useColorScheme,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -49,6 +50,7 @@ type Props = StackScreenProps<DashboardStackParamList, "EditProfile">;
 
 const EditProfile = ({ navigation }: Props) => {
   const store = useBoundStore();
+  const colorScheme = useColorScheme();
   const fullNameArray = store.user?.full_name.split(" ");
   const ln = fullNameArray.pop();
   const fn = fullNameArray.join(" ");
@@ -87,14 +89,21 @@ const EditProfile = ({ navigation }: Props) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className={`flex-1 ${colorScheme === "dark" ? "bg-mdark-background" : "bg-white"}`}
+    >
+      <NavigationHeader />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 32 : 0}
       >
-        <StatusBar barStyle="dark-content" backgroundColor="white" />
-        <NavigationHeader />
+        <StatusBar
+          barStyle={
+            useColorScheme() === "dark" ? "light-content" : "dark-content"
+          }
+        />
+
         <ScrollView className="flex-1">
           <Box className="p-5">
             <Text className="text-2xl font-semibold mb-6 mt-4">
@@ -167,6 +176,7 @@ const EditProfile = ({ navigation }: Props) => {
                   <FormControlLabelText>Branch</FormControlLabelText>
                 </FormControlLabel>
                 <Select
+                  className="mt-2"
                   selectedValue={branch}
                   onValueChange={(value) => setBranch(value)}
                 >
@@ -193,17 +203,22 @@ const EditProfile = ({ navigation }: Props) => {
               <FormControl className="mb-6">
                 <FormControlLabel>
                   <FormControlLabelText>
-                    Default Fulfillment Option
+                    Fulfillment Option
                   </FormControlLabelText>
                 </FormControlLabel>
                 <Select
+                  className="mt-2"
                   selectedValue={fulfillment}
+                  defaultValue="store"
+                  isDisabled
                   onValueChange={(value) => setFulfillment(value)}
                 >
                   <SelectTrigger size="xl">
                     <SelectInput placeholder="Select fulfillment option" />
                     <SelectIcon className="mr-3">
-                      <ChevronDownIcon />
+                      <ChevronDownIcon
+                        color={colorScheme === "dark" ? "#dadada" : "#333"}
+                      />
                     </SelectIcon>
                   </SelectTrigger>
                   <SelectPortal>
@@ -221,7 +236,7 @@ const EditProfile = ({ navigation }: Props) => {
             </VStack>
           </Box>
         </ScrollView>
-        <Button size="xl" className="ml-4 mr-4" onPress={handleUpdate}>
+        <Button size="xl" className="ml-4 mr-4 mb-4" onPress={handleUpdate}>
           <ButtonText>Update</ButtonText>
         </Button>
       </KeyboardAvoidingView>

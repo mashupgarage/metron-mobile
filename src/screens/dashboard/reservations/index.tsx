@@ -41,15 +41,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import { useBoundStore } from "@/src/store";
 import { useReservationManager } from "./useReservationManager";
-interface Release {
-  id: number;
-  title: string;
-  release_date: string;
-  status: string;
-  products_count: number;
-  reservations_total: number;
-  customers_count: number;
-}
 
 export default function ReservationsScreen() {
   const store = useBoundStore();
@@ -81,7 +72,6 @@ export default function ReservationsScreen() {
     setShowConfirmationModal,
 
     // Helper Methods
-    formatDateHuman,
     getLatestRelease,
     isOldRelease,
 
@@ -191,10 +181,7 @@ export default function ReservationsScreen() {
                     className="mr-4"
                     onPress={() => setShowSearchBar(true)}
                   >
-                    <Search
-                      size={24}
-                      color={useColorScheme() === "dark" ? "#dadada" : "#333"}
-                    />
+                    <Search size={24} color="#666" />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -225,13 +212,7 @@ export default function ReservationsScreen() {
                     ) : (
                       <ClipboardCheck
                         size={24}
-                        color={
-                          isOldRelease()
-                            ? "#9E9E9E"
-                            : useColorScheme() === "dark"
-                            ? "#dadada"
-                            : "#333"
-                        }
+                        color={isOldRelease() ? "#9E9E9E" : "#333"}
                         className="mr-4"
                       />
                     )}
@@ -404,6 +385,7 @@ export default function ReservationsScreen() {
             }}
             contentContainerStyle={{
               padding: 12,
+              paddingBottom: 0,
             }}
             renderItem={({ item, i }) => {
               const product = item as ProductT;
@@ -599,7 +581,7 @@ export default function ReservationsScreen() {
               );
             }}
           />
-          <Box className="h-40" />
+          <Box className="h-12" />
         </Box>
 
         {/* Confirmation Modal */}
