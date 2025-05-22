@@ -153,7 +153,7 @@ export default function Profile(props: { navigation: any }) {
         <View style={styles.settingsContainer}>
           {/* Settings Items */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             disabled
             style={styles.settingItem}
             onPress={() => handleSettingPress("Help Center")}
@@ -163,9 +163,9 @@ export default function Profile(props: { navigation: any }) {
               <Text style={styles.settingText}>Help Center</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#999" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.settingItem}
             disabled
             onPress={() => handleSettingPress("About")}
@@ -179,7 +179,7 @@ export default function Profile(props: { navigation: any }) {
               <Text style={styles.settingText}>About</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color="#999" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.settingItem}

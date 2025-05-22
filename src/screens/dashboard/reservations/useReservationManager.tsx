@@ -214,8 +214,13 @@ export const useReservationManager = () => {
 
   const isOldRelease = (): boolean => {
     const latest = getLatestRelease(releaseDates);
+    const selectedRelease = releaseDates.find(
+      (r) => r.id === selectedReleaseId
+    );
+
     return Boolean(
-      latest && selectedReleaseId && selectedReleaseId !== latest.id
+      (latest && selectedReleaseId && selectedReleaseId !== latest.id) ||
+        (selectedRelease && selectedRelease.status === "close")
     );
   };
 

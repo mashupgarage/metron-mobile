@@ -30,6 +30,7 @@ const config: ExpoConfig = {
     sessionToken: process.env.SESSION_TOKEN,
     apiUrl: process.env.API_URL,
   },
+  plugins: ["expo-font"],
 };
 
 export default config;
