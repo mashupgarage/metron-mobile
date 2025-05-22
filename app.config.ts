@@ -18,6 +18,7 @@ const config: ExpoConfig = {
     supportsTablet: true,
   },
   android: {
+    package: "com.comicodyssey.metron",
     adaptiveIcon: {
       foregroundImage: "./src/assets/adaptive-icon.png",
       backgroundColor: "#ffffff",
@@ -29,6 +30,9 @@ const config: ExpoConfig = {
   extra: {
     sessionToken: process.env.SESSION_TOKEN,
     apiUrl: process.env.API_URL,
+    eas: {
+      projectId: "80691796-1460-45bd-93f5-1df0268da7a7",
+    },
   },
   plugins: ["expo-font"],
 };

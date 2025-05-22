@@ -4,24 +4,53 @@
 
 /* Inter font faces for web */
 @font-face {
-  font-family: 'Inter';
-  src: url('./src/assets/fonts/Inter_18pt-Regular.ttf') format('truetype');
+  font-family: "Inter";
+  src: url("./src/assets/fonts/Inter_18pt-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Inter';
-  src: url('./src/assets/fonts/Inter_18pt-Bold.ttf') format('truetype');
+  font-family: "Inter";
+  src: url("./src/assets/fonts/Inter_18pt-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 @font-face {
-  font-family: 'Inter';
-  src: url('./src/assets/fonts/Inter_18pt-Italic.ttf') format('truetype');
+  font-family: "Inter";
+  src: url("./src/assets/fonts/Inter_18pt-Italic.ttf") format("truetype");
   font-weight: 400;
   font-style: italic;
 }
 
-html, body, #root, .app {
-  font-family: 'Inter', sans-serif !important;
+html,
+body,
+#root,
+.app {
+  font-family: "Inter", sans-serif !important;
+}
+
+:root {
+  --color-primary-0: 20, 55, 125;
+  --color-primary-50: 20, 55, 125;
+  --color-primary-100: 20, 55, 125;
+  --color-primary-200: 20, 55, 125;
+  --color-primary-300: 20, 55, 125;
+  --color-primary-400: 20, 55, 125;
+  --color-primary-500: 20, 55, 125;
+  --color-primary-600: 20, 55, 125;
+  --color-primary-700: 20, 55, 125;
+  --color-primary-800: 20, 55, 125;
+  --color-primary-900: 20, 55, 125;
+
+  --color-secondary-0: 20, 87, 125;
+  --color-secondary-50: 20, 87, 125;
+  --color-secondary-100: 20, 87, 125;
+  --color-secondary-200: 20, 87, 125;
+  --color-secondary-300: 20, 87, 125;
+  --color-secondary-400: 20, 87, 125;
+  --color-secondary-500: 20, 87, 125;
+  --color-secondary-600: 20, 87, 125;
+  --color-secondary-700: 20, 87, 125;
+  --color-secondary-800: 20, 87, 125;
+  --color-secondary-900: 20, 87, 125;
 }
