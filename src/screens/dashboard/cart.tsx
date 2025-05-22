@@ -210,6 +210,7 @@ export default function Cart() {
             <Button
               onPress={handleCheckout}
               size="xl"
+              isDisabled
               disabled={selectedItems.size === 0}
               style={{ flex: 1 }}
             >

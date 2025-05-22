@@ -21,7 +21,11 @@ import { Button } from "@/src/components/ui/button";
 import { Menu } from "lucide-react-native";
 import { mockedCarouselItems } from "@/src/utils/mock";
 import { useCallback, useEffect, useState } from "react";
-import { fetchProducts, fetchUserProfile } from "@/src/api/apiEndpoints";
+import {
+  fetchCartItems,
+  fetchProducts,
+  fetchUserProfile,
+} from "@/src/api/apiEndpoints";
 import Constants from "expo-constants";
 
 const PAGE_SIZE = 10; // Define standard page size
@@ -46,10 +50,16 @@ export default function Home() {
   // Load first page of products when component mounts or route params change
   useEffect(() => {
     loadInitialProducts();
-
     fetchUserProfile(store.user?.id)
       .then((res) => {
         store.setUser(res.data);
+        fetchCartItems(store.user.id)
+          .then((res) => {
+            store.setCartItems(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       })
       .catch((err) => {
         console.log(err);

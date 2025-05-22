@@ -187,7 +187,7 @@ export default function ReservationsScreen() {
             ) : (
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="font-bold text-lg">
-                  {formatDateHuman(selectedDate)}
+                  {/* {formatDateHuman(selectedDate)} */}
                 </Text>
                 <View className="flex-row items-center">
                   <TouchableOpacity
@@ -274,6 +274,14 @@ export default function ReservationsScreen() {
                       >
                         press here.
                       </Text>
+                    </Text>
+                  </View>
+                );
+              } else if (latest && latest.status === "close") {
+                return (
+                  <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
+                    <Text className="text-amber-800">
+                      This release is now closed.
                     </Text>
                   </View>
                 );
@@ -395,7 +403,7 @@ export default function ReservationsScreen() {
               return (
                 <>
                   <View
-                    className="p-0 m-1"
+                    className="p-0"
                     style={
                       isMultiSelectMode && isSelected
                         ? {
@@ -539,9 +547,6 @@ export default function ReservationsScreen() {
                             <Text numberOfLines={1} className="font-bold">
                               {product.title}
                             </Text>
-                            <Text className="text-green-700 font-bold">
-                              {product.formatted_price}
-                            </Text>
                             <Text numberOfLines={1} className="text-gray-600">
                               {product.creators}
                             </Text>
@@ -562,7 +567,7 @@ export default function ReservationsScreen() {
                     </Pressable>
                   </View>
                   <TouchableOpacity
-                    className={`px-3 ${
+                    className={`px-4 ${
                       isWanted ? "opacity-50" : "opacity-100"
                     }`}
                     disabled={isWanted}

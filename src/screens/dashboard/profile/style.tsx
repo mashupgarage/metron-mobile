@@ -72,10 +72,12 @@ export const profileStyles = StyleSheet.create({
   statNumber: {
     fontSize: 22,
     fontWeight: "700",
+    fontFamily: "Inter",
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 14,
+    fontFamily: "Inter-Regular",
     color: "#666",
   },
   sectionContainer: {

@@ -13,6 +13,7 @@ import { useBoundStore } from "./src/store";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { loadAuthTokenToAxios } from "./src/api/tokenManager";
+import { config } from "./src/components/ui/gluestack-ui-provider/config";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function App() {
   const store = useBoundStore();
   const [fontsLoaded] = useFonts(InterFonts);
   useEffect(() => {
+    console.log("fontsLoaded", fontsLoaded);
     loadAuthTokenToAxios();
   }, []);
 

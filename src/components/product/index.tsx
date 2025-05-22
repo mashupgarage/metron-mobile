@@ -15,7 +15,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
 
   return (
     <Box className="mb-2">
-      <View style={{ padding: 4, margin: 8, marginBottom: 0 }}>
+      <View style={{ padding: 4, margin: 4, marginBottom: 0 }}>
         <Image
           source={{ uri: product.cover_url }}
           alt={product.id.toString()}
@@ -26,9 +26,11 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
           <Text numberOfLines={1} className="font-bold">
             {product.title}
           </Text>
-          <Text className="text-green-700 font-bold">
-            {product.formatted_price}
-          </Text>
+          {product.formatted_price && (
+            <Text className="text-green-700 font-bold">
+              {product.formatted_price}
+            </Text>
+          )}
           <Text numberOfLines={1} className="text-gray-600">
             {product.creators}
           </Text>
