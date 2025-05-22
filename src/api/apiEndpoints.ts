@@ -36,16 +36,20 @@ export const fetchProductDetails = (id: number) => {
  * @example
  * fetchProducts(undefined, 2).then(res => res.data) // fetch page 2 of all products
  */
-export const fetchProducts = (category_id?: number, page: number = 1, limit: number = 10) => {
+export const fetchProducts = (
+  category_id?: number,
+  page: number = 1,
+  limit: number = 10
+) => {
   const params: Record<string, string | number> = { page, limit };
-  
+
   if (category_id !== undefined) {
-    return axiosClient.get(`/marketplace/catalog_products`, { 
-      params: { 
+    return axiosClient.get(`/marketplace/catalog_products`, {
+      params: {
         c: category_id,
         page,
-        limit
-      } 
+        limit,
+      },
     });
   }
   return axiosClient.get("/marketplace/catalog_products", { params });
@@ -59,21 +63,21 @@ export const fetchProducts = (category_id?: number, page: number = 1, limit: num
  * @param category_id - Optional category ID to filter products
  */
 export const searchMarketplaceProducts = (
-  query: string, 
-  page: number = 1, 
+  query: string,
+  page: number = 1,
   limit: number = 10,
   category_id?: number
 ) => {
-  const params: Record<string, string | number> = { 
+  const params: Record<string, string | number> = {
     q: query,
     page,
-    limit
+    limit,
   };
-  
+
   if (category_id !== undefined) {
     params.c = category_id;
   }
-  
+
   return axiosClient.get(`/marketplace/catalog_products`, { params });
 };
 
@@ -253,13 +257,17 @@ export const fetchReleaseById = (id: number) => {
  * @example
  * fetchProductsByReleaseId(1).then(res => res.data)
  */
-export const fetchProductsByReleaseId = (id: number, page: number = 1, limit: number = 10) => {
+export const fetchProductsByReleaseId = (
+  id: number,
+  page: number = 1,
+  limit: number = 10
+) => {
   return axiosClient.get(`/releases/${id}/products`, {
     params: {
       meta: true,
       page,
-      limit
-    }
+      limit,
+    },
   });
 };
 
@@ -360,6 +368,10 @@ export const getMyCollection = async (userId: number) => {
       user_id: userId,
     },
   });
+};
+
+export const getUserCollection = async (userId: number) => {
+  return axiosClient.get(`/users/${userId}/report`);
 };
 
 /**

@@ -111,13 +111,6 @@ export default function Search() {
             <Text className="text-center mb-4 text-gray-600 text-xl font-medium">
               Search for products
             </Text>
-            <Image
-              source={{
-                uri: "https://i.namu.wiki/i/i8pFObUYpfyr8yr4pgmE0JMrvSnMGNN4fY5n3vTz4azQhS-IfDZ3txCoNTxpFTzR-eE2CyJZemmtkpa71ijVaA.gif",
-              }}
-              alt="scv_spinning"
-              className="w-32 h-32"
-            />
           </>
         )}
       </VStack>
@@ -132,7 +125,7 @@ export default function Search() {
             <Input
               className="flex-1 mr-2 bg-white rounded-lg"
               variant="outline"
-              size="md"
+              size="lg"
             >
               <InputField
                 placeholder="Search products..."
@@ -146,7 +139,7 @@ export default function Search() {
             <Button
               onPress={() => handleSearch(1)}
               disabled={loading || searchQuery.trim() === ""}
-              className="bg-blue-900 rounded-lg h-12 px-4"
+              className="bg-blue-900 rounded-lg h-11 px-4"
             >
               {loading ? <ButtonSpinner /> : <ButtonText>Search</ButtonText>}
             </Button>

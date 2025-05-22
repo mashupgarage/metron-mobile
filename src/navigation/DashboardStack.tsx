@@ -9,6 +9,7 @@ import { useBoundStore } from "../store";
 import { screenOption } from "../utils/screenOption";
 import DashboardTabs from "./DashboardTabs";
 import EditProfile from "../screens/dashboard/edit-profile";
+import CollectionScreen from "../screens/dashboard/collection";
 
 const Stack = createStackNavigator();
 export function DashboardStack() {
@@ -55,6 +56,11 @@ export function DashboardStack() {
         name="EditProfile"
         options={screenOption}
         component={EditProfile}
+      />
+      <Stack.Screen
+        name="Collection"
+        options={screenOption}
+        component={CollectionScreen}
       />
     </Stack.Navigator>
   );

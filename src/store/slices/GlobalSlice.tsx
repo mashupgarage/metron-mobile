@@ -12,6 +12,8 @@ export type GlobalSlice = {
   isLoading: boolean;
   cartCount: number;
   cartItems: CartItemT[];
+  hasSeenCollectionSummary: boolean;
+  setHasSeenCollectionSummary: (val: boolean) => void;
   setLoading: (value: boolean) => void;
   setCartCount: (value: number) => void;
   setCartItems: (value: CartItemT[]) => void;
@@ -24,6 +26,9 @@ export const createGlobalSlice: StateCreator<GlobalSlice> = (set, get) => ({
   isLoading: false,
   cartCount: 0,
   cartItems: [],
+  hasSeenCollectionSummary: false,
+  setHasSeenCollectionSummary: (val: boolean) => set(() => ({ hasSeenCollectionSummary: val })),
+
   setLoading: (value: boolean) => set(() => ({ isLoading: value })),
   setCartCount: (value: number) => set(() => ({ cartCount: value })),
   setCartItems: (value: CartItemT[]) =>

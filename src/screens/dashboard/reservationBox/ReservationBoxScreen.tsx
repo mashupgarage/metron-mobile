@@ -66,11 +66,13 @@ export default function ReservationBoxScreen() {
     getReservationList(store.user.id, 1, PAGE_SIZE)
       .then((res) => {
         console.log("reservations", res.data);
-        const reservationData = res.data.reservations || [];
+        const reservationData = (res.data.reservations || []).filter(
+          (item) => item.status !== "fill"
+        );
         setReservations(reservationData);
         setPage(1);
         setTotalPages(res.data.metadata?.total_pages || 1);
-        setTotalCount(res.data.metadata?.total_count || reservationData.length);
+        setTotalCount(reservationData.length);
         setError(null);
       })
       .catch((err) => {
@@ -280,7 +282,9 @@ export default function ReservationBoxScreen() {
               PAGE_SIZE
             );
             // console.log('API returned reservations:', res.data.reservations);
-            const newReservations = res.data.reservations || [];
+            const newReservations = (res.data.reservations || []).filter(
+              (item) => item.status !== "fill"
+            );
             setReservations((prev) => {
               const existingIds = new Set(prev.map((item) => item.id));
               const filtered = newReservations.filter(
@@ -291,11 +295,12 @@ export default function ReservationBoxScreen() {
                 "Combined reservations count after append:",
                 combined.length
               );
+              // Update totalCount here to reflect only non-'fill' reservations
+              setTotalCount(combined.length);
               return combined;
             });
             setPage(nextPage);
             setTotalPages(res.data.metadata?.total_pages || totalPages);
-            setTotalCount(res.data.metadata?.total_count || totalCount);
           } catch (err) {
             console.error("Failed to fetch more reservations:", err);
           } finally {
