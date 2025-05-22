@@ -72,7 +72,7 @@ export default function ReservationBoxScreen() {
         setReservations(reservationData);
         setPage(1);
         setTotalPages(res.data.metadata?.total_pages || 1);
-        setTotalCount(reservationData.length);
+        setTotalCount(res.data.metadata?.total_count);
         setError(null);
       })
       .catch((err) => {
@@ -281,7 +281,7 @@ export default function ReservationBoxScreen() {
               nextPage,
               PAGE_SIZE
             );
-            // console.log('API returned reservations:', res.data.reservations);
+            console.log("API returned reservations:", res.data.reservations);
             const newReservations = (res.data.reservations || []).filter(
               (item) => item.status !== "fill"
             );
@@ -296,7 +296,6 @@ export default function ReservationBoxScreen() {
                 combined.length
               );
               // Update totalCount here to reflect only non-'fill' reservations
-              setTotalCount(combined.length);
               return combined;
             });
             setPage(nextPage);

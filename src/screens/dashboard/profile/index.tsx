@@ -27,8 +27,7 @@ export default function Profile(props: { navigation: any }) {
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
   // Use dedicated slices for ordersCount and collectionCount
   const ordersCount = store.ordersCount ?? 0;
-  const [orderedProducts, setOrderedProducts] = useState<any[]>([]);
-  const collectionCount = orderedProducts.length ?? 0;
+  const collectionCount = store.user?.series_ids.length ?? 0;
   const setOrdersCount = (count: number) => store.setOrdersCount(count);
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
@@ -48,24 +47,18 @@ export default function Profile(props: { navigation: any }) {
       // Fetch real orders count (filter out 'fill' status)
       getReservationList(store.user.id)
         .then((res) => {
-          const filtered = (res.data.reservations || []).filter(
-            (item) => item.status !== "fill"
-          );
-          setOrdersCount(filtered.length);
+          console.log("actual reservation", res.data.metadata?.total_count);
+          setOrdersCount(res.data.metadata?.total_count ?? 0);
         })
         .catch(() => setOrdersCount(0));
 
       // Fetch real collection count from getUserCollection, filter out 'fill' status
       getUserCollection(store.user.id)
         .then((res) => {
-          const products = (res.data.ordered_products || []).filter(
-            (item: any) => item.status !== "fill"
-          );
-          setOrderedProducts(products);
-          setCollectionCount(products.length);
+          console.log("actual collection", res.data);
+          setCollectionCount(res.data.ordered_products.length);
         })
         .catch(() => {
-          setOrderedProducts([]);
           setCollectionCount(0);
         });
     }
@@ -115,7 +108,7 @@ export default function Profile(props: { navigation: any }) {
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{collectionCount}</Text>
-            <Text style={styles.statLabel}>Owned</Text>
+            <Text style={styles.statLabel}>Series Collections</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>{wantlistCount}</Text>
@@ -192,7 +185,7 @@ export default function Profile(props: { navigation: any }) {
             style={styles.settingItem}
             onPress={() => {
               removeAuthToken();
-              store.setOnboardingDone(false);
+              store.setOnboardingDone(true);
               store.setCartItems([]);
               store.setCartCount(0);
               store.setCollectionCount(0);

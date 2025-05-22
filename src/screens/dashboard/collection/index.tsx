@@ -19,29 +19,23 @@ const CollectionScreen = () => {
   const store = useBoundStore();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedSeriesId, setSelectedSeriesId] = useState<number | null>(null);
-  const [orderedProducts, setOrderedProducts] = useState<any[]>([]);
-  const [wantlistedProducts, setWantlistedProducts] = useState<any[]>([]);
   const [seriesCount, setSeriesCount] = useState(0);
   const [collectedSeries, setCollectedSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Fetch collection from API
   useEffect(() => {
     setLoading(true);
+    setSeriesCount(store.user?.series_ids?.length || 0);
+    setLoading(false);
+    // fetch collected series
     getUserCollection(store.user.id ?? 0)
       .then((res) => {
-        console.log("collected_series", res.data.collected_series);
-
-        setOrderedProducts(res.data.ordered_products || []);
-        setWantlistedProducts(res.data.wantlisted_products || []);
-        setSeriesCount(res.data.series_count || 0);
-        setCollectedSeries(res.data.collected_series || []);
-        setLoading(false);
+        console.log("user", res.data);
+        // setCollectedSeries(res.data.collected_series || []);
       })
       .catch((err) => {
-        setError("Failed to load collection");
-        setLoading(false);
+        console.log("Failed to load collection", err);
       });
   }, []);
 
@@ -54,19 +48,14 @@ const CollectionScreen = () => {
     },
     {
       label: "Collected",
-      value: orderedProducts.length,
+      value: 0,
       icon: "book",
       color: "#0284c7",
     },
   ];
 
   // Filtering logic for orderedProducts
-  let filteredItems =
-    selectedCategory === "All"
-      ? orderedProducts
-      : orderedProducts.filter(
-          (item) => item.category_id === CATEGORY_ID_MAP[selectedCategory]
-        );
+  let filteredItems = [];
 
   // Further filter by selected series if any
   if (selectedSeriesId !== null) {
