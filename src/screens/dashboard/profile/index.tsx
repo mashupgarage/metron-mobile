@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  useColorScheme,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
@@ -17,12 +18,12 @@ import {
   getWantList,
   getUserCollection,
 } from "@/src/api/apiEndpoints";
-import { profileStyles } from "./style";
+
 import { removeAuthToken } from "@/src/api/tokenManager";
 
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore();
-  const styles = profileStyles;
+  const colorScheme = useColorScheme();
   const wantlistCount = useWantListStore((state) => state.wantlistCount);
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
   // Use dedicated slices for ordersCount and collectionCount
@@ -78,65 +79,146 @@ export default function Profile(props: { navigation: any }) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        {/* <Text style={styles.headerTitle}>Profile</Text> */}
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={() => handleSettingPress("Settings")}
-        >
-          <TouchableOpacity onPress={handleEditProfile}>
-            <Text className="font-semibold">Edit Profile</Text>
-          </TouchableOpacity>
+    <SafeAreaView
+      style={{
+        paddingTop: 24,
+      }}
+      className={`flex-1 ${
+        colorScheme === "dark" ? "bg-[#1e1e1e]" : "bg-white"
+      }`}
+    >
+      <View
+        className={`flex-row items-center justify-between py-4 px-5 border-b ${
+          colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
+        }`}
+      >
+        {/* <Text className="text-xl font-semibold">Profile</Text> */}
+        <View />
+        <TouchableOpacity onPress={handleEditProfile}>
+          <Text className="font-semibold text-primary-600">Edit Profile</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.profileSection}>
+      <ScrollView className="flex-1">
+        <View className="items-center py-6">
           <Image
             source={{ uri: "https://picsum.photos/200" }}
-            style={styles.profileImage}
+            className="w-24 h-24 rounded-full mb-3"
           />
-          <Text style={styles.userName}>{store.user?.full_name}</Text>
-          <Text style={styles.userEmail}>{store.user?.email}</Text>
+          <Text
+            className={`text-xl font-bold mb-1 ${
+              colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+            }`}
+          >
+            {store.user?.full_name}
+          </Text>
+          <Text
+            className={`text-base ${
+              colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+            }`}
+          >
+            {store.user?.email}
+          </Text>
         </View>
 
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{ordersCount}</Text>
-            <Text style={styles.statLabel}>Orders</Text>
+        <View className="flex-row justify-around py-5 border-y border-gray-200 mx-4">
+          <View className="items-center">
+            <Text
+              className={`text-2xl font-bold ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              }`}
+            >
+              {ordersCount}
+            </Text>
+            <Text
+              className={`text-base ${
+                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+              }`}
+            >
+              Orders
+            </Text>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{collectionCount}</Text>
-            <Text style={styles.statLabel}>Series Collections</Text>
+          <View className="items-center">
+            <Text
+              className={`text-2xl font-bold ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              }`}
+            >
+              {collectionCount}
+            </Text>
+            <Text
+              className={`text-base ${
+                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+              }`}
+            >
+              Series Collections
+            </Text>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{wantlistCount}</Text>
-            <Text style={styles.statLabel}>Wantlist</Text>
+          <View className="items-center">
+            <Text
+              className={`text-2xl font-bold ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#222]"
+              }`}
+            >
+              {wantlistCount}
+            </Text>
+            <Text
+              className={`text-base ${
+                colorScheme === "dark" ? "text-[#b0b0b0]" : "text-gray-500"
+              }`}
+            >
+              Wantlist
+            </Text>
           </View>
         </View>
 
-        <View style={styles.actionsGrid}>
+        <View className="flex-row flex-wrap justify-between px-4 py-6">
           <TouchableOpacity
-            style={styles.actionButton}
+            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+            }`}
             onPress={() => {
               props.navigation.navigate("ReservationBoxScreen");
             }}
           >
-            <Ionicons name="cube-outline" size={24} color="#4285F4" />
-            <Text style={styles.actionText}>Reservation Box</Text>
+            <Ionicons
+              name="cube-outline"
+              size={24}
+              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+            />
+            <Text
+              className={`mt-2 text-base text-center ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+              }`}
+            >
+              Reservation Box
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.actionButton}
+            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+            }`}
             onPress={() => {
               props.navigation.navigate("WantlistScreen");
             }}
           >
-            <Ionicons name="list-outline" size={24} color="#4285F4" />
-            <Text style={styles.actionText}>Wantlist</Text>
+            <Ionicons
+              name="list-outline"
+              size={24}
+              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+            />
+            <Text
+              className={`mt-2 text-base text-center ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+              }`}
+            >
+              Wantlist
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.actionButton}
+            className={`w-[48%] bg-gray-100 rounded-lg p-4 items-center mb-4 ${
+              colorScheme === "dark" ? "bg-[#242424]" : "bg-gray-100"
+            }`}
             onPress={async () => {
               console.log("clicked");
               getMyCollection(store.user?.id).then((res) => {
@@ -145,44 +227,26 @@ export default function Profile(props: { navigation: any }) {
               props.navigation.navigate("Collection");
             }}
           >
-            <Ionicons name="cube-outline" size={24} color="#4285F4" />
-            <Text style={styles.actionText}>My Collection</Text>
+            <Ionicons
+              name="cube-outline"
+              size={24}
+              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+            />
+            <Text
+              className={`mt-2 text-base text-center ${
+                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+              }`}
+            >
+              My Collection
+            </Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.settingsContainer}>
-          {/* Settings Items */}
-
-          {/* <TouchableOpacity
-            disabled
-            style={styles.settingItem}
-            onPress={() => handleSettingPress("Help Center")}
-          >
-            <View style={styles.settingLeft}>
-              <Ionicons name="help-circle-outline" size={22} color="#333" />
-              <Text style={styles.settingText}>Help Center</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#999" />
-          </TouchableOpacity> */}
-
-          {/* <TouchableOpacity
-            style={styles.settingItem}
-            disabled
-            onPress={() => handleSettingPress("About")}
-          >
-            <View style={styles.settingLeft}>
-              <Ionicons
-                name="information-circle-outline"
-                size={22}
-                color="#333"
-              />
-              <Text style={styles.settingText}>About</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#999" />
-          </TouchableOpacity> */}
-
+        <View className="px-4 pb-8">
           <TouchableOpacity
-            style={styles.settingItem}
+            className={`flex-row items-center justify-between py-4 border-b ${
+              colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
+            }`}
             onPress={() => {
               removeAuthToken();
               store.setOnboardingDone(true);
@@ -192,11 +256,25 @@ export default function Profile(props: { navigation: any }) {
               store.setUser(null);
             }}
           >
-            <View style={styles.settingLeft}>
-              <Ionicons name="log-out-outline" size={22} color="#333" />
-              <Text style={styles.settingText}>Logout</Text>
+            <View className="flex-row items-center">
+              <Ionicons
+                name="log-out-outline"
+                size={22}
+                color={colorScheme === "dark" ? "#dadada" : "#333"}
+              />
+              <Text
+                className={`ml-3 text-base ${
+                  colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+                }`}
+              >
+                Logout
+              </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#999" />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={colorScheme === "dark" ? "#999" : "#999"}
+            />
           </TouchableOpacity>
         </View>
       </ScrollView>

@@ -59,7 +59,12 @@ export default function Novels() {
   const novels = store.novels_list?.products || [];
 
   return (
-    <Box className="h-screen w-full pb-24">
+    <Box
+      style={{
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+      }}
+      className="h-screen w-full pb-24"
+    >
       <MasonryList
         data={novels}
         scrollEnabled

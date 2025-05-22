@@ -2,7 +2,7 @@ import { Box } from "@/src/components/ui/box";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { ArrowLeft } from "lucide-react-native";
 import React from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, useColorScheme } from "react-native";
 
 const AuthLayout = ({
   children,
@@ -14,7 +14,11 @@ const AuthLayout = ({
   navigation: any;
 }) => {
   return (
-    <ScrollView>
+    <ScrollView
+      style={{
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+      }}
+    >
       {showBackButton && (
         <Button
           onPress={() => {
@@ -23,7 +27,9 @@ const AuthLayout = ({
           className="absolute ml-4 top-16 p-0"
           variant="link"
         >
-          <ArrowLeft />
+          <ArrowLeft
+            color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
+          />
           <ButtonText>Back</ButtonText>
         </Button>
       )}

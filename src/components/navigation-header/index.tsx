@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { Button, ButtonText } from "../ui/button";
 import { useNavigation } from "@react-navigation/native";
 import { ArrowLeft, Dot, ShoppingBag } from "lucide-react-native";
@@ -20,7 +20,9 @@ const NavigationHeader = ({
           className="absolute ml-4"
           variant="link"
         >
-          <ArrowLeft />
+          <ArrowLeft
+            color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
+          />
           <ButtonText>Back</ButtonText>
         </Button>
       )}
@@ -42,7 +44,9 @@ const NavigationHeader = ({
                 size={44}
               />
             )}
-            <ShoppingBag />
+            <ShoppingBag
+              color={useColorScheme() !== "dark" ? "#121212" : "#dadada"}
+            />
             <ButtonText>My Cart</ButtonText>
           </Button>
         )}

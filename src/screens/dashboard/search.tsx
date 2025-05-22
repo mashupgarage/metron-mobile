@@ -103,12 +103,12 @@ export default function Search() {
     return (
       <VStack className="items-center justify-center p-4">
         {searchQuery !== "" ? (
-          <Text className="text-center text-gray-500 text-base">
+          <Text className="text-center text-base">
             No products found matching "{searchQuery}"
           </Text>
         ) : (
           <>
-            <Text className="text-center mb-4 text-gray-600 text-xl font-medium">
+            <Text className="text-center mb-4 text-xl font-medium">
               Search for products
             </Text>
           </>
@@ -121,11 +121,11 @@ export default function Search() {
     <DashboardLayout>
       <Box className="h-screen w-full pb-24">
         <VStack className="w-full px-4 mb-4">
-          <HStack className="w-full mb-6">
+          <HStack className="w-full mb-6 mt-4">
             <Input
-              className="flex-1 mr-2 bg-white rounded-lg"
+              className="flex-1 mr-2 rounded-lg"
               variant="outline"
-              size="lg"
+              size="xl"
             >
               <InputField
                 placeholder="Search products..."
@@ -137,9 +137,10 @@ export default function Search() {
               />
             </Input>
             <Button
+              size="xl"
               onPress={() => handleSearch(1)}
               disabled={loading || searchQuery.trim() === ""}
-              className="bg-blue-900 rounded-lg h-11 px-4"
+              className="rounded-lg px-4"
             >
               {loading ? <ButtonSpinner /> : <ButtonText>Search</ButtonText>}
             </Button>

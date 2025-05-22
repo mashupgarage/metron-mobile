@@ -16,7 +16,7 @@ import {
 } from "lucide-react-native";
 import { useBoundStore } from "../store";
 import HomeDrawer from "./HomeDrawer";
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 
 const DashboardTab = createBottomTabNavigator();
 
@@ -30,6 +30,9 @@ const DashboardTabs = () => {
     route: { name: string };
   }): BottomTabNavigationOptions => ({
     headerShown: false,
+    tabBarStyle: {
+      backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+    },
     tabBarIcon: ({ color }) => iconDisplay(route.name, color, 24),
     tabBarBadge:
       route.name === "My Cart"
@@ -55,12 +58,13 @@ const DashboardTabs = () => {
               width: 70,
               height: 70,
               borderRadius: 50,
-              backgroundColor: "#fff",
+              backgroundColor:
+                useColorScheme() === "dark" ? "#121212" : "#dadada",
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 12,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
+              shadowColor: useColorScheme() !== "dark" ? "#121212" : "#dadada",
+              shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.1,
               shadowRadius: 6,
               elevation: 8,
@@ -77,7 +81,7 @@ const DashboardTabs = () => {
   };
 
   return (
-    <DashboardTab.Navigator>
+    <DashboardTab.Navigator id={undefined}>
       <DashboardTab.Screen
         options={{
           ...screenConfig({ route: { name: "Marketplace" } }),

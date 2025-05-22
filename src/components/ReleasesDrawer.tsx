@@ -3,8 +3,8 @@ import {
   Animated,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { Text } from "./ui/text";
@@ -55,129 +55,68 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
     <>
       {visible && (
         <TouchableOpacity
-          style={styles.overlay}
+          className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 z-[1]"
           activeOpacity={1}
           onPress={onClose}
         />
       )}
       <Animated.View
         style={[
-          styles.drawer,
           {
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            width: 300,
+            backgroundColor: useColorScheme() === "dark" ? "#1e1e1e" : "#fff",
+            zIndex: 2,
             transform: [{ translateX: drawerAnimation }],
           },
         ]}
       >
-        <SafeAreaView style={styles.drawerContent}>
-          <View style={styles.drawerHeader}>
-            <Text style={styles.drawerHeaderText}>Release History</Text>
+        <SafeAreaView className="flex-1">
+          <View className="p-4 border-b flex-row justify-between items-center">
+            <Text className="text-xl font-bold">Release History</Text>
             <TouchableOpacity onPress={onClose}>
-              <X size={24} color="#333333" />
+              <X
+                size={24}
+                color={useColorScheme() === "dark" ? "#dadada" : "#333"}
+              />
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.drawerList}>
+          <ScrollView className="flex-1">
             <TouchableOpacity
-              style={[styles.drawerItem, styles.allReleasesItem]}
+              className="flex-row justify-between items-center p-4"
               onPress={() => {
                 onShowAllReleases();
                 onClose();
               }}
             >
-              <Text style={styles.drawerItemText}>LATEST RELEASE</Text>
+              <Text className="text-base">LATEST RELEASE</Text>
             </TouchableOpacity>
 
-            {releaseDates.map((item, index) => (
+            {releaseDates.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={[
-                  styles.drawerItem,
-                  item.id === selectedReleaseId && styles.selectedDrawerItem
-                ]}
+                className={`flex-row justify-between items-center p-4 border-b border-b-[#e0e0e0] ${
+                  item.id === selectedReleaseId ? "bg-primary-50" : ""
+                }`}
                 onPress={() => {
                   onSelectDate(item.id, item.date);
                 }}
               >
-                <Text style={styles.drawerItemText}>{item.date}</Text>
-                <View style={styles.drawerBadge}>
-                  <Text style={styles.drawerBadgeText}>{item.count}</Text>
+                <Text className="text-[#333333] text-base">{item.date}</Text>
+                <View className="bg-[rgb(43,100,207)] rounded px-2 py-0.5">
+                  <Text className="text-white text-sm">{item.count}</Text>
                 </View>
               </TouchableOpacity>
-            ))} 
+            ))}
           </ScrollView>
         </SafeAreaView>
       </Animated.View>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  selectedDrawerItem: {
-    backgroundColor: "#e0ebfa",
-  },
-  overlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 1,
-  },
-  drawer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: 300,
-    backgroundColor: "#fff",
-    zIndex: 2,
-  },
-  drawerContent: {
-    flex: 1,
-  },
-  drawerHeader: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#f9f9f9",
-  },
-  drawerHeaderText: {
-    color: "#333333",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  drawerList: {
-    flex: 1,
-  },
-  drawerItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  allReleasesItem: {
-    backgroundColor: "#f0f0f0",
-  },
-  drawerItemText: {
-    color: "#333333",
-    fontSize: 16,
-  },
-  drawerBadge: {
-    backgroundColor: "rgb(43,100,207)",
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  drawerBadgeText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-  },
-});
 
 export default ReleasesDrawer;

@@ -8,13 +8,14 @@ import {
   ActivityIndicator,
   Modal,
   ScrollView,
+  useColorScheme,
 } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 // @ts-ignore
 import ComicOdysseyIcon from "@/src/assets/icon.png";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
-import { ProductT, SearchOptions } from "@/src/utils/types/common";
+import { ProductT } from "@/src/utils/types/common";
 import { ClipboardCheck, Menu, Search, X, Check } from "lucide-react-native";
 import DashboardLayout from "../_layout";
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
@@ -39,9 +40,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import { useBoundStore } from "@/src/store";
-import { debounce } from "lodash";
 import { useReservationManager } from "./useReservationManager";
-import Constants from "expo-constants";
 interface Release {
   id: number;
   title: string;
@@ -64,11 +63,9 @@ export default function ReservationsScreen() {
     reservedProductIds,
     userReservationProductIds,
     loading,
-    error,
     selectedProducts,
     isMultiSelectMode,
     showDrawer,
-    selectedDate,
     selectedReleaseId,
     searchQuery,
     isSearching,
@@ -194,7 +191,10 @@ export default function ReservationsScreen() {
                     className="mr-4"
                     onPress={() => setShowSearchBar(true)}
                   >
-                    <Search size={24} color="#333" />
+                    <Search
+                      size={24}
+                      color={useColorScheme() === "dark" ? "#dadada" : "#333"}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -225,7 +225,13 @@ export default function ReservationsScreen() {
                     ) : (
                       <ClipboardCheck
                         size={24}
-                        color={isOldRelease() ? "#9E9E9E" : "#333"}
+                        color={
+                          isOldRelease()
+                            ? "#9E9E9E"
+                            : useColorScheme() === "dark"
+                            ? "#dadada"
+                            : "#333"
+                        }
                         className="mr-4"
                       />
                     )}
@@ -238,7 +244,10 @@ export default function ReservationsScreen() {
                     </Pressable>
                   )}
                   <TouchableOpacity onPress={toggleDrawer} className="p-2">
-                    <Menu size={24} color="#333" />
+                    <Menu
+                      size={24}
+                      color={useColorScheme() === "dark" ? "#dadada" : "#333"}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -334,7 +343,7 @@ export default function ReservationsScreen() {
                 <View className="flex mt-56 mb-4 flex-col items-center" />
               ) : (
                 <View className="flex mt-56 mb-4 flex-col items-center">
-                  <View>
+                  <View className="flex items-center">
                     <Image
                       alt="Comic Odyssey Icon"
                       key="closed"

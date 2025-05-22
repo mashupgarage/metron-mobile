@@ -2,7 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import "./global.css";
 import { useFonts } from "expo-font";
 import { InterFonts } from "./src/assets/fonts";
-import { useColorScheme } from "react-native";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -32,7 +31,6 @@ export default function App() {
           flex: 1,
           width: "100%",
           height: "100%",
-          backgroundColor: useColorScheme() === "dark" ? "#202020" : "#FFFFFF",
           alignItems: "center",
           justifyContent: "center",
         }}

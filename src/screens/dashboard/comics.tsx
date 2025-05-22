@@ -58,7 +58,12 @@ export default function Comics() {
   const comics = store.comics_list?.products || [];
 
   return (
-    <Box className="h-screen w-full pb-24">
+    <Box
+      style={{
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+      }}
+      className="h-screen w-full pb-24"
+    >
       <MasonryList
         data={comics}
         scrollEnabled
