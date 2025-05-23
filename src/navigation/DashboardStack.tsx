@@ -16,7 +16,7 @@ export function DashboardStack() {
   const store = useBoundStore();
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator id={undefined}>
       {store.isOnboardingDone === false &&
       store.user?.primary_address === null ? (
         <Stack.Screen

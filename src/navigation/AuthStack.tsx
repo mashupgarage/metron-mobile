@@ -6,7 +6,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 const Stack = createStackNavigator();
 export function AuthStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator id={undefined}>
       <Stack.Screen name="SignIn" options={screenOption} component={SignIn} />
       <Stack.Screen name="SignUp" options={screenOption} component={SignUp} />
     </Stack.Navigator>

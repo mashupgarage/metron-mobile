@@ -10,6 +10,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  useColorScheme,
 } from "react-native";
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { useNavigation } from "@react-navigation/native";
@@ -243,7 +244,12 @@ export default function Product(props: {
     : 0;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#ffffff",
+      }}
+    >
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -357,11 +363,13 @@ export default function Product(props: {
               flexDirection: "row",
               marginHorizontal: 12,
               alignItems: "center",
+              marginBottom: 4,
             }}
           >
             {maxQuantity > 1 && (
               <TextInput
                 style={{
+                  backgroundColor: "#fff",
                   borderWidth: 1,
                   borderColor: quantityError ? "#e53935" : "#ccc",
                   borderRadius: 6,

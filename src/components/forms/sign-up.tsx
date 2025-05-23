@@ -11,7 +11,7 @@ import { Text } from "../ui/text";
 import { Input, InputField } from "../ui/input";
 import { Button, ButtonText } from "../ui/button";
 import { HStack } from "../ui/hstack";
-import { KeyboardAvoidingView } from "react-native";
+import { KeyboardAvoidingView, useColorScheme } from "react-native";
 import { emailValidator, validatePassword } from "@/src/utils/validators";
 
 interface SignUpFormProps {
@@ -143,7 +143,7 @@ const SignUpForm: FC<SignUpFormProps> = ({
         </FormControl>
         <HStack className="justify-between">
           <Button
-            className="mt-4 w-full rounded-[8px]"
+            className={"mt-4 w-full rounded-[8px] bg-primary-600"}
             size={size}
             testID="submit-button"
             onPress={() => {

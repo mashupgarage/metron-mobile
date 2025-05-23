@@ -152,7 +152,12 @@ export default function Home() {
   };
 
   return (
-    <Box className="h-screen w-full pb-24">
+    <Box
+      className="h-screen w-full pb-24"
+      style={{
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#fff",
+      }}
+    >
       <MasonryList
         data={products}
         scrollEnabled

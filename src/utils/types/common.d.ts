@@ -73,6 +73,7 @@ export type ProductT = {
   cover_url: string;
   cover_url_large: string;
   formatted_price: string;
+  publisher: string;
   publisher_name: string;
   category_name: string;
   meta_attributes: Record<string, unknown>;

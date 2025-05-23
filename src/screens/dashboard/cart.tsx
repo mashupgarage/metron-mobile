@@ -1,17 +1,12 @@
 import { Button, ButtonText } from "@/src/components/ui/button";
 import { useBoundStore } from "@/src/store";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, FlatList } from "react-native";
+import { Text, View, FlatList, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ProductT, CartItemT } from "@/src/utils/types/common";
 import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
-import {
-  Trash2,
-  MinusCircle,
-  PlusCircle,
-  CheckIcon,
-} from "lucide-react-native";
+import { Trash2, CheckIcon } from "lucide-react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import {
@@ -24,10 +19,13 @@ import {
   addToCart,
   removeFromCart,
 } from "@/src/api/apiEndpoints";
+import { useToast } from "@gluestack-ui/themed";
+import { Toast, ToastTitle } from "@/src/components/ui/toast";
 
 export default function Cart() {
   const store = useBoundStore();
   const navigation = useNavigation();
+  const toast = useToast();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -112,11 +110,6 @@ export default function Cart() {
     }
   };
 
-  const handleDecrease = (item: CartItemT) => {
-    // TODO: Update to use API endpoint for decreasing/removing from cart
-    store.decreaseItemQuantity(item.id);
-  };
-
   const handleCheckout = () => {
     const itemsToCheckout = groupedCartItems
       .filter((item) => selectedItems.has(item.id))
@@ -133,6 +126,19 @@ export default function Cart() {
 
     if (store.user) {
       console.log("Checkout Selected Items:", itemsToCheckout);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Toast nativeID={toastId} action="info">
+              <ToastTitle>
+                Checkout functionality to be implemented soon
+              </ToastTitle>
+            </Toast>
+          );
+        },
+      });
       // TODO: Implement actual checkout logic (e.g., navigate to checkout flow) with itemsToCheckout
     } else {
       console.log("User not authenticated, redirecting to Auth stack...");
@@ -145,7 +151,11 @@ export default function Cart() {
   }: {
     item: CartItemT & { cartQuantity: number };
   }) => (
-    <Box className="flex-row items-center p-2 border-b border-gray-200">
+    <Box
+      className={`flex-row items-center p-2 border-b ${
+        colorScheme === "dark" ? "border-b-mdark-surface" : "border-b-gray-200"
+      }`}
+    >
       <Checkbox
         aria-label={`Select item ${item.product.title}`}
         value={item.id.toString()}
@@ -162,10 +172,26 @@ export default function Cart() {
           className="w-16 h-24 mr-2"
           alt={item.product.title}
         />
-        <View style={{ flex: 1, marginTop: 24 }}>
-          <Text className="font-semibold">{item.product.title}</Text>
-          <Text>NM: {item.product_item_id}</Text>
-          <Text>
+        <View className="flex-1 mt-6">
+          <Text
+            className={`font-semibold ${
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+            }`}
+          >
+            {item.product.title}
+          </Text>
+          <Text
+            className={`${
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+            }`}
+          >
+            NM: {item.product_item_id}
+          </Text>
+          <Text
+            className={`${
+              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
+            }`}
+          >
             Price:{" "}
             {item.product.formatted_price ||
               "₱" + Number(item.price).toFixed(2)}
@@ -185,34 +211,49 @@ export default function Cart() {
 
   const totalSelectedItems = selectedItems.size;
 
+  const colorScheme = useColorScheme();
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
+    <SafeAreaView
+      className={`flex-1 ${
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+      }`}
+    >
+      <Text
+        className={`text-2xl font-bold m-4 text-left ${
+          colorScheme === "dark" ? "text-mdark-text" : "text-[#222]"
+        }`}
+      >
         Your Cart{" "}
         {groupedCartItems.length !== 0 && `(${groupedCartItems.length} items)`}
       </Text>
-      <View style={styles.contentWrapper}>
+      <View className="flex-1">
         {groupedCartItems.length === 0 ? (
-          <Text style={styles.emptyText}>Your cart is empty.</Text>
+          <Text className="mt-12 text-lg text-gray-400 text-center">
+            Your cart is empty.
+          </Text>
         ) : (
           <FlatList
             data={groupedCartItems}
             renderItem={({ item }) => renderItem({ item })}
             keyExtractor={(item) => item.id.toString()}
-            style={styles.list}
-            contentContainerStyle={{ paddingBottom: 96 }} // add space for footer
+            className="flex-1 w-full"
+            contentContainerStyle={{ paddingBottom: 96 }}
           />
         )}
       </View>
       {groupedCartItems.length > 0 && (
-        <View style={styles.footer}>
-          <View style={{ flexDirection: "row", marginHorizontal: 4 }}>
+        <View
+          className={`absolute left-0 right-0 bottom-0 ${
+            colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+          } pb-4 pt-2 items-center`}
+        >
+          <View className="flex-row mx-1">
             <Button
               onPress={handleCheckout}
               size="xl"
-              isDisabled
+              isDisabled={selectedItems.size === 0}
               disabled={selectedItems.size === 0}
-              style={{ flex: 1 }}
+              className="flex-1"
             >
               <ButtonText className="text-md">
                 Checkout ({totalSelectedItems} Selected)
@@ -225,39 +266,3 @@ export default function Cart() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    margin: 16,
-    textAlign: "left",
-  },
-  contentWrapper: {
-    flex: 1,
-  },
-  list: {
-    flex: 1,
-    width: "100%",
-  },
-  footer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#fff",
-    paddingBottom: 16,
-    paddingTop: 8,
-    alignItems: "center",
-  },
-  emptyText: {
-    marginTop: 50,
-    fontSize: 16,
-    color: "gray",
-    textAlign: "center",
-  },
-});
