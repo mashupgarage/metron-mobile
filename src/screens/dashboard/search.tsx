@@ -120,12 +120,12 @@ export default function Search() {
   return (
     <DashboardLayout>
       <Box className="h-screen w-full pb-24">
-        <VStack className="w-full px-4 mb-4">
+        <VStack className="w-full px-4 mb-2">
           <HStack className="w-full mb-6 mt-4">
             <Input
               className="flex-1 mr-2 rounded-lg"
               variant="outline"
-              size="xl"
+              size="md"
             >
               <InputField
                 placeholder="Search products..."
@@ -137,7 +137,7 @@ export default function Search() {
               />
             </Input>
             <Button
-              size="xl"
+              size="md"
               onPress={() => handleSearch(1)}
               disabled={loading || searchQuery.trim() === ""}
               className="rounded-lg px-4"

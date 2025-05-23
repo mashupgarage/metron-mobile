@@ -262,7 +262,7 @@ export default function Profile(props: { navigation: any }) {
             />
             <Text
               className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+                colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
               }`}
             >
               My Collection
@@ -289,11 +289,11 @@ export default function Profile(props: { navigation: any }) {
             <Ionicons
               name="log-out-outline"
               size={22}
-              color={colorScheme === "dark" ? "#dadada" : "#333"}
+              color={colorScheme === "dark" ? "#ffffff" : "#333"}
             />
             <Text
               className={`ml-3 text-base ${
-                colorScheme === "dark" ? "text-[#dadada]" : "text-[#333]"
+                colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
               }`}
             >
               Logout

@@ -247,7 +247,7 @@ export default function Product(props: {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#ffffff",
       }}
     >
       <KeyboardAvoidingView

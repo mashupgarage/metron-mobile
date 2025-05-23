@@ -66,6 +66,26 @@ const WantlistScreen = () => {
   const [error, setError] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
+  // Centralized color palette for light/dark mode
+  const colors = {
+    background: colorScheme === "dark" ? "#181A20" : "#FFFFFF",
+    surface: colorScheme === "dark" ? "#23262F" : "#F3F4F6",
+    text: colorScheme === "dark" ? "#F3F4F6" : "#181A20",
+    textSecondary: colorScheme === "dark" ? "#B5B5B5" : "#6B7280",
+    border: colorScheme === "dark" ? "#23262F" : "#E5E7EB",
+    placeholder: colorScheme === "dark" ? "#444857" : "#E5E7EB",
+    primary: "#3B82F6",
+    error: "#EF4444",
+    cardShadow: colorScheme === "dark" ? "#000000" : "#D1D5DB",
+    icon: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
+    available: colorScheme === "dark" ? "#4ADE80" : "#16A34A", // green-400/green-600
+    outOfStock: colorScheme === "dark" ? "#F87171" : "#DC2626", // red-400/red-600
+    button: colorScheme === "dark" ? "#3B82F6" : "#2563EB", // blue-500/blue-700
+    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
+    yellowBg: colorScheme === "dark" ? "#78350F" : "#FEF3C7",
+    yellowText: colorScheme === "dark" ? "#FDE68A" : "#92400E",
+  };
+
   useEffect(() => {
     if (!store.user) {
       // @ts-ignore
@@ -99,35 +119,22 @@ const WantlistScreen = () => {
   if (loading) {
     return (
       <SafeAreaView
-        className={`flex-1 justify-center items-center ${
-          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-        }`}
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.background,
+        }}
       >
-        <Text
-          className={
-            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-          }
-        >
-          Loading your want list...
-        </Text>
+        <Text style={{ color: colors.text }}>Loading your want list...</Text>
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView
-        className={`flex-1 ${
-          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-        }`}
-      >
-        <Text
-          className={
-            colorScheme === "dark" ? "text-mdark-text" : "text-red-500"
-          }
-        >
-          {error}
-        </Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <Text style={{ color: colors.error, margin: 16 }}>{error}</Text>
       </SafeAreaView>
     );
   }
@@ -135,22 +142,17 @@ const WantlistScreen = () => {
   if (wantlistItems.length === 0) {
     return (
       <SafeAreaView
-        className={`flex-1 ${
-          colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-        }`}
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        <Text
-          className={
-            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-          }
-        >
+        <Text style={{ color: colors.text, marginBottom: 8 }}>
           Your want list is empty.
         </Text>
-        <Text
-          className={
-            colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-          }
-        >
+        <Text style={{ color: colors.textSecondary }}>
           Add items you want by tapping "I want this" on product pages.
         </Text>
       </SafeAreaView>
@@ -238,7 +240,17 @@ const WantlistScreen = () => {
 
     return (
       <Pressable
-        className={`m-2 rounded-xl overflow-hidden bg-mdark-surface shadow-md flex-1`}
+        style={{
+          margin: 8,
+          borderRadius: 16,
+          overflow: "hidden",
+          backgroundColor: colors.surface,
+          shadowColor: colors.cardShadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+          flex: 1,
+        }}
         onPress={() => {
           if (wantlistItem.product) {
             // Create a sanitized copy of the product with a valid cover_url
@@ -263,10 +275,19 @@ const WantlistScreen = () => {
       >
         {hasImageError ? (
           // Show placeholder when there's an error or no URL
-          <View className="w-full h-44 items-center justify-center bg-gray-100 dark:bg-mdark-surface rounded-xl">
+          <View
+            style={{
+              width: "100%",
+              height: 176,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: colors.placeholder,
+              borderRadius: 16,
+            }}
+          >
             <Image
               source={require("@/src/assets/icon.png")}
-              className="w-20 h-20 opacity-60"
+              style={{ width: 80, height: 80, opacity: 0.6 }}
               resizeMode="contain"
             />
           </View>
@@ -274,63 +295,102 @@ const WantlistScreen = () => {
           // Try to load actual image
           <Image
             source={{ uri: coverUrl }}
-            className="w-full h-44 rounded-t-xl"
+            style={{
+              width: "100%",
+              height: 176,
+              borderTopLeftRadius: 16,
+              borderTopRightRadius: 16,
+            }}
             resizeMode="cover"
             onError={() => {
-              console.log("Image failed to load:", coverUrl);
               setImageErrors((prev) => ({ ...prev, [productId]: true }));
             }}
           />
         )}
-        <View className="p-3">
+        <View style={{ padding: 12 }}>
           <Text
-            className={`text-lg font-bold mb-1 ${
-              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-            }`}
+            style={{
+              fontSize: 18,
+              fontWeight: "bold",
+              marginBottom: 4,
+              color: colors.text,
+            }}
             numberOfLines={1}
           >
             {wantlistItem.product.title}
           </Text>
           <Text
-            className={`text-base font-semibold mb-1 ${
-              colorScheme === "dark"
-                ? "text-mdark-textSecondary"
-                : "text-gray-600"
-            }`}
+            style={{
+              fontSize: 16,
+              fontWeight: "600",
+              marginBottom: 4,
+              color: colors.textSecondary,
+            }}
           >
             {wantlistItem.product.cover_price
               ? `$${wantlistItem.product.cover_price}`
               : "Price unavailable"}
           </Text>
           {wantlistItem.product.creators && (
-            <Text className="text-xs text-gray-400 mb-1" numberOfLines={1}>
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.textSecondary,
+                marginBottom: 4,
+              }}
+              numberOfLines={1}
+            >
               {wantlistItem.product.creators}
             </Text>
           )}
           {wantlistItem.product.issue_number && (
-            <Text className="text-xs text-gray-400 mb-1">
+            <Text
+              style={{
+                fontSize: 12,
+                color: colors.textSecondary,
+                marginBottom: 4,
+              }}
+            >
               Issue: {wantlistItem.product.issue_number}
             </Text>
           )}
 
           {/* Availability indicator and Add to Cart button */}
-          <View className="flex-row justify-between items-center mt-2">
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: 8,
+            }}
+          >
             <Text
-              className={
-                isAvailable
-                  ? "text-green-600 dark:text-green-400"
-                  : "text-red-600 dark:text-red-400"
-              }
+              style={{
+                color: isAvailable ? colors.available : colors.outOfStock,
+                fontSize: 14,
+                fontWeight: "bold",
+              }}
             >
               {isAvailable ? "Available" : "Out of Stock"}
             </Text>
 
             {isAvailable && (
               <TouchableOpacity
-                className="mt-0 px-2 py-1 rounded-lg "
+                style={{
+                  marginTop: 0,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  borderRadius: 8,
+                }}
                 onPress={handleAddToCart}
               >
-                <Text className="text-white font-bold text-center">
+                <Text
+                  style={{
+                    color: colors.buttonText,
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
                   Add to Cart
                 </Text>
               </TouchableOpacity>
@@ -343,38 +403,41 @@ const WantlistScreen = () => {
 
   return (
     <SafeAreaView
-      className={`flex-1 pt-4 ${
-        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-      }`}
+      style={{ flex: 1, paddingTop: 16, backgroundColor: colors.background }}
     >
-      <StatusBar style="auto" />
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       {/* Information Section */}
-      <View className="px-4 pt-2 pb-4">
-        <View className="flex-row items-center mb-2">
+      <View style={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 16 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 8,
+          }}
+        >
           <TouchableOpacity
-            className="p-2 rounded-full"
+            style={{ padding: 8, borderRadius: 999 }}
             onPress={() => navigation.goBack()}
           >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color={colorScheme === "dark" ? "white" : "black"}
-            />
+            <Ionicons name="arrow-back" size={24} color={colors.icon} />
           </TouchableOpacity>
         </View>
         <Text
-          className={`text-xs mb-2 ${
-            colorScheme === "dark"
-              ? "text-mdark-textSecondary"
-              : "text-gray-600"
-          }`}
+          style={{ fontSize: 12, marginBottom: 8, color: colors.textSecondary }}
         >
           This is your want list. Visit this page regularly to view the status
           of your want list. You will also get notified as soon as the product
           becomes available.
         </Text>
-        <View className="bg-yellow-100 dark:bg-yellow-900 rounded-md p-2 mt-2">
-          <Text className="text-xs text-yellow-700 dark:text-yellow-200">
+        <View
+          style={{
+            backgroundColor: colors.yellowBg,
+            borderRadius: 8,
+            padding: 8,
+            marginTop: 8,
+          }}
+        >
+          <Text style={{ fontSize: 12, color: colors.yellowText }}>
             Please note that products are first pay, first serve basis.
           </Text>
         </View>

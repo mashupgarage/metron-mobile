@@ -155,7 +155,7 @@ export default function Home() {
     <Box
       className="h-screen w-full pb-24"
       style={{
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#fff",
       }}
     >
       <MasonryList

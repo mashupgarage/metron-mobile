@@ -19,10 +19,13 @@ import {
   addToCart,
   removeFromCart,
 } from "@/src/api/apiEndpoints";
+import { useToast } from "@gluestack-ui/themed";
+import { Toast, ToastTitle } from "@/src/components/ui/toast";
 
 export default function Cart() {
   const store = useBoundStore();
   const navigation = useNavigation();
+  const toast = useToast();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -107,11 +110,6 @@ export default function Cart() {
     }
   };
 
-  const handleDecrease = (item: CartItemT) => {
-    // TODO: Update to use API endpoint for decreasing/removing from cart
-    store.decreaseItemQuantity(item.id);
-  };
-
   const handleCheckout = () => {
     const itemsToCheckout = groupedCartItems
       .filter((item) => selectedItems.has(item.id))
@@ -128,6 +126,19 @@ export default function Cart() {
 
     if (store.user) {
       console.log("Checkout Selected Items:", itemsToCheckout);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => {
+          const toastId = "toast-" + id;
+          return (
+            <Toast nativeID={toastId} action="info">
+              <ToastTitle>
+                Checkout functionality to be implemented soon
+              </ToastTitle>
+            </Toast>
+          );
+        },
+      });
       // TODO: Implement actual checkout logic (e.g., navigate to checkout flow) with itemsToCheckout
     } else {
       console.log("User not authenticated, redirecting to Auth stack...");
@@ -240,7 +251,7 @@ export default function Cart() {
             <Button
               onPress={handleCheckout}
               size="xl"
-              isDisabled
+              isDisabled={selectedItems.size === 0}
               disabled={selectedItems.size === 0}
               className="flex-1"
             >

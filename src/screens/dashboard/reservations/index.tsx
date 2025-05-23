@@ -132,7 +132,7 @@ export default function ReservationsScreen() {
           />
           <View className="ml-4 mr-4">
             {showSearchBar ? (
-              <View className="flex-row items-center mb-4">
+              <View className="flex-row items-center mt-4 mb-4">
                 <View className="flex-1 flex-row items-center border border-gray-300 rounded-lg px-2 py-1">
                   <Search
                     size={18}
@@ -172,7 +172,7 @@ export default function ReservationsScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              <View className="flex-row justify-between items-center mb-4">
+              <View className="flex-row justify-between items-center mb-4 mt-4">
                 <Text className="font-bold text-lg">
                   {/* {formatDateHuman(selectedDate)} */}
                 </Text>
@@ -227,7 +227,7 @@ export default function ReservationsScreen() {
                   <TouchableOpacity onPress={toggleDrawer} className="p-2">
                     <Menu
                       size={24}
-                      color={colorScheme === "dark" ? "#dadada" : "#333"}
+                      color={colorScheme === "dark" ? "#ffffff" : "#333"}
                     />
                   </TouchableOpacity>
                 </View>

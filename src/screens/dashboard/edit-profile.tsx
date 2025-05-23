@@ -90,7 +90,9 @@ const EditProfile = ({ navigation }: Props) => {
 
   return (
     <SafeAreaView
-      className={`flex-1 ${colorScheme === "dark" ? "bg-mdark-background" : "bg-white"}`}
+      className={`flex-1 ${
+        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
+      }`}
     >
       <NavigationHeader />
       <KeyboardAvoidingView
@@ -217,7 +219,7 @@ const EditProfile = ({ navigation }: Props) => {
                     <SelectInput placeholder="Select fulfillment option" />
                     <SelectIcon className="mr-3">
                       <ChevronDownIcon
-                        color={colorScheme === "dark" ? "#dadada" : "#333"}
+                        color={colorScheme === "dark" ? "#ffffff" : "#333"}
                       />
                     </SelectIcon>
                   </SelectTrigger>

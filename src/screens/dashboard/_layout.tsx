@@ -11,7 +11,7 @@ const DashboardLayout = ({ children }: { children: React.ReactElement }) => {
       style={{
         paddingTop: safeArea.top,
         marginBottom: safeArea.bottom,
-        backgroundColor: colorScheme === "dark" ? "#121212" : "#dadada",
+        backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff",
       }}
     >
       <React.Fragment>{children}</React.Fragment>

@@ -31,7 +31,7 @@ const DashboardTabs = () => {
   }): BottomTabNavigationOptions => ({
     headerShown: false,
     tabBarStyle: {
-      backgroundColor: useColorScheme() === "dark" ? "#121212" : "#dadada",
+      backgroundColor: useColorScheme() === "dark" ? "#121212" : "#ffffff",
     },
     tabBarIcon: ({ color }) => iconDisplay(route.name, color, 24),
     tabBarBadge:
@@ -59,11 +59,11 @@ const DashboardTabs = () => {
               height: 70,
               borderRadius: 50,
               backgroundColor:
-                useColorScheme() === "dark" ? "#121212" : "#dadada",
+                useColorScheme() === "dark" ? "#121212" : "#ffffff",
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 12,
-              shadowColor: useColorScheme() !== "dark" ? "#121212" : "#dadada",
+              shadowColor: useColorScheme() !== "dark" ? "#121212" : "#ffffff",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.1,
               shadowRadius: 6,
