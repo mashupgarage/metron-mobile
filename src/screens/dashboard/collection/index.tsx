@@ -78,6 +78,7 @@ const CollectionScreen = () => {
                 fontSize: 24,
                 fontWeight: "bold",
                 fontFamily: "Inter",
+                color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
               className="mt-4 mb-2 ml-4"
             >
@@ -109,6 +110,7 @@ const CollectionScreen = () => {
                 fontSize: 24,
                 fontWeight: "bold",
                 fontFamily: "Inter",
+                color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
               className="mb-2 ml-4"
             >
