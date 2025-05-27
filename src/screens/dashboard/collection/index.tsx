@@ -43,7 +43,14 @@ const CollectionScreen = () => {
       {/* Header */}
       <NavigationHeader />
       <Box className="flex-row items-center justify-between px-4 mt-8 mb-4">
-        <Text style={{ fontSize: 24, fontWeight: "bold", fontFamily: "Inter" }}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            fontFamily: "Inter",
+            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+          }}
+        >
           Collection
         </Text>
         <Box className="flex-row">
