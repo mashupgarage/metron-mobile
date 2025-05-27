@@ -12,12 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { useWantListStore } from "@/src/store/slices/WantListSlice";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  getMyCollection,
-  getReservationList,
-  getWantList,
-  getUserCollection,
-} from "@/src/api/apiEndpoints";
+import { getWantList, getUserCollection } from "@/src/api/apiEndpoints";
 
 import { removeAuthToken } from "@/src/api/tokenManager";
 
@@ -29,7 +24,6 @@ export default function Profile(props: { navigation: any }) {
   // Use dedicated slices for ordersCount and collectionCount
   const ordersCount = store.ordersCount ?? 0;
   const collectionCount = store.user?.series_ids.length ?? 0;
-  const setOrdersCount = (count: number) => store.setOrdersCount(count);
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
 
   const [checkingUser, setCheckingUser] = useState(true);
@@ -52,13 +46,7 @@ export default function Profile(props: { navigation: any }) {
       .catch(() => {
         setWantlistCount(0);
       });
-    getMyCollection(store.user.id)
-      .then((res) => {
-        setOrdersCount(res.data.orders.length);
-      })
-      .catch(() => {
-        setOrdersCount(0);
-      });
+
     getUserCollection(store.user.id)
       .then((res) => {
         console.log("actual collection", res.data);
@@ -143,7 +131,7 @@ export default function Profile(props: { navigation: any }) {
         </View>
 
         <View className="flex-row justify-around py-5 border-y border-gray-200 mx-4">
-          <View className="items-center">
+          {/* <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
                 colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
@@ -160,7 +148,7 @@ export default function Profile(props: { navigation: any }) {
             >
               Orders
             </Text>
-          </View>
+          </View> */}
           <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
@@ -242,16 +230,12 @@ export default function Profile(props: { navigation: any }) {
               Wantlist
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            disabled
+          <TouchableOpacity
             className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
               colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
-            onPress={async () => {
+            onPress={() => {
               console.log("clicked");
-              getMyCollection(store.user?.id).then((res) => {
-                // handle want list display
-              });
               props.navigation.navigate("Collection");
             }}
           >
@@ -267,7 +251,7 @@ export default function Profile(props: { navigation: any }) {
             >
               My Collection
             </Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </ScrollView>
       {/* Logout Button at Bottom */}

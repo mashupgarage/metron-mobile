@@ -370,8 +370,8 @@ export const getMyCollection = async (userId: number) => {
   });
 };
 
-export const getUserCollection = async (userId: number) => {
-  return axiosClient.get(`/users/${userId}/report`);
+export const getUserCollection = async () => {
+  return axiosClient.get(`/user_collection`);
 };
 
 /**
