@@ -22,7 +22,9 @@ const NavigationHeader = ({
           variant="link"
         >
           <ArrowLeft color={colorScheme === "dark" ? "#FFFFFF" : "#181718"} />
-          <ButtonText>Back</ButtonText>
+          <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+            Back
+          </ButtonText>
         </Button>
       )}
       <View>
@@ -46,7 +48,9 @@ const NavigationHeader = ({
             <ShoppingBag
               color={colorScheme === "dark" ? "#FFFFFF" : "#181718"}
             />
-            <ButtonText>My Cart</ButtonText>
+            <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+              My Cart
+            </ButtonText>
           </Button>
         )}
       </View>

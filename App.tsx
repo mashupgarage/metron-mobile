@@ -2,6 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import "./global.css";
 import { useFonts } from "expo-font";
 import { InterFonts } from "./src/assets/fonts";
+import { UrbanistFonts } from "./src/assets/fonts";
+import { PublicSansFonts } from "./src/assets/fonts";
 import { GluestackUIProvider } from "@/src/components/ui/gluestack-ui-provider";
 import { useColorScheme, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -19,7 +21,11 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const store = useBoundStore();
   const colorScheme = useColorScheme();
-  const [fontsLoaded] = useFonts(InterFonts);
+  const [fontsLoaded] = useFonts({
+    ...InterFonts,
+    ...UrbanistFonts,
+    ...PublicSansFonts,
+  });
   useEffect(() => {
     console.log("fontsLoaded", fontsLoaded);
     loadAuthTokenToAxios();

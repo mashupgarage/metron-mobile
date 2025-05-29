@@ -307,8 +307,8 @@ export const config = {
     "--color-indicator-error": "232 70 69",
   }),
   fonts: {
-    body: 'Inter-Regular',
-    heading: 'Inter-Bold',
-    mono: 'Inter-Light',
+    body: "PublicSans-Regular",
+    heading: "Urbanist-Bold",
+    mono: "PublicSans-regular",
   },
 };

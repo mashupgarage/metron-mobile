@@ -103,12 +103,18 @@ export default function Search() {
     return (
       <VStack className="items-center justify-center p-4">
         {searchQuery !== "" ? (
-          <Text className="text-center text-base">
+          <Text
+            style={{ fontFamily: "PublicSans-regular" }}
+            className="text-center text-base"
+          >
             No products found matching "{searchQuery}"
           </Text>
         ) : (
           <>
-            <Text className="text-center mb-4 text-xl font-medium">
+            <Text
+              style={{ fontFamily: "PublicSans-regular" }}
+              className="text-center mb-4 text-xl font-medium"
+            >
               Search for products
             </Text>
           </>
@@ -142,7 +148,13 @@ export default function Search() {
               disabled={loading || searchQuery.trim() === ""}
               className="rounded-lg px-4"
             >
-              {loading ? <ButtonSpinner /> : <ButtonText>Search</ButtonText>}
+              {loading ? (
+                <ButtonSpinner />
+              ) : (
+                <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+                  Search
+                </ButtonText>
+              )}
             </Button>
           </HStack>
 

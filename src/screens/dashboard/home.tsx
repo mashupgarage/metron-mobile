@@ -185,26 +185,6 @@ export default function Home() {
       }}
     >
       {/* Loading overlay */}
-      {/* {isLoading && (
-        <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(255,255,255,0.7)",
-            zIndex: 100,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color="#2563eb" />
-          <Text style={{ marginTop: 16, color: "#2563eb" }}>
-            Loading products...
-          </Text>
-        </View>
-      )} */}
       <MasonryList
         data={products}
         scrollEnabled
@@ -234,6 +214,7 @@ export default function Home() {
             >
               {pills.map((pill) => (
                 <Button
+                  key={pill.id}
                   onPress={() => {
                     // change results based on pill
                     console.log("pill pressed", pill);
@@ -249,6 +230,7 @@ export default function Home() {
                 >
                   <Text
                     style={{
+                      fontFamily: "Urbanist-Bold",
                       color: colorScheme !== "dark" ? "#FFFFFF" : "#202020",
                     }}
                   >
@@ -258,8 +240,16 @@ export default function Home() {
               ))}
             </ScrollView>
             <HStack className="justify-between mr-2 ml-2">
-              <Box className="p-2">
-                <Text className="text-primary-400 text-2xl font-bold ">
+              <Box className="p-2 mt-4">
+                <Text
+                  style={{
+                    fontFamily: "Urbanist-Bold",
+                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    lineHeight: 24,
+                    fontSize: 24,
+                    marginTop: 8,
+                  }}
+                >
                   {selectedPill !== undefined
                     ? `Featured ${
                         pills.find((p) => p.id === selectedPill)?.name ?? ""
@@ -268,7 +258,7 @@ export default function Home() {
                 </Text>
                 {/* <Text>{totalCount} products total</Text> */}
               </Box>
-              <HStack space={"xl"} className="p-2 flex items-center">
+              <HStack space={"xl"} className="p-2 mt-4 flex items-center">
                 <Pressable onPress={() => setIsGrid(!isGrid)}>
                   {isGrid ? (
                     <LayoutList
@@ -325,6 +315,7 @@ export default function Home() {
                     <Text
                       style={{
                         fontWeight: "bold",
+                        fontFamily: "Urbanist-Black",
                         color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
                         maxWidth: 240,
                       }}
@@ -335,6 +326,7 @@ export default function Home() {
                     </Text>
                     <Text
                       style={{
+                        fontFamily: "PublicSans-Regular",
                         color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
                       }}
                     >

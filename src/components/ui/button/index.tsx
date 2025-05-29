@@ -320,13 +320,15 @@ const ButtonText = React.forwardRef<
   const style = Array.isArray(props.style) ? props.style : [props.style];
   const hasInter = style.some(
     // @ts-ignore
-    (s) => s && s.fontFamily && s.fontFamily.startsWith("Inter")
+    (s) => s && s.fontFamily && s.fontFamily.startsWith("PublicSans-regular")
   );
   return (
     <UIButton.Text
       ref={ref}
       {...props}
-      style={hasInter ? style : [{ fontFamily: "Inter-Regular" }, ...style]}
+      style={
+        hasInter ? style : [{ fontFamily: "PublicSans-regular" }, ...style]
+      }
       className={buttonTextStyle({
         parentVariants: {
           variant: parentVariant,

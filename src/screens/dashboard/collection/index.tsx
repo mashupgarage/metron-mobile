@@ -56,7 +56,7 @@ const CollectionScreen = () => {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            fontFamily: "Inter",
+            fontFamily: "Urbanist-Bold",
             color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
           }}
         >
@@ -66,7 +66,7 @@ const CollectionScreen = () => {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Inter",
+              fontFamily: "Urbanist-Bold",
               color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
             }}
           >
@@ -112,7 +112,7 @@ const CollectionScreen = () => {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                fontFamily: "Inter",
+                fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
               className="mt-4 mb-2 ml-4"
@@ -135,7 +135,7 @@ const CollectionScreen = () => {
                   <Text
                     style={{
                       fontSize: 16,
-                      fontFamily: "Inter",
+                      fontFamily: "Urbanist-Bold",
                       color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
                     }}
                   >
@@ -162,7 +162,7 @@ const CollectionScreen = () => {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                fontFamily: "Inter",
+                fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
               className="mb-2 ml-4"

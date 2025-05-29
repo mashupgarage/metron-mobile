@@ -32,7 +32,8 @@ const Text = React.forwardRef<React.ElementRef<typeof RNText>, ITextProps>(
     // Use Gluestack theme fonts
     const theme = useTheme();
     // Fallbacks for fontFamily
-    const fontFamily = theme?.fonts?.[variant] || theme?.fonts?.body || "Inter";
+    const fontFamily =
+      theme?.fonts?.[variant] || theme?.fonts?.body || "PublicSans-regular";
 
     return (
       <RNText

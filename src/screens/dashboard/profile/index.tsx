@@ -102,7 +102,12 @@ export default function Profile(props: { navigation: any }) {
         {/* <Text className="text-xl font-semibold">Profile</Text> */}
         <View />
         <TouchableOpacity onPress={handleEditProfile}>
-          <Text className="font-semibold text-primary-600">Edit</Text>
+          <Text
+            style={{ fontFamily: "PublicSans-regular", fontSize: 16 }}
+            className="font-semibold text-primary-600"
+          >
+            Edit
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -113,6 +118,7 @@ export default function Profile(props: { navigation: any }) {
             className="w-24 h-24 rounded-full mb-3"
           />
           <Text
+            style={{ fontFamily: "Urbanist-Bold" }}
             className={`text-xl font-bold mb-1 ${
               colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
@@ -120,6 +126,7 @@ export default function Profile(props: { navigation: any }) {
             {store.user?.full_name}
           </Text>
           <Text
+            style={{ fontFamily: "PublicSans-regular" }}
             className={`text-base ${
               colorScheme === "dark"
                 ? "text-mdark-textSecondary"
@@ -151,6 +158,7 @@ export default function Profile(props: { navigation: any }) {
           </View> */}
           <View className="items-center">
             <Text
+              style={{ fontFamily: "Urbanist-Bold" }}
               className={`text-2xl font-bold ${
                 colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
@@ -158,6 +166,7 @@ export default function Profile(props: { navigation: any }) {
               {collectionCount}
             </Text>
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`text-base ${
                 colorScheme === "dark"
                   ? "text-mdark-textSecondary"
@@ -169,6 +178,7 @@ export default function Profile(props: { navigation: any }) {
           </View>
           <View className="items-center">
             <Text
+              style={{ fontFamily: "Urbanist-Bold" }}
               className={`text-2xl font-bold ${
                 colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
@@ -176,6 +186,7 @@ export default function Profile(props: { navigation: any }) {
               {wantlistCount}
             </Text>
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`text-base ${
                 colorScheme === "dark"
                   ? "text-mdark-textSecondary"
@@ -202,6 +213,7 @@ export default function Profile(props: { navigation: any }) {
               color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
             />
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`mt-2 text-base text-center ${
                 colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
@@ -210,6 +222,7 @@ export default function Profile(props: { navigation: any }) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={{ fontFamily: "PublicSans-regular" }}
             className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
               colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
@@ -223,6 +236,7 @@ export default function Profile(props: { navigation: any }) {
               color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
             />
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`mt-2 text-base text-center ${
                 colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
               }`}
@@ -231,6 +245,7 @@ export default function Profile(props: { navigation: any }) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={{ fontFamily: "PublicSans-regular" }}
             className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
               colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
             }`}
@@ -245,6 +260,7 @@ export default function Profile(props: { navigation: any }) {
               color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
             />
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`mt-2 text-base text-center ${
                 colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
               }`}
@@ -276,6 +292,7 @@ export default function Profile(props: { navigation: any }) {
               color={colorScheme === "dark" ? "#ffffff" : "#333"}
             />
             <Text
+              style={{ fontFamily: "PublicSans-regular" }}
               className={`ml-3 text-base ${
                 colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
               }`}

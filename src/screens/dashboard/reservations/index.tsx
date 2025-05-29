@@ -233,7 +233,10 @@ export default function ReservationsScreen() {
                 </View>
               </View>
             )}
-            <Text className="mb-2 text-sm">
+            <Text
+              style={{ fontFamily: "PublicSans-regular" }}
+              className="mb-2 text-sm"
+            >
               {(() => {
                 const selectedRelease = releaseDates.find(
                   (item) => item.id === selectedReleaseId
@@ -251,10 +254,14 @@ export default function ReservationsScreen() {
               ) {
                 return (
                   <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
-                    <Text className="text-amber-800">
+                    <Text
+                      style={{ fontFamily: "PublicSans-regular" }}
+                      className="text-amber-800"
+                    >
                       This is a past release. To browse the current release,{" "}
                       <Text
-                        className="font-bold text-indigo-900"
+                        style={{ fontFamily: "PublicSans-regular" }}
+                        className="text-indigo-900"
                         onPress={() => {
                           const latest = getLatestRelease(releaseDates);
                           if (latest) {
@@ -270,7 +277,10 @@ export default function ReservationsScreen() {
               } else if (latest && latest.status === "close") {
                 return (
                   <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
-                    <Text className="text-amber-800">
+                    <Text
+                      style={{ fontFamily: "PublicSans-regular" }}
+                      className="text-amber-800"
+                    >
                       This release is now closed.
                     </Text>
                   </View>
@@ -371,7 +381,10 @@ export default function ReservationsScreen() {
                   resizeMethod="scale"
                   source={ComicOdysseyIcon}
                 />
-                <Text className="mt-4 text-center mb-2">
+                <Text
+                  style={{ fontFamily: "PublicSans-regular" }}
+                  className="mt-4 text-center mb-2"
+                >
                   {isSearching
                     ? `Searching for "${searchQuery}"...`
                     : "Hang tight, we're loading the latest releases!"}
@@ -535,10 +548,18 @@ export default function ReservationsScreen() {
                             </View>
                           )}
                           <View className="mt-2">
-                            <Text numberOfLines={1} className="font-bold">
+                            <Text
+                              style={{ fontFamily: "Urbanist-Bold" }}
+                              numberOfLines={1}
+                              className="font-bold"
+                            >
                               {product.title}
                             </Text>
-                            <Text numberOfLines={1} className="text-gray-600">
+                            <Text
+                              style={{ fontFamily: "PublicSans-regular" }}
+                              numberOfLines={1}
+                              className="text-gray-600"
+                            >
                               {product.creators}
                             </Text>
                           </View>
@@ -547,7 +568,10 @@ export default function ReservationsScreen() {
                               {userReservationProductIds.includes(
                                 product.id
                               ) && (
-                                <Text className="text-orange-500 font-bold text-xs">
+                                <Text
+                                  style={{ fontFamily: "PublicSans-regular" }}
+                                  className="text-orange-500 font-bold text-xs"
+                                >
                                   Already Reserved
                                 </Text>
                               )}
@@ -573,7 +597,10 @@ export default function ReservationsScreen() {
                       }
                     }}
                   >
-                    <Text className="text-indigo-900 font-bold">
+                    <Text
+                      style={{ fontFamily: "PublicSans-regular" }}
+                      className="text-indigo-900 font-medium"
+                    >
                       {isWanted ? "Wanted!" : "I want this"}
                     </Text>
                   </TouchableOpacity>

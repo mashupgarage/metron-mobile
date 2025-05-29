@@ -286,8 +286,13 @@ export default function Product(props: {
             source={{ uri: product?.cover_url_large ?? "" }}
           />
           <Text
-            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
-            className="px-4 mt-6 mb-2 font-bold text-2xl"
+            style={{
+              fontFamily: "Urbanist-Bold",
+              fontSize: 24,
+              lineHeight: 24,
+              color: colorScheme === "dark" ? "#fff" : "#000",
+            }}
+            className="px-4 mt-6 mb-2"
           >
             {product?.title}
           </Text>
@@ -345,31 +350,106 @@ export default function Product(props: {
                 </Box>
               </VStack>
             </View>
-            <Text>{product?.description ?? ""}</Text>
-            <Text className="font-bold text-base mb-1">Publisher</Text>
+            <Text
+              style={{
+                fontFamily: "PublicSans-regular",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
+              {product?.description ?? ""}
+            </Text>
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
+              Publisher
+            </Text>
             <Text style={{ marginBottom: 8 }}>{product?.publisher}</Text>
 
             {product?.creators && (
               <>
-                <Text className="font-bold text-base mb-1">Creators</Text>
+                <Text
+                  style={{
+                    fontFamily: "Urbanist-Bold",
+                    fontSize: 16,
+                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                  }}
+                >
+                  Creators
+                </Text>
                 <Text style={{ marginBottom: 8 }}>{product?.creators}</Text>
               </>
             )}
-            <Text className="font-bold text-base mb-1">ISBN/UPC</Text>
-            <Text style={{ marginBottom: 8 }}>
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
+              ISBN/UPC
+            </Text>
+            <Text
+              style={{
+                fontFamily: "PublicSans-regular",
+                fontSize: 16,
+                marginBottom: 8,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
               {product?.isbn || product?.upc}
             </Text>
-            <Text className="font-bold text-base mb-1">Price</Text>
-            <Text style={{ marginBottom: 8 }}>
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
+              Price
+            </Text>
+            <Text
+              style={{
+                fontFamily: "PublicSans-regular",
+                fontSize: 16,
+                marginBottom: 8,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
               {product?.formatted_price ??
                 "PHP " + Number(product?.price).toFixed(2)}
             </Text>
-            <Text className="font-bold text-base mb-1">Available Quantity</Text>
-            <Text style={{ marginBottom: 8 }}>
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
+              Available Quantity
+            </Text>
+            <Text
+              style={{
+                fontFamily: "PublicSans-regular",
+                fontSize: 16,
+                marginBottom: 8,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
               {product?.quantity ?? "Out of Stock"}
             </Text>
             {/* Collection Status */}
-            <Text className="font-bold mt-12 text-base mb-1">
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              }}
+            >
               Your Collection Status
             </Text>
             {/* Series Status (Collection Progress) */}
@@ -382,19 +462,37 @@ export default function Product(props: {
               }}
             >
               {seriesLoading ? (
-                <Text style={{ color: "#374151", fontSize: 14 }}>
+                <Text
+                  style={{
+                    fontFamily: "PublicSans-regular",
+                    fontSize: 16,
+                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                  }}
+                >
                   Loading...
                 </Text>
               ) : seriesStatus ? (
                 <>
-                  <Text style={{ color: "#374151", fontSize: 14 }}>
+                  <Text
+                    style={{
+                      fontFamily: "PublicSans-regular",
+                      fontSize: 16,
+                      color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    }}
+                  >
                     {seriesStatus?.related_series?.collected ?? 0} of{" "}
                     {seriesStatus?.related_series?.total === 0
                       ? 1
                       : seriesStatus?.related_series?.total}{" "}
                     Series Collected
                   </Text>
-                  <Text style={{ color: "#2563eb", fontSize: 14 }}>
+                  <Text
+                    style={{
+                      fontFamily: "PublicSans-regular",
+                      fontSize: 16,
+                      color: colorScheme === "dark" ? "#FFFFFF" : "#2563eb",
+                    }}
+                  >
                     {(() => {
                       const collected = Number(
                         seriesStatus?.related_series?.collected ?? 0
@@ -409,7 +507,13 @@ export default function Product(props: {
                   </Text>
                 </>
               ) : (
-                <Text style={{ color: "#374151", fontSize: 14 }}>
+                <Text
+                  style={{
+                    fontFamily: "PublicSans-regular",
+                    fontSize: 16,
+                    color: colorScheme === "dark" ? "#FFFFFF" : "#374151",
+                  }}
+                >
                   No series data
                 </Text>
               )}
@@ -433,7 +537,16 @@ export default function Product(props: {
                 }}
               />
             </View>
-            <Text className="font-bold text-base mb-2">You May Also Like</Text>
+            <Text
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                marginBottom: 16,
+              }}
+            >
+              You may also like
+            </Text>
             <FlatList
               data={recommendations?.recommendations || []}
               horizontal
@@ -523,9 +636,9 @@ export default function Product(props: {
               />
               <Text
                 style={{
+                  fontFamily: "Urbanist-Bold",
+                  fontSize: 16,
                   color: colorScheme === "dark" ? "#fff" : "#111",
-                  fontSize: 14,
-                  fontWeight: "500",
                 }}
               >
                 {isWanted ? "Already added to want list" : "Add to want list"}

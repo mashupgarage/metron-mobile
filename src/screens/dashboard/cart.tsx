@@ -169,11 +169,12 @@ export default function Cart() {
 
         <Image
           source={{ uri: item.product.cover_url_large }}
-          className="w-16 h-24 mr-2"
+          className="w-24 h-24 mr-2"
           alt={item.product.title}
         />
-        <View className="flex-1 mt-6">
+        <View className="flex-1">
           <Text
+            style={{ fontFamily: "Urbanist-Bold" }}
             className={`font-semibold ${
               colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
@@ -181,6 +182,7 @@ export default function Cart() {
             {item.product.title}
           </Text>
           <Text
+            style={{ fontFamily: "PublicSans-regular", marginTop: 8 }}
             className={`${
               colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
@@ -188,6 +190,7 @@ export default function Cart() {
             NM: {item.product_item_id}
           </Text>
           <Text
+            style={{ fontFamily: "PublicSans-regular", marginTop: 4 }}
             className={`${
               colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
             }`}
@@ -219,6 +222,7 @@ export default function Cart() {
       }`}
     >
       <Text
+        style={{ fontFamily: "Urbanist-Bold" }}
         className={`text-2xl font-bold m-4 text-left ${
           colorScheme === "dark" ? "text-mdark-text" : "text-[#222]"
         }`}
@@ -255,7 +259,7 @@ export default function Cart() {
               disabled={selectedItems.size === 0}
               className="flex-1"
             >
-              <ButtonText className="text-md">
+              <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
                 Checkout ({totalSelectedItems} Selected)
               </ButtonText>
             </Button>

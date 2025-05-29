@@ -76,7 +76,12 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
       >
         <SafeAreaView className="flex-1">
           <View className="p-4 border-b flex-row justify-between items-center">
-            <Text className="text-xl font-bold">Release History</Text>
+            <Text
+              style={{ fontFamily: "Urbanist-Bold" }}
+              className="text-xl font-bold"
+            >
+              Release History
+            </Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color={colorScheme === "dark" ? "white" : "black"} />
             </TouchableOpacity>
@@ -90,7 +95,12 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                 onClose();
               }}
             >
-              <Text className="text-base">LATEST RELEASE</Text>
+              <Text
+                style={{ fontFamily: "PublicSans-regular" }}
+                className="text-base"
+              >
+                LATEST RELEASE
+              </Text>
             </TouchableOpacity>
 
             {releaseDates.map((item) => (
@@ -106,7 +116,12 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   onSelectDate(item.id, item.date);
                 }}
               >
-                <Text className="text-base">{item.date}</Text>
+                <Text
+                  style={{ fontFamily: "PublicSans-regular" }}
+                  className="text-base"
+                >
+                  {item.date}
+                </Text>
                 <View
                   style={{
                     backgroundColor:
@@ -116,7 +131,12 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   }}
                   className=" rounded px-2 py-0.5"
                 >
-                  <Text className="text-white text-sm">{item.count}</Text>
+                  <Text
+                    style={{ fontFamily: "PublicSans-regular" }}
+                    className="text-white text-sm"
+                  >
+                    {item.count}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}

@@ -3,7 +3,7 @@ import { FC, useState } from "react";
 import { Box } from "../ui/box";
 import { Image } from "../ui/image";
 import { Text } from "../ui/text";
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 
 interface ProductCardProps {
   product: ProductT;
@@ -13,6 +13,8 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
   const { product } = data;
   const [imgError, setImgError] = useState(false);
+
+  const colorScheme = useColorScheme();
 
   const mainImage = product.cover_url || undefined;
 
@@ -31,7 +33,13 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
           onError={() => setImgError(true)}
         />
         <View className="mt-2">
-          <Text numberOfLines={1} className="font-bold">
+          <Text
+            numberOfLines={1}
+            style={{
+              fontFamily: "Urbanist-Bold",
+              color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+            }}
+          >
             {product.title}
           </Text>
           {product.formatted_price && (
@@ -39,7 +47,14 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
               {product.formatted_price}
             </Text>
           )}
-          <Text numberOfLines={1} className="text-gray-600">
+          <Text
+            numberOfLines={1}
+            style={{
+              fontFamily: "PublicSans-regular",
+              color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+            }}
+            className="text-gray-600"
+          >
             {product.creators}
           </Text>
         </View>
