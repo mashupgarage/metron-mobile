@@ -28,10 +28,13 @@ import {
 } from "@/src/api/apiEndpoints";
 import Constants from "expo-constants";
 
+import { LayoutGrid, LayoutList } from "lucide-react-native";
+
 const PAGE_SIZE = 10; // Define standard page size
 
 export default function Home() {
   const store = useBoundStore();
+  const colorScheme = useColorScheme();
   const route = useRoute<RouteProp<DashboardStackParams, "Home">>();
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
@@ -40,6 +43,7 @@ export default function Home() {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isGrid, setIsGrid] = useState(true);
 
   console.log(
     "------------------------------------------------>",
@@ -175,11 +179,28 @@ export default function Home() {
             <HStack className="justify-between mr-2 ml-2">
               <Box className="p-2">
                 <Text className="text-primary-400 text-2xl font-bold ">
-                  Latest Products
+                  Featured Products
                 </Text>
                 <Text>{totalCount} products total</Text>
               </Box>
-              <Box className="p-2">
+              <HStack space={"xl"} className="p-2 flex items-center">
+                <Pressable onPress={() => setIsGrid(!isGrid)}>
+                  {isGrid ? (
+                    <LayoutList
+                      size={24}
+                      color={
+                        useColorScheme() === "dark" ? "#FFFFFF" : "#202020"
+                      }
+                    />
+                  ) : (
+                    <LayoutGrid
+                      size={24}
+                      color={
+                        useColorScheme() === "dark" ? "#FFFFFF" : "#202020"
+                      }
+                    />
+                  )}
+                </Pressable>
                 <Button
                   onPress={() => {
                     navigation.dispatch(DrawerActions.toggleDrawer());
@@ -191,21 +212,50 @@ export default function Home() {
                     color={useColorScheme() === "dark" ? "#FFFFFF" : "#202020"}
                   />
                 </Button>
-              </Box>
+              </HStack>
             </HStack>
           </Box>
         }
         ListFooterComponent={renderFooter()}
-        numColumns={2}
+        numColumns={!isGrid ? 2 : 1}
         keyExtractor={(item, index) => `${item.id}_${index}`}
-        renderItem={({ item, i }) => (
+        renderItem={({ item, i }: { item: ProductT; i: number }) => (
           <Pressable
             onPress={() => {
-              navigation.navigate("Product", { product: item as ProductT });
+              navigation.navigate("Product", { product: item });
             }}
           >
             <View key={i} className="p-2">
-              <ProductCard isInCart={false} product={item as ProductT} />
+              {!isGrid ? (
+                <ProductCard isInCart={false} product={item as ProductT} />
+              ) : (
+                <HStack space="xl">
+                  <Image
+                    source={{ uri: item.cover_url_large }}
+                    alt={item.title}
+                  />
+                  <Box>
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                        maxWidth: 240,
+                      }}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {item.title}
+                    </Text>
+                    <Text
+                      style={{
+                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                      }}
+                    >
+                      {item.publisher}
+                    </Text>
+                  </Box>
+                </HStack>
+              )}
             </View>
           </Pressable>
         )}

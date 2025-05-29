@@ -20,6 +20,7 @@ interface SeriesCardProps {
     };
     owned_products: number;
     unowned_products: number;
+    grayed?: boolean;
   };
 }
 

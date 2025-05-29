@@ -374,6 +374,10 @@ export const getUserCollection = async () => {
   return axiosClient.get(`/user_collection`);
 };
 
+export const getCollectionSeriesStatus = async (seriesId: number) => {
+  return axiosClient.get(`/user_collection/${seriesId}`);
+};
+
 /**
  * Search for products in reservations with optional filters.
  * @param productName - The product name to search for
@@ -400,4 +404,16 @@ export const searchReservationProducts = (
 
 export const fetchAvailableBranches = async () => {
   return axiosClient.get(`/locations`);
+};
+
+export const fetchIsOwned = async (productId: number) => {
+  return axiosClient.get(`/products/${productId}/is_owned`);
+};
+
+export const fetchProductSeriesStatus = async (productId: number) => {
+  return axiosClient.get(`/products/${productId}/series_status`);
+};
+
+export const fetchProductRecommendations = async (productId: number) => {
+  return axiosClient.get(`/products/${productId}/recommendations`);
 };
