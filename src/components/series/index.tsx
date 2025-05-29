@@ -92,8 +92,8 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
             alt={"banner"}
             className={
               imgError
-                ? "pl-4 h-56 p-8 w-full rounded-md"
-                : "h-56 p-2 w-full rounded-md "
+                ? "pl-4 h-60 p-8 w-full rounded-md"
+                : "h-60 p-2 w-full rounded-md "
             }
             resizeMode="contain"
             onError={() => setImgError(true)}
@@ -104,8 +104,8 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
               style={{
                 position: "absolute",
                 top: 6,
-                left: 14,
-                right: 14,
+                left: 9,
+                right: 9,
                 bottom: 6,
                 backgroundColor: "rgba(200,200,200,0.8)",
                 borderRadius: 4, // match your image's border radius
@@ -157,7 +157,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
             </View>
           )}
         </View>
-        <View className="mt-2">
+        <View className="mt-2 px-2">
           <Text numberOfLines={1} className="font-bold">
             {data.series.title}
           </Text>

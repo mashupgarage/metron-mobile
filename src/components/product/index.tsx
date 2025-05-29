@@ -26,11 +26,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
               : { uri: mainImage }
           }
           alt={product.id.toString()}
-          className={
-            imgError
-              ? "pl-4 h-48 p-2 w-full rounded-md bg-gray-200"
-              : "h-48 p-2 w-full rounded-md"
-          }
+          className={imgError ? "pl-4 h-60 w-full bg-gray-200" : "h-60 w-full "}
           resizeMode="contain"
           onError={() => setImgError(true)}
         />

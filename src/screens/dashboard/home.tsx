@@ -2,7 +2,12 @@ import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Text } from "@/src/components/ui/text";
 import { useBoundStore } from "@/src/store";
-import { useColorScheme, View, ActivityIndicator } from "react-native";
+import {
+  useColorScheme,
+  View,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 
 import ProductCard from "@/src/components/product";
@@ -14,8 +19,8 @@ import {
   DrawerActions,
   useRoute,
   RouteProp,
+  ParamListBase,
 } from "@react-navigation/native";
-import { DashboardStackParams } from "@/src/utils/types/navigation";
 import { HStack } from "@/src/components/ui/hstack";
 import { Button } from "@/src/components/ui/button";
 import { Menu } from "lucide-react-native";
@@ -35,9 +40,11 @@ const PAGE_SIZE = 10; // Define standard page size
 export default function Home() {
   const store = useBoundStore();
   const colorScheme = useColorScheme();
-  const route = useRoute<RouteProp<DashboardStackParams, "Home">>();
-  const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
-
+  const route = useRoute<RouteProp<ParamListBase, "Home">>();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const [selectedPill, setSelectedPill] = useState<number | undefined>(
+    undefined
+  );
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -53,6 +60,7 @@ export default function Home() {
 
   // Load first page of products when component mounts or route params change
   useEffect(() => {
+    setSelectedPill(undefined);
     loadInitialProducts();
     fetchUserProfile(store.user?.id)
       .then((res) => {
@@ -70,12 +78,17 @@ export default function Home() {
       });
   }, [route.params]);
 
+  // Refetch products when selectedPill changes
+  useEffect(() => {
+    loadInitialProducts(selectedPill);
+  }, [selectedPill]);
+
   // Function to load initial products
-  const loadInitialProducts = useCallback(() => {
+  const loadInitialProducts = useCallback((pill?: number) => {
     store.setProductsLoading(true);
     setCurrentPage(1);
 
-    fetchProducts(undefined, 1, PAGE_SIZE)
+    fetchProducts(pill, 1, PAGE_SIZE)
       .then((res) => {
         const products = res.data.products || [];
         const totalCount = res.data.total_count || 0;
@@ -148,12 +161,21 @@ export default function Home() {
           </>
         )}
 
-        <Text className="text-sm text-gray-500 mt-2">
+        {/* <Text className="text-sm text-gray-500 mt-2">
           Showing {products.length} of {totalCount} products
-        </Text>
+        </Text> */}
       </Box>
     );
   };
+
+  const pills = [
+    { name: "Featured", id: undefined },
+    { name: "Comics", id: 6 },
+    { name: "Graphic Novels", id: 2 },
+    { name: "Manga", id: 4 },
+    { name: "Magazines", id: 3 },
+    { name: "Cards", id: 7 },
+  ];
 
   return (
     <Box
@@ -162,6 +184,27 @@ export default function Home() {
         backgroundColor: useColorScheme() === "dark" ? "#121212" : "#fff",
       }}
     >
+      {/* Loading overlay */}
+      {/* {isLoading && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255,255,255,0.7)",
+            zIndex: 100,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color="#2563eb" />
+          <Text style={{ marginTop: 16, color: "#2563eb" }}>
+            Loading products...
+          </Text>
+        </View>
+      )} */}
       <MasonryList
         data={products}
         scrollEnabled
@@ -171,17 +214,59 @@ export default function Home() {
           <Box>
             <Box className="h-48">
               <Image
+                className="w-36 absolute h-48 z-10 left-1/2 -translate-x-1/2"
+                source={require("@/src/assets/icon.png")}
+                alt="logo"
+                resizeMode="contain"
+              />
+              <Image
                 className="w-full h-48"
                 source={{ uri: carouselItems[0].img_url }}
                 alt={carouselItems[0].name}
               />
             </Box>
+            {/* Navigation Pill */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              className="mr-2 ml-2 mt-4"
+            >
+              {pills.map((pill) => (
+                <Button
+                  onPress={() => {
+                    // change results based on pill
+                    console.log("pill pressed", pill);
+                    setSelectedPill(pill.id);
+                    store.setProducts({
+                      products: [],
+                      total_count: 0,
+                      total_pages: 1,
+                    });
+                  }}
+                  variant="solid"
+                  className="rounded-full ml-2"
+                >
+                  <Text
+                    style={{
+                      color: colorScheme !== "dark" ? "#FFFFFF" : "#202020",
+                    }}
+                  >
+                    {pill.name}
+                  </Text>
+                </Button>
+              ))}
+            </ScrollView>
             <HStack className="justify-between mr-2 ml-2">
               <Box className="p-2">
                 <Text className="text-primary-400 text-2xl font-bold ">
-                  Featured Products
+                  {selectedPill !== undefined
+                    ? `Featured ${
+                        pills.find((p) => p.id === selectedPill)?.name ?? ""
+                      }`
+                    : "Featured Products"}
                 </Text>
-                <Text>{totalCount} products total</Text>
+                {/* <Text>{totalCount} products total</Text> */}
               </Box>
               <HStack space={"xl"} className="p-2 flex items-center">
                 <Pressable onPress={() => setIsGrid(!isGrid)}>
@@ -231,7 +316,9 @@ export default function Home() {
               ) : (
                 <HStack space="xl">
                   <Image
-                    source={{ uri: item.cover_url_large }}
+                    className="w-24 h-24"
+                    resizeMode="cover"
+                    source={{ uri: item.cover_url }}
                     alt={item.title}
                   />
                   <Box>

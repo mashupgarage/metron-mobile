@@ -280,10 +280,18 @@ export default function Product(props: {
           <NavigationHeader showCartButton />
         </Box>
         <ScrollView>
+          <Image
+            alt={product?.title ?? ""}
+            className="w-full h-[350px]"
+            source={{ uri: product?.cover_url_large ?? "" }}
+          />
+          <Text
+            style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}
+            className="px-4 mt-6 mb-2 font-bold text-2xl"
+          >
+            {product?.title}
+          </Text>
           <View className="px-4 mt-6 mb-2">
-            <Text size="2xl" bold style={{ marginBottom: 8, marginTop: 4 }}>
-              {product?.title ?? ""}
-            </Text>
             {/* <Text
             style={{
               color: "#2563eb",
@@ -302,12 +310,6 @@ export default function Product(props: {
                 position: "relative",
               }}
             >
-              <Image
-                alt={product?.title ?? ""}
-                className="rounded-lg w-full h-[350px]"
-                source={{ uri: product?.cover_url ?? "" }}
-              />
-
               <VStack className="absolute top-4 right-4" space="md">
                 <Box className="mb-4">
                   <Pressable
@@ -431,23 +433,6 @@ export default function Product(props: {
                 }}
               />
             </View>
-            {/* 
-            {seriesStatus?.related_series?.total !== 0 && (
-              <Text
-                style={{
-                  color: "#2563eb",
-                  textDecorationLine: "underline",
-                  fontWeight: "500",
-                  marginBottom: 16,
-                }}
-                onPress={() => {
-                
-                }}
-                >
-                  View Full Series
-                </Text>
-              )}
-           */}
             <Text className="font-bold text-base mb-2">You May Also Like</Text>
             <FlatList
               data={recommendations?.recommendations || []}
@@ -459,7 +444,7 @@ export default function Product(props: {
                   <ProductCard product={item} />
                 </Box>
               )}
-              ListEmptyComponent={
+              ListEmptyComponent={() =>
                 recsLoading ? (
                   <Text style={{ color: "#6b7280" }}>Loading...</Text>
                 ) : (

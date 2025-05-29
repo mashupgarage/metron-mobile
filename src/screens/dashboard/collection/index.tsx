@@ -5,6 +5,7 @@ import { Box } from "@/src/components/ui/box";
 import { getUserCollection } from "@/src/api/apiEndpoints";
 import { useBoundStore } from "@/src/store";
 import SeriesCard from "@/src/components/series";
+import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import NavigationHeader from "@/src/components/navigation-header";
@@ -27,42 +28,19 @@ const CollectionScreen = () => {
   useEffect(() => {
     setLoading(true);
     setSeriesCount(store.user?.series_ids?.length || 0);
-    setLoading(false);
     // fetch collected series
     getUserCollection()
       .then((res) => {
+        setLoading(false);
         console.log("user", res.data);
         setCollectedSeries(res.data.series_stats || []);
         setSeries(res.data.series || []);
       })
       .catch((err) => {
+        setLoading(false);
         console.log("Failed to load collection", err);
       });
   }, []);
-
-  if (loading) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" color="#2563eb" />
-        <Text
-          style={{
-            marginTop: 16,
-            fontFamily: "Inter",
-            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
-          }}
-        >
-          Loading your collection...
-        </Text>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView
@@ -99,26 +77,34 @@ const CollectionScreen = () => {
 
       {/* Collection Grid */}
       <FlatList
-        data={series}
+        data={loading ? Array.from({ length: 6 }) : series}
         numColumns={2}
-        keyExtractor={(item) => item.series.id.toString()}
-        contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 16 }}
-        renderItem={({ item }) => (
-          <Box
-            key={item.series.id}
-            className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]"
-          >
-            <Pressable
-              onPress={() =>
-                navigation.navigate("DetailedCollectionScreen", {
-                  seriesId: item.series.id,
-                })
-              }
+        keyExtractor={(item, idx) =>
+          loading ? idx.toString() : item.series.id.toString()
+        }
+        contentContainerStyle={{ paddingTop: 16 }}
+        renderItem={({ item, index }) =>
+          loading ? (
+            <Box key={index} className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
+              <SeriesCardSkeleton />
+            </Box>
+          ) : (
+            <Box
+              key={item.series.id}
+              className="flex-1 ml-2 mr-2 mb-4 max-w-[50%]"
             >
-              <SeriesCard data={item} />
-            </Pressable>
-          </Box>
-        )}
+              <Pressable
+                onPress={() =>
+                  navigation.navigate("DetailedCollectionScreen", {
+                    seriesId: item.series.id,
+                  })
+                }
+              >
+                <SeriesCard data={item} />
+              </Pressable>
+            </Box>
+          )
+        }
         ListHeaderComponent={
           <>
             {/* Most Collected Series */}
@@ -136,9 +122,15 @@ const CollectionScreen = () => {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={{ paddingLeft: 8, marginBottom: 16 }}
+              style={{ paddingLeft: 0, marginBottom: 16 }}
             >
-              {collectedSeries.length === 0 ? (
+              {loading ? (
+                <Box className="ml-[-8px] flex-row">
+                  {Array.from({ length: 4 }).map((_, idx) => (
+                    <SeriesCardSkeleton key={idx} horizontal />
+                  ))}
+                </Box>
+              ) : collectedSeries.length === 0 ? (
                 <Box className="ml-2 flex-1 h-20 items-center justify-center">
                   <Text
                     style={{
@@ -154,6 +146,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
+                    className="ml-[-12px]"
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
