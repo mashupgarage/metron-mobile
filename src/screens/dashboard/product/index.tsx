@@ -259,7 +259,6 @@ export default function Product(props: {
     }
   };
 
-  console.log(seriesStatus);
   return (
     <SafeAreaView
       style={{
@@ -387,19 +386,19 @@ export default function Product(props: {
               ) : seriesStatus ? (
                 <>
                   <Text style={{ color: "#374151", fontSize: 14 }}>
-                    {seriesStatus.related_series?.collected ?? 0} of{" "}
-                    {seriesStatus.related_series?.total === 0
+                    {seriesStatus?.related_series?.collected ?? 0} of{" "}
+                    {seriesStatus?.related_series?.total === 0
                       ? 1
-                      : seriesStatus.related_series?.total}{" "}
+                      : seriesStatus?.related_series?.total}{" "}
                     Series Collected
                   </Text>
                   <Text style={{ color: "#2563eb", fontSize: 14 }}>
                     {(() => {
                       const collected = Number(
-                        seriesStatus.related_series?.collected ?? 0
+                        seriesStatus?.related_series?.collected ?? 0
                       );
                       let total = Number(
-                        seriesStatus.related_series?.total ?? 1
+                        seriesStatus?.related_series?.total ?? 1
                       );
                       if (!total) total = 1;
                       return ((collected / total) * 100).toFixed(0);
@@ -432,7 +431,8 @@ export default function Product(props: {
                 }}
               />
             </View>
-            {seriesStatus.related_series.total !== 0 && (
+            {/* 
+            {seriesStatus?.related_series?.total !== 0 && (
               <Text
                 style={{
                   color: "#2563eb",
@@ -441,12 +441,13 @@ export default function Product(props: {
                   marginBottom: 16,
                 }}
                 onPress={() => {
-                  /* TODO: handle full series link navigation */
+                
                 }}
-              >
-                View Full Series
-              </Text>
-            )}
+                >
+                  View Full Series
+                </Text>
+              )}
+           */}
             <Text className="font-bold text-base mb-2">You May Also Like</Text>
             <FlatList
               data={recommendations?.recommendations || []}

@@ -8,8 +8,11 @@ import NavigationHeader from "@/src/components/navigation-header";
 import { useColorScheme } from "react-native";
 import { getCollectionSeriesStatus } from "@/src/api/apiEndpoints";
 import { useRoute } from "@react-navigation/native";
+import { getWantList } from "@/src/api/apiEndpoints";
 
 const DetailedCollectionScreen = () => {
+  const [wantList, setWantList] = useState<number[]>([]);
+
   const store = useBoundStore();
   const route = useRoute();
   const colorScheme = useColorScheme();
@@ -23,6 +26,12 @@ const DetailedCollectionScreen = () => {
   // Fetch collection from API
   useEffect(() => {
     setLoading(true);
+    // Fetch want list
+    getWantList()
+      .then((res) => {
+        setWantList(res.data.want_lists.map((item: any) => item.id));
+      })
+      .catch(() => setWantList([]));
 
     // @ts-ignore
     const seriesId = route.params?.seriesId;
@@ -32,9 +41,6 @@ const DetailedCollectionScreen = () => {
     }
     getCollectionSeriesStatus(seriesId)
       .then((res) => {
-        console.log("--------------------------------------------");
-        console.log(res.data);
-        console.log("--------------------------------------------");
         setCollection(res.data.series.products);
         setOwned(res.data.series.products_owned);
         setTotalOwned(res.data.series.owned);
@@ -73,9 +79,12 @@ const DetailedCollectionScreen = () => {
       <NavigationHeader />
       <Box className="flex-row items-center justify-between px-4 mt-8 mb-4">
         <Text
+          numberOfLines={3}
+          ellipsizeMode="tail"
           style={{
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: "bold",
+            width: "70%",
             fontFamily: "Inter",
             color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
           }}
@@ -90,7 +99,7 @@ const DetailedCollectionScreen = () => {
               color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
             }}
           >
-            {total_owned ?? 0} out of {total_products ?? 0}
+            {total_owned ?? 0} of {total_products ?? 0}
           </Text>
         </Box>
       </Box>
@@ -120,9 +129,11 @@ const DetailedCollectionScreen = () => {
             owned_products: item.owned_products,
             unowned_products: item.unowned_products,
             cover_url_large: item.cover_url_large,
+            product_items_count: item.product_items_count,
+            in_want_list: !wantList.includes(item.id),
+            ...item,
           };
 
-          console.log(grayed);
           return (
             <Box className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
               <SeriesCard data={transformed} grayed={grayed} />
