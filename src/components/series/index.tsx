@@ -92,7 +92,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
             alt={"banner"}
             className={
               imgError
-                ? "pl-4 h-56 p-2 w-full rounded-md bg-gray-200"
+                ? "pl-4 h-56 p-8 w-full rounded-md"
                 : "h-56 p-2 w-full rounded-md "
             }
             resizeMode="contain"
@@ -103,10 +103,10 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
             <View
               style={{
                 position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
+                top: 6,
+                left: 14,
+                right: 14,
+                bottom: 6,
                 backgroundColor: "rgba(200,200,200,0.8)",
                 borderRadius: 4, // match your image's border radius
                 justifyContent: "center",

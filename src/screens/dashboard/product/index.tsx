@@ -474,7 +474,7 @@ export default function Product(props: {
             style={{
               flexDirection: "row",
               padding: 16,
-              backgroundColor: "#fff",
+              backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
               borderTopWidth: 1,
               borderColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",
               alignItems: "center",

@@ -29,7 +29,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
           className={
             imgError
               ? "pl-4 h-48 p-2 w-full rounded-md bg-gray-200"
-              : "h-48 p-2 w-full rounded-md bg-gray-200"
+              : "h-48 p-2 w-full rounded-md"
           }
           resizeMode="contain"
           onError={() => setImgError(true)}
