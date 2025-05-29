@@ -5,9 +5,7 @@ export interface AuthStackParams {
   NotFound: undefined;
 }
 
-import { ParamListBase } from '@react-navigation/native';
-
-export interface DashboardStackParams extends ParamListBase {
+export interface DashboardStackParams {
   Onboarding: undefined;
   Home: { category_id?: number };
   NotFound: undefined;
@@ -16,4 +14,5 @@ export interface DashboardStackParams extends ParamListBase {
   Product: { product: Product };
   Wantlist: undefined;
   CGCSubmit: undefined;
+  DetailedCollectionScreen: { seriesId: number };
 }

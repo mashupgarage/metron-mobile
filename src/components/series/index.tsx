@@ -2,7 +2,7 @@ import { FC } from "react";
 import { Box } from "../ui/box";
 import { Image } from "../ui/image";
 import { Text } from "../ui/text";
-import { View } from "react-native";
+import { useColorScheme, View } from "react-native";
 
 interface SeriesCardProps {
   data: {
@@ -20,20 +20,49 @@ interface SeriesCardProps {
     };
     owned_products: number;
     unowned_products: number;
-    grayed?: boolean;
+    cover_url_large?: string;
   };
+  grayed?: boolean;
 }
 
-const SeriesCard: FC<SeriesCardProps> = ({ data }) => {
+const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
+  const colorScheme = useColorScheme();
   return (
     <Box className="mb-2 w-[180px]">
       <View style={{ paddingHorizontal: 12, margin: 4, marginBottom: 0 }}>
-        <Image
-          source={{ uri: data.last_product.image_url }}
-          alt={data.series.id.toString()}
-          className="h-52 w-full rounded-md"
-          resizeMode="cover"
-        />
+        <View style={{ position: "relative" }}>
+          <Image
+            source={{
+              uri: data.last_product?.image_url || data.cover_url_large,
+            }}
+            alt={"banner"}
+            className="h-52 w-full rounded-md"
+            resizeMode="cover"
+            style={{ opacity: grayed ? 0.7 : 1 }}
+          />
+          {grayed && (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(200,200,200,0.8)",
+                borderRadius: 4, // match your image's border radius
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                className="font-bold"
+                style={{ color: colorScheme === "dark" ? "white" : "black" }}
+              >
+                Not Owned
+              </Text>
+            </View>
+          )}
+        </View>
         <View className="mt-2">
           <Text numberOfLines={1} className="font-bold">
             {data.series.title}

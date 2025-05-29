@@ -10,6 +10,7 @@ import { screenOption } from "../utils/screenOption";
 import DashboardTabs from "./DashboardTabs";
 import EditProfile from "../screens/dashboard/edit-profile";
 import CollectionScreen from "../screens/dashboard/collection";
+import DetailedCollectionScreen from "../screens/dashboard/collection/detailed-display";
 
 const Stack = createStackNavigator();
 export function DashboardStack() {
@@ -61,6 +62,11 @@ export function DashboardStack() {
         name="Collection"
         options={screenOption}
         component={CollectionScreen}
+      />
+      <Stack.Screen
+        name="DetailedCollectionScreen"
+        options={screenOption}
+        component={DetailedCollectionScreen}
       />
     </Stack.Navigator>
   );
