@@ -5,8 +5,13 @@ import { Box } from "@/src/components/ui/box";
 import { getUserCollection } from "@/src/api/apiEndpoints";
 import { useBoundStore } from "@/src/store";
 import SeriesCard from "@/src/components/series";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { Pressable } from "react-native";
 import NavigationHeader from "@/src/components/navigation-header";
 import { useColorScheme } from "react-native";
+import { DashboardStackParams } from "@/src/utils/types/navigation";
+
+import { ActivityIndicator, View } from "react-native";
 
 const CollectionScreen = () => {
   const store = useBoundStore();
@@ -15,6 +20,8 @@ const CollectionScreen = () => {
   const [collectedSeries, setCollectedSeries] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
 
   // Fetch collection from API
   useEffect(() => {
@@ -32,6 +39,30 @@ const CollectionScreen = () => {
         console.log("Failed to load collection", err);
       });
   }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text
+          style={{
+            marginTop: 16,
+            fontFamily: "Inter",
+            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+          }}
+        >
+          Loading your collection...
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -51,7 +82,7 @@ const CollectionScreen = () => {
             color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
           }}
         >
-          Collection
+          Your Collection
         </Text>
         <Box className="flex-row">
           <Text
@@ -70,11 +101,22 @@ const CollectionScreen = () => {
       <FlatList
         data={series}
         numColumns={2}
-        // keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.series.id.toString()}
         contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 16 }}
         renderItem={({ item }) => (
-          <Box className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
-            <SeriesCard data={item} />
+          <Box
+            key={item.series.id}
+            className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]"
+          >
+            <Pressable
+              onPress={() =>
+                navigation.navigate("DetailedCollectionScreen", {
+                  seriesId: item.series.id,
+                })
+              }
+            >
+              <SeriesCard data={item} />
+            </Pressable>
           </Box>
         )}
         ListHeaderComponent={
@@ -109,7 +151,18 @@ const CollectionScreen = () => {
                   </Text>
                 </Box>
               ) : (
-                collectedSeries.map((s) => <SeriesCard data={s} />)
+                collectedSeries.map((s) => (
+                  <Pressable
+                    key={s.series.id}
+                    onPress={() =>
+                      navigation.navigate("DetailedCollectionScreen", {
+                        seriesId: s.series.id,
+                      })
+                    }
+                  >
+                    <SeriesCard data={s} />
+                  </Pressable>
+                ))
               )}
             </ScrollView>
             <Text
