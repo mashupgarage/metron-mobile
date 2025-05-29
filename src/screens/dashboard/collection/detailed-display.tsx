@@ -9,6 +9,7 @@ import { useColorScheme } from "react-native";
 import { getCollectionSeriesStatus } from "@/src/api/apiEndpoints";
 import { useRoute } from "@react-navigation/native";
 import { getWantList } from "@/src/api/apiEndpoints";
+import { HStack } from "@/src/components/ui/hstack";
 
 const DetailedCollectionScreen = () => {
   const [wantList, setWantList] = useState<number[]>([]);
@@ -77,32 +78,32 @@ const DetailedCollectionScreen = () => {
     >
       {/* Header */}
       <NavigationHeader />
-      <Box className="flex-row items-center justify-between px-4 mt-8 mb-4">
+      <HStack className="flex-row items-center justify-between px-4 mt-8 mb-4">
         <Text
           numberOfLines={3}
           ellipsizeMode="tail"
           style={{
             fontSize: 18,
             fontWeight: "bold",
-            width: "70%",
+            maxWidth: "60%",
             fontFamily: "Inter",
             color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
           }}
         >
           {title || ""}
         </Text>
-        <Box className="flex-row">
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: "Inter",
-              color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
-            }}
-          >
-            {total_owned ?? 0} of {total_products ?? 0}
-          </Text>
-        </Box>
-      </Box>
+
+        <Text
+          numberOfLines={2}
+          style={{
+            fontSize: 16,
+            fontFamily: "Inter",
+            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+          }}
+        >
+          {total_owned ?? 0} of {total_products ?? 0} Collected
+        </Text>
+      </HStack>
 
       {/* Collection Grid */}
       <FlatList

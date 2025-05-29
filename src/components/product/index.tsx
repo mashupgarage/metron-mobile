@@ -1,5 +1,5 @@
 import { ProductT } from "@/src/utils/types/common";
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Box } from "../ui/box";
 import { Image } from "../ui/image";
 import { Text } from "../ui/text";
@@ -12,15 +12,27 @@ interface ProductCardProps {
 
 const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
   const { product } = data;
+  const [imgError, setImgError] = useState(false);
+
+  const mainImage = product.cover_url || undefined;
 
   return (
     <Box className="mb-2">
       <View style={{ paddingHorizontal: 12, margin: 4, marginBottom: 0 }}>
         <Image
-          source={{ uri: product.cover_url }}
+          source={
+            imgError || !mainImage
+              ? require("@/src/assets/icon.png")
+              : { uri: mainImage }
+          }
           alt={product.id.toString()}
-          className="h-48 w-full rounded-md"
-          resizeMode="cover"
+          className={
+            imgError
+              ? "pl-4 h-48 p-2 w-full rounded-md bg-gray-200"
+              : "h-48 p-2 w-full rounded-md bg-gray-200"
+          }
+          resizeMode="contain"
+          onError={() => setImgError(true)}
         />
         <View className="mt-2">
           <Text numberOfLines={1} className="font-bold">

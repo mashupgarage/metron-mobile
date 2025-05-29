@@ -11,6 +11,8 @@ import NavigationHeader from "@/src/components/navigation-header";
 import { useColorScheme } from "react-native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 
+import { ActivityIndicator, View } from "react-native";
+
 const CollectionScreen = () => {
   const store = useBoundStore();
   const colorScheme = useColorScheme();
@@ -37,6 +39,30 @@ const CollectionScreen = () => {
         console.log("Failed to load collection", err);
       });
   }, []);
+
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color="#2563eb" />
+        <Text
+          style={{
+            marginTop: 16,
+            fontFamily: "Inter",
+            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+          }}
+        >
+          Loading your collection...
+        </Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView

@@ -90,7 +90,11 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
                 : { uri: mainImage }
             }
             alt={"banner"}
-            className="h-56 w-full rounded-md"
+            className={
+              imgError
+                ? "pl-4 h-56 p-2 w-full rounded-md bg-gray-200"
+                : "h-56 p-2 w-full rounded-md "
+            }
             resizeMode="contain"
             onError={() => setImgError(true)}
             style={{ opacity: grayed ? 0.7 : 1 }}
