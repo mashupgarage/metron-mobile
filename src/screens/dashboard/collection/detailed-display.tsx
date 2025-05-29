@@ -137,7 +137,7 @@ const DetailedCollectionScreen = () => {
 
           return (
             <Box className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
-              <SeriesCard data={transformed} grayed={grayed} />
+              <SeriesCard data={transformed} grayed={grayed} detailedDisplay />
             </Box>
           );
         }}

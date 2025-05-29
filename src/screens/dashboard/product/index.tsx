@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Box } from "@/src/components/ui/box";
 import { Text } from "@/src/components/ui/text";
 import { Image } from "@/src/components/ui/image";
@@ -16,9 +16,17 @@ import {
 import { Button } from "@/src/components/ui/button";
 import { useNavigation } from "@react-navigation/native";
 import { ProductT } from "@/src/utils/types/common";
-import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast";
+import {
+  useToast,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+} from "@/src/components/ui/toast";
 import NavigationHeader from "@/src/components/navigation-header";
 import { Download, Heart, ShoppingCart, ZoomIn } from "lucide-react-native";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import ImageViewing from "react-native-image-viewing";
 import {
   addToReservation,
   addToWantList,
@@ -27,7 +35,6 @@ import {
   fetchCartItems,
   fetchProductDetails,
 } from "@/src/api/apiEndpoints";
-import { VStack } from "@gluestack-ui/themed";
 
 import {
   useProductOwned,
@@ -35,6 +42,7 @@ import {
   useProductRecommendations,
 } from "./productHooks";
 import ProductCard from "@/src/components/product";
+import { VStack } from "@/src/components/ui/vstack";
 
 export default function Product(props: {
   route: {
@@ -43,18 +51,20 @@ export default function Product(props: {
       fromReservations?: boolean;
       reservationId?: number;
       reservationList?: any[];
+      fromCollection?: boolean;
     };
   };
 }) {
   const colorScheme = useColorScheme();
   const { route } = props;
   const { params } = route;
-  const { product, fromReservations, reservationId, reservationList } = params;
-
-  // Custom hooks for product data
-  const { data: ownedData, loading: ownedLoading } = useProductOwned(
-    product.id
-  );
+  const {
+    product,
+    fromReservations,
+    reservationId,
+    reservationList,
+    fromCollection,
+  } = params;
 
   const { data: seriesStatus, loading: seriesLoading } = useProductSeriesStatus(
     product.id
@@ -63,7 +73,7 @@ export default function Product(props: {
     useProductRecommendations(product.id);
 
   // Local state for reservation list so we can update it after reservation
-  const [localReservationList, setLocalReservationList] = React.useState<any[]>(
+  const [localReservationList, setLocalReservationList] = useState<any[]>(
     reservationList || []
   );
 
@@ -72,12 +82,11 @@ export default function Product(props: {
     ? localReservationList.some((r) => r.product?.id === product.id)
     : false;
 
-  const [productItems, setProductItems] = React.useState<any[]>([]);
-  const [selectedProductItemId, setSelectedProductItemId] = React.useState<
+  const [productItems, setProductItems] = useState<any[]>([]);
+  const [selectedProductItemId, setSelectedProductItemId] = useState<
     number | null
   >(null);
-  const [quantity, setQuantity] = React.useState(1);
-  const [quantityError, setQuantityError] = React.useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Only count available NM items for cart logic
   const availableNMItems = productItems.filter(
@@ -90,6 +99,8 @@ export default function Product(props: {
   const navigation = useNavigation();
   const toast = useToast();
   const [isWanted, setIsWanted] = React.useState(false);
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   React.useEffect(() => {
     // Fetch product details to get normalized_product_items
@@ -280,11 +291,119 @@ export default function Product(props: {
           <NavigationHeader showCartButton />
         </Box>
         <ScrollView>
-          <Image
-            alt={product?.title ?? ""}
-            className="w-full h-[350px]"
-            source={{ uri: product?.cover_url_large ?? "" }}
-          />
+          <View
+            style={{
+              alignItems: "center",
+              marginBottom: 16,
+              position: "relative",
+            }}
+          >
+            <Image
+              alt={product?.title ?? ""}
+              className="w-full h-[350px]"
+              source={{ uri: product?.cover_url_large ?? "" }}
+            />
+            <ImageViewing
+              images={[{ uri: product?.cover_url_large ?? "" }]}
+              imageIndex={0}
+              visible={isImageViewerVisible}
+              onRequestClose={() => setIsImageViewerVisible(false)}
+            />
+            <VStack className="absolute top-4 right-4" space="md">
+              <Box className="mb-4">
+                <Pressable
+                  onPress={() => setIsImageViewerVisible(true)}
+                  accessibilityLabel="Zoom image"
+                  hitSlop={8}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.7 : 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  })}
+                >
+                  <ZoomIn size={24} color="#fff" />
+                </Pressable>
+              </Box>
+              <Box className="w-6">
+                <Pressable
+                  onPress={async () => {
+                    if (!product?.cover_url_large) return;
+                    setDownloading(true);
+                    try {
+                      const { status } =
+                        await MediaLibrary.requestPermissionsAsync();
+                      if (status !== "granted") {
+                        toast.show({
+                          placement: "top",
+                          render: ({ id }) => (
+                            <Toast nativeID={"toast-" + id} action="error">
+                              <ToastTitle>Permission denied</ToastTitle>
+                              <ToastDescription>
+                                Cannot save image without permission.
+                              </ToastDescription>
+                            </Toast>
+                          ),
+                        });
+                        setDownloading(false);
+                        return;
+                      }
+                      const fileUri =
+                        FileSystem.cacheDirectory +
+                        (product?.title?.replace(/[^a-zA-Z0-9]/g, "_") ||
+                          "image") +
+                        ".jpg";
+                      const downloadRes = await FileSystem.downloadAsync(
+                        product.cover_url_large,
+                        fileUri
+                      );
+                      const asset = await MediaLibrary.createAssetAsync(
+                        downloadRes.uri
+                      );
+                      await MediaLibrary.createAlbumAsync(
+                        "Download",
+                        asset,
+                        false
+                      );
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => (
+                          <Toast nativeID={"toast-" + id} action="success">
+                            <ToastTitle>Image saved</ToastTitle>
+                            <ToastDescription>
+                              Image has been saved to your gallery.
+                            </ToastDescription>
+                          </Toast>
+                        ),
+                      });
+                    } catch (err) {
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => (
+                          <Toast nativeID={"toast-" + id} action="error">
+                            <ToastTitle>Download failed</ToastTitle>
+                            <ToastDescription>
+                              There was an error saving the image.
+                            </ToastDescription>
+                          </Toast>
+                        ),
+                      });
+                    } finally {
+                      setDownloading(false);
+                    }
+                  }}
+                  accessibilityLabel="Download image"
+                  hitSlop={8}
+                  style={({ pressed }) => ({
+                    opacity: pressed ? 0.7 : 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  })}
+                >
+                  <Download size={24} color="#fff" />
+                </Pressable>
+              </Box>
+            </VStack>
+          </View>
           <Text
             style={{
               fontFamily: "Urbanist-Bold",
@@ -308,48 +427,6 @@ export default function Product(props: {
           >
             Part of Amazing Spider-Man Series &gt;
           </Text> */}
-            <View
-              style={{
-                alignItems: "center",
-                marginBottom: 16,
-                position: "relative",
-              }}
-            >
-              <VStack className="absolute top-4 right-4" space="md">
-                <Box className="mb-4">
-                  <Pressable
-                    onPress={() => {
-                      // TODO: Implement zoom functionality
-                    }}
-                    accessibilityLabel="Zoom image"
-                    hitSlop={8}
-                    style={({ pressed }) => ({
-                      opacity: pressed ? 0.7 : 1,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    })}
-                  >
-                    <ZoomIn size={24} color="#fff" />
-                  </Pressable>
-                </Box>
-                <Box className="w-6">
-                  <Pressable
-                    onPress={() => {
-                      // TODO: Implement download functionality
-                    }}
-                    accessibilityLabel="Download image"
-                    hitSlop={8}
-                    style={({ pressed }) => ({
-                      opacity: pressed ? 0.7 : 1,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    })}
-                  >
-                    <Download size={24} color="#fff" />
-                  </Pressable>
-                </Box>
-              </VStack>
-            </View>
             <Text
               style={{
                 fontFamily: "PublicSans-regular",
@@ -442,130 +519,138 @@ export default function Product(props: {
             >
               {product?.quantity ?? "Out of Stock"}
             </Text>
-            {/* Collection Status */}
-            <Text
-              style={{
-                fontFamily: "Urbanist-Bold",
-                fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
-              }}
-            >
-              Your Collection Status
-            </Text>
-            {/* Series Status (Collection Progress) */}
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 4,
-              }}
-            >
-              {seriesLoading ? (
+            {/* if from collection we hide the stats */}
+            {/* Hide collection status, series progress, and recommendations if fromDetailedDisplay */}
+            {!fromCollection && (
+              <VStack>
+                {/* Collection Status */}
                 <Text
                   style={{
-                    fontFamily: "PublicSans-regular",
+                    fontFamily: "Urbanist-Bold",
                     fontSize: 16,
                     color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
                   }}
                 >
-                  Loading...
+                  Your Collection Status
                 </Text>
-              ) : seriesStatus ? (
-                <>
-                  <Text
-                    style={{
-                      fontFamily: "PublicSans-regular",
-                      fontSize: 16,
-                      color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
-                    }}
-                  >
-                    {seriesStatus?.related_series?.collected ?? 0} of{" "}
-                    {seriesStatus?.related_series?.total === 0
-                      ? 1
-                      : seriesStatus?.related_series?.total}{" "}
-                    Series Collected
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: "PublicSans-regular",
-                      fontSize: 16,
-                      color: colorScheme === "dark" ? "#FFFFFF" : "#2563eb",
-                    }}
-                  >
-                    {(() => {
-                      const collected = Number(
-                        seriesStatus?.related_series?.collected ?? 0
-                      );
-                      let total = Number(
-                        seriesStatus?.related_series?.total ?? 1
-                      );
-                      if (!total) total = 1;
-                      return ((collected / total) * 100).toFixed(0);
-                    })()}
-                    % Complete
-                  </Text>
-                </>
-              ) : (
-                <Text
+                {/* Series Status (Collection Progress) */}
+                <View
                   style={{
-                    fontFamily: "PublicSans-regular",
-                    fontSize: 16,
-                    color: colorScheme === "dark" ? "#FFFFFF" : "#374151",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 4,
                   }}
                 >
-                  No series data
+                  {seriesLoading ? (
+                    <Text
+                      style={{
+                        fontFamily: "PublicSans-regular",
+                        fontSize: 16,
+                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                      }}
+                    >
+                      Loading...
+                    </Text>
+                  ) : seriesStatus ? (
+                    <>
+                      <Text
+                        style={{
+                          fontFamily: "PublicSans-regular",
+                          fontSize: 16,
+                          color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                        }}
+                      >
+                        {seriesStatus?.related_series?.collected ?? 0} of{" "}
+                        {seriesStatus?.related_series?.total === 0
+                          ? 1
+                          : seriesStatus?.related_series?.total}{" "}
+                        Series Collected
+                      </Text>
+                      <Text
+                        style={{
+                          fontFamily: "PublicSans-regular",
+                          fontSize: 16,
+                          color: colorScheme === "dark" ? "#FFFFFF" : "#2563eb",
+                        }}
+                      >
+                        {(() => {
+                          const collected = Number(
+                            seriesStatus?.related_series?.collected ?? 0
+                          );
+                          let total = Number(
+                            seriesStatus?.related_series?.total ?? 1
+                          );
+                          if (!total) total = 1;
+                          return ((collected / total) * 100).toFixed(0);
+                        })()}
+                        % Complete
+                      </Text>
+                    </>
+                  ) : (
+                    <Text
+                      style={{
+                        fontFamily: "PublicSans-regular",
+                        fontSize: 16,
+                        color: colorScheme === "dark" ? "#FFFFFF" : "#374151",
+                      }}
+                    >
+                      No series data
+                    </Text>
+                  )}
+                </View>
+                <View
+                  style={{
+                    height: 8,
+                    backgroundColor: "#e5e7eb",
+                    borderRadius: 4,
+                    marginBottom: 12,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: seriesStatus
+                        ? `${seriesStatus.completion_percent ?? 0}%`
+                        : "0%",
+                      height: 8,
+                      backgroundColor: "#2563eb",
+                      borderRadius: 4,
+                    }}
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontFamily: "Urbanist-Bold",
+                    fontSize: 16,
+                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    marginBottom: 16,
+                  }}
+                >
+                  You may also like
                 </Text>
-              )}
-            </View>
-            <View
-              style={{
-                height: 8,
-                backgroundColor: "#e5e7eb",
-                borderRadius: 4,
-                marginBottom: 12,
-              }}
-            >
-              <View
-                style={{
-                  width: seriesStatus
-                    ? `${seriesStatus.completion_percent ?? 0}%`
-                    : "0%",
-                  height: 8,
-                  backgroundColor: "#2563eb",
-                  borderRadius: 4,
-                }}
-              />
-            </View>
-            <Text
-              style={{
-                fontFamily: "Urbanist-Bold",
-                fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
-                marginBottom: 16,
-              }}
-            >
-              You may also like
-            </Text>
-            <FlatList
-              data={recommendations?.recommendations || []}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, idx) => `${item.id}_${idx}`}
-              renderItem={({ item }) => (
-                <Box className="max-w-[180px]">
-                  <ProductCard product={item} />
-                </Box>
-              )}
-              ListEmptyComponent={() =>
-                recsLoading ? (
-                  <Text style={{ color: "#6b7280" }}>Loading...</Text>
-                ) : (
-                  <Text style={{ color: "#6b7280" }}>No recommendations</Text>
-                )
-              }
-              style={{ marginBottom: 16 }}
-            />
+                <FlatList
+                  data={recommendations?.recommendations || []}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, idx) => `${item.id}_${idx}`}
+                  renderItem={({ item }) => (
+                    <Box className="max-w-[180px]">
+                      <ProductCard product={item} />
+                    </Box>
+                  )}
+                  ListEmptyComponent={() =>
+                    recsLoading ? (
+                      <Text style={{ color: "#6b7280" }}>Loading...</Text>
+                    ) : (
+                      <Text style={{ color: "#6b7280" }}>
+                        No recommendations
+                      </Text>
+                    )
+                  }
+                  style={{ marginBottom: 16 }}
+                />
+              </VStack>
+            )}
           </View>
           {/* Bottom Bar */}
           <View

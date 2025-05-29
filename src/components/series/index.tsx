@@ -6,7 +6,16 @@ import { Pressable, useColorScheme, View } from "react-native";
 import { addToWantList, addToCart } from "@/src/api/apiEndpoints";
 import { useToast } from "@/src/components/ui/toast";
 import { useBoundStore } from "@/src/store";
-import { ShoppingCart, StarIcon } from "lucide-react-native";
+import { ShoppingCart, StarIcon, ZoomIn, Download } from "lucide-react-native";
+import ImageViewing from "react-native-image-viewing";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import {
+  NavigationProp,
+  ParamListBase,
+  useNavigation,
+} from "@react-navigation/native";
+import { HStack } from "../ui/hstack";
 
 interface SeriesCardProps {
   data: {
@@ -28,14 +37,17 @@ interface SeriesCardProps {
     product_items_count?: number;
     in_want_list?: boolean;
   };
+  detailedDisplay?: boolean;
   grayed?: boolean;
 }
 
-const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
+const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   const colorScheme = useColorScheme();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const toast = useToast();
-  const store = useBoundStore();
   const [imgError, setImgError] = useState(false);
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const mainImage =
     data.last_product?.image_url || data.cover_url_large || undefined;
@@ -59,23 +71,14 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
     }
   };
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (item: any) => {
     try {
-      // You may need to adjust parameters based on your backend
-      await addToCart(store.user.id, data.series.id, data.last_product.id);
-      toast.show({
-        placement: "top",
-        render: ({ id }) => (
-          <Text className="text-green-600">Added to Cart!</Text>
-        ),
+      navigation.navigate("Product", {
+        product: item,
+        fromCollection: true,
       });
     } catch (error) {
-      toast.show({
-        placement: "top",
-        render: ({ id }) => (
-          <Text className="text-red-600">Failed to add to Cart.</Text>
-        ),
-      });
+      console.log(error);
     }
   };
 
@@ -98,6 +101,126 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
             resizeMode="contain"
             onError={() => setImgError(true)}
             style={{ opacity: grayed ? 0.7 : 1 }}
+          />
+          {/* Show full screen icon if owned */}
+          {!grayed && detailedDisplay && !imgError && mainImage && (
+            <Pressable
+              onPress={() => setIsImageViewerVisible(true)}
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                backgroundColor: "rgba(0,0,0,0.6)",
+                borderRadius: 16,
+                padding: 6,
+                zIndex: 10,
+              }}
+              accessibilityLabel="View cover full screen"
+              hitSlop={8}
+            >
+              <ZoomIn size={22} color="#fff" />
+            </Pressable>
+          )}
+          <ImageViewing
+            images={[{ uri: mainImage }]}
+            imageIndex={0}
+            visible={isImageViewerVisible}
+            onRequestClose={() => setIsImageViewerVisible(false)}
+            FooterComponent={({ imageIndex }) => (
+              <View
+                style={{
+                  width: "100%",
+                  alignItems: "flex-end",
+                  padding: 24,
+                  position: "absolute",
+                  bottom: 0,
+                  right: 0,
+                }}
+              >
+                <Pressable
+                  onPress={async () => {
+                    if (!mainImage) return;
+                    setDownloading(true);
+                    try {
+                      const { status } =
+                        await MediaLibrary.requestPermissionsAsync();
+                      if (status !== "granted") {
+                        toast.show({
+                          placement: "top",
+                          render: ({ id }) => (
+                            <Text style={{ color: "red" }}>
+                              Permission denied: Cannot save image.
+                            </Text>
+                          ),
+                        });
+                        setDownloading(false);
+                        return;
+                      }
+                      const fileUri =
+                        FileSystem.cacheDirectory +
+                        "cover_" +
+                        Date.now() +
+                        ".jpg";
+                      const downloadRes = await FileSystem.downloadAsync(
+                        mainImage,
+                        fileUri
+                      );
+                      const asset = await MediaLibrary.createAssetAsync(
+                        downloadRes.uri
+                      );
+                      await MediaLibrary.createAlbumAsync(
+                        "Download",
+                        asset,
+                        false
+                      );
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => (
+                          <Text style={{ color: "green" }}>
+                            Image saved to gallery.
+                          </Text>
+                        ),
+                      });
+                    } catch (err) {
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }) => (
+                          <Text style={{ color: "red" }}>
+                            Failed to save image.
+                          </Text>
+                        ),
+                      });
+                    } finally {
+                      setDownloading(false);
+                    }
+                  }}
+                  style={{
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    borderRadius: 16,
+                    padding: 10,
+                    marginBottom: 10,
+                    marginRight: 10,
+                  }}
+                  accessibilityLabel="Download image"
+                  hitSlop={8}
+                  disabled={downloading}
+                >
+                  <HStack className="flex-row items-center" space="md">
+                    <Download
+                      size={28}
+                      color={colorScheme === "dark" ? "#FFFFFF" : "#DADADA"}
+                    />
+                    <Text
+                      style={{
+                        color: colorScheme === "dark" ? "#FFFFFF" : "#DADADA",
+                      }}
+                    >
+                      Download
+                    </Text>
+                  </HStack>
+                </Pressable>
+              </View>
+            )}
           />
           {grayed && (
             <View
@@ -148,7 +271,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
                       data.product_items_count !== 0 ? "#77778a" : "#d1d1d1",
                     opacity: data.product_items_count !== 0 ? 0.7 : 0.4,
                   }}
-                  onPress={handleAddToCart}
+                  onPress={() => handleAddToCart(data)}
                   disabled={data.product_items_count === 0}
                 >
                   <ShoppingCart size={24} color="white" />

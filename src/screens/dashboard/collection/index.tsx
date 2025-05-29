@@ -125,7 +125,7 @@ const CollectionScreen = () => {
               style={{ paddingLeft: 0, marginBottom: 16 }}
             >
               {loading ? (
-                <Box className="ml-[-8px] flex-row">
+                <Box className="ml-[4px] flex-row">
                   {Array.from({ length: 4 }).map((_, idx) => (
                     <SeriesCardSkeleton key={idx} horizontal />
                   ))}
