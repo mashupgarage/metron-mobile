@@ -19,7 +19,6 @@ import { getReservationList } from "@/src/api/apiEndpoints";
 import { ReservationItemT } from "@/src/utils/types/common";
 import { useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
 import ReservationCard from "@/src/components/ReservationCard";
 import NavigationHeader from "@/src/components/navigation-header";
 

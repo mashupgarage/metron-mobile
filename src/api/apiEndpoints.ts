@@ -89,17 +89,6 @@ export const searchMarketplaceProducts = (
  * Authenticate a user with their email and password.
  * @param email - The user's email address.
  * @param password - The user's password.
-  );
-};
-
-// =========================
-// User-related Endpoints
-// =========================
-
-/**
- * Authenticate a user with their email and password.
- * @param email - The user's email address.
- * @param password - The user's password.
  * @returns Axios promise resolving to the authentication response (user info, session, etc).
  * @throws Error if authentication fails.
  * @example
@@ -288,14 +277,36 @@ export const addToWantList = async (productId: number) => {
   });
 };
 
+interface GetWantListParams {
+  page?: number;
+  per?: number;
+  search?: string;
+  paginated?: boolean;
+}
+
 /**
- * Fetch the authenticated user's want list.
- * @returns Axios promise resolving to the user's want list array.
+ * Fetch the authenticated user's want list with pagination and search.
+ * @param params - Optional parameters for pagination and search
+ * @returns Axios promise with want lists and pagination metadata
  * @example
+ * // Basic usage without pagination
  * getWantList().then(res => res.data.want_lists)
+ *
+ * // With pagination and search
+ * getWantList({
+ *   page: 1,
+ *   per: 20,
+ *   search: 'spiderman',
+ *   paginated: true
+ * }).then(res => {
+ *   const { want_lists, meta } = res.data;
+ *   return { items: want_lists, pagination: meta };
+ * });
  */
-export const getWantList = async () => {
-  return axiosClient.get(`/want_lists`);
+export const getWantList = async (params: GetWantListParams = {}) => {
+  // Always include paginated=true for consistent API behavior
+  const queryParams = { ...params, paginated: true };
+  return axiosClient.get(`/want_lists`, { params: queryParams });
 };
 
 /**
