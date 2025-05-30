@@ -53,7 +53,6 @@ const DetailedCollectionScreen = () => {
       })
       .finally(() => setLoading(false));
   }, []);
-
   if (loading) {
     return (
       <SafeAreaView
@@ -104,10 +103,8 @@ const DetailedCollectionScreen = () => {
           {total_owned ?? 0} of {total_products ?? 0} Collected
         </Text>
       </HStack>
-
-      {/* Collection Grid */}
       <FlatList
-        data={collection}
+        data={[...collection].sort((a, b) => a.title.localeCompare(b.title))}
         numColumns={2}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 16 }}

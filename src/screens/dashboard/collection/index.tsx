@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, FlatList, ScrollView } from "react-native";
+import { Text, FlatList, ScrollView, TextInput } from "react-native";
 import { Box } from "@/src/components/ui/box";
 import { getUserCollection } from "@/src/api/apiEndpoints";
 import { useBoundStore } from "@/src/store";
@@ -12,9 +12,16 @@ import NavigationHeader from "@/src/components/navigation-header";
 import { useColorScheme } from "react-native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
 
-import { ActivityIndicator, View } from "react-native";
-
 const CollectionScreen = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
   const store = useBoundStore();
   const colorScheme = useColorScheme();
   const [seriesCount, setSeriesCount] = useState(0);
@@ -32,9 +39,13 @@ const CollectionScreen = () => {
     getUserCollection()
       .then((res) => {
         setLoading(false);
-        console.log("user", res.data);
         setCollectedSeries(res.data.series_stats || []);
-        setSeries(res.data.series || []);
+        console.log(res.data.series.map((s) => s.series.title));
+        setSeries(
+          res.data.series.sort((a: any, b: any) =>
+            b.series.title.localeCompare(a.series.title)
+          ) || []
+        );
       })
       .catch((err) => {
         setLoading(false);
@@ -75,9 +86,60 @@ const CollectionScreen = () => {
         </Box>
       </Box>
 
+      {/* Search Bar */}
+      <Box style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+        <Box style={{ position: "relative" }}>
+          <TextInput
+            placeholder="Search by title..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={{
+              backgroundColor: "#f0f0f0",
+              borderRadius: 8,
+              padding: 10,
+              fontSize: 16,
+              borderWidth: 1,
+              borderColor: "#e0e0e0",
+              paddingRight: 36, // leave space for clear button
+            }}
+            placeholderTextColor="#888"
+          />
+          {searchQuery.length > 0 && (
+            <Pressable
+              onPress={() => setSearchQuery("")}
+              style={{
+                position: "absolute",
+                right: 10,
+                top: 0,
+                bottom: 0,
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+                width: 28,
+              }}
+              accessibilityLabel="Clear search"
+            >
+              <Text style={{ fontSize: 18, color: "#888" }}>✕</Text>
+            </Pressable>
+          )}
+        </Box>
+      </Box>
+
       {/* Collection Grid */}
       <FlatList
-        data={loading ? Array.from({ length: 6 }) : series}
+        data={
+          loading
+            ? Array.from({ length: 6 })
+            : [...series].filter(
+                (item) =>
+                  item &&
+                  item.series &&
+                  typeof item.series.title === "string" &&
+                  item.series.title
+                    .toLowerCase()
+                    .includes(debouncedQuery.trim().toLowerCase())
+              )
+        }
         numColumns={2}
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()

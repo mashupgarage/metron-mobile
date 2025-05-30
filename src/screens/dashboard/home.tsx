@@ -296,6 +296,7 @@ export default function Home() {
         keyExtractor={(item, index) => `${item.id}_${index}`}
         renderItem={({ item, i }: { item: ProductT; i: number }) => (
           <Pressable
+            key={item.id}
             onPress={() => {
               navigation.navigate("Product", { product: item });
             }}

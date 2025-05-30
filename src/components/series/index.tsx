@@ -95,15 +95,14 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             alt={"banner"}
             className={
               imgError
-                ? "pl-4 h-60 p-8 w-full rounded-md"
-                : "h-60 p-2 w-full rounded-md "
+                ? "pl-4 h-60 p-8 w-[180px] rounded-md"
+                : "h-60 p-2 w-[180px] rounded-md "
             }
-            resizeMode="contain"
-            onError={() => setImgError(true)}
             style={{ opacity: grayed ? 0.7 : 1 }}
+            onError={() => setImgError(true)}
           />
           {/* Show full screen icon if owned */}
-          {!grayed && detailedDisplay && !imgError && mainImage && (
+          {!imgError && mainImage && (
             <Pressable
               onPress={() => setIsImageViewerVisible(true)}
               style={{
@@ -223,53 +222,31 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             )}
           />
           {grayed && (
-            <View
-              style={{
-                position: "absolute",
-                top: 6,
-                left: 9,
-                right: 9,
-                bottom: 6,
-                backgroundColor: "rgba(200,200,200,0.8)",
-                borderRadius: 4, // match your image's border radius
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Text
-                className="font-bold"
-                style={{
-                  color: "#FAFAFA",
-                }}
-              >
-                Not Collected
-              </Text>
-              <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+            <View className="absolute top-2 left-2 right-2 bottom-2 h-56 bg-black/50 justify-center items-center">
+              <Text className="font-bold text-white">Not Collected</Text>
+              <View className="flex-row gap-2 mt-2">
                 <Pressable
                   className="p-3 rounded-full"
                   style={{
-                    backgroundColor: "#77778a",
+                    backgroundColor: "rgba(255,255,255,0.4)",
                     opacity: data.in_want_list ? 1 : 0.7,
                   }}
                   onPress={handleAddToWantList}
-                  disabled={data.in_want_list}
+                  disabled={data.in_want_list !== true}
                 >
-                  {data.in_want_list ? (
-                    <StarIcon
-                      fill="#ffd700"
-                      color={data.in_want_list ? "#ffd700" : "#fff"}
-                      size={24}
-                    />
-                  ) : (
-                    <StarIcon color="#fff" size={24} />
-                  )}
+                  <StarIcon
+                    fill={
+                      !data.in_want_list ? "#ffd700" : "rgba(255,255,255,0.02)"
+                    }
+                    color={data.in_want_list ? "#ffd700" : "#fff"}
+                    size={24}
+                  />
                 </Pressable>
                 <Pressable
                   className="p-3 rounded-full"
                   style={{
-                    backgroundColor:
-                      data.product_items_count !== 0 ? "#77778a" : "#d1d1d1",
-                    opacity: data.product_items_count !== 0 ? 0.7 : 0.4,
+                    backgroundColor: "rgba(255,255,255,0.4)",
+                    opacity: data.product_items_count !== 0 ? 1 : 0.4,
                   }}
                   onPress={() => handleAddToCart(data)}
                   disabled={data.product_items_count === 0}
