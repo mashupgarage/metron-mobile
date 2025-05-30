@@ -6,14 +6,16 @@ import { useNavigation } from "@react-navigation/native";
 import { debounce } from "lodash";
 import Constants from "expo-constants";
 import {
-  fetchProducts,
   fetchProductsByReleaseId,
   fetchReleases,
   addToWantList,
   getWantList,
   getReservationList,
-  addToReservation,
-  confirmReservationList,
+  checkReservationEntry,
+  createReservationEntry,
+  addProductsToReservation,
+  submitReservation,
+  fetchReservationProducts,
   searchReservationProducts,
 } from "@/src/api/apiEndpoints";
 import { ProductT, SearchOptions } from "@/src/utils/types/common";
@@ -44,6 +46,12 @@ export const useReservationManager = () => {
   const [wantedProductIds, setWantedProductIds] = useState<number[]>([]);
   const [releaseDates, setReleaseDates] = useState<Release[]>([]);
   const [products, setProducts] = useState<ProductT[]>([]);
+  // Holds the current reservation list ID for the selected release, if any
+  const [reservationListId, setReservationListId] = useState<number | null>(
+    null
+  );
+  // Holds the products currently in the reservation entry
+  const [productsInReservation, setProductsInReservation] = useState<any[]>([]);
   const [userReservationProductIds, setUserReservationProductIds] = useState<
     number[]
   >([]);
@@ -125,8 +133,6 @@ export const useReservationManager = () => {
 
       if (id) {
         const response = await fetchProductsByReleaseId(id, page, PAGE_SIZE);
-        console.log("API Response type:", typeof response.data);
-        console.log("Is response.data an array?", Array.isArray(response.data));
 
         // Extract products and pagination info
         let productsArray: ProductT[] = [];
@@ -139,8 +145,6 @@ export const useReservationManager = () => {
           // If it's just an array, assume it's the full list
           totalItems = response.data.length;
         } else if (response.data && typeof response.data === "object") {
-          console.log("Response data structure:", Object.keys(response.data));
-
           // Check for common API response patterns
           if ("products" in response.data) {
             productsArray = response.data.products;
@@ -154,7 +158,6 @@ export const useReservationManager = () => {
             currentPageValue = response.data.meta?.current_page || page;
           } else {
             // Try to convert to array if no recognized structure
-            console.log("Converting response data to array");
             productsArray = Object.values(response.data || {}) as ProductT[];
             totalItems = productsArray.length;
           }
@@ -195,7 +198,6 @@ export const useReservationManager = () => {
       return;
     }
 
-    console.log(`Loading more products: page ${currentPage + 1}`);
     loadProductsByRelease(selectedReleaseId, currentPage + 1, false);
   }, [currentPage, hasMore, isFetchingMore, loading, selectedReleaseId]);
 
@@ -355,6 +357,16 @@ export const useReservationManager = () => {
     }
   };
 
+  // Helper: fetch products in reservation and update state
+  const refreshProductsInReservation = async (reservationListId: number) => {
+    try {
+      const prodRes = await fetchReservationProducts(reservationListId);
+      setProductsInReservation(prodRes.data || []);
+    } catch {
+      setProductsInReservation([]);
+    }
+  };
+
   const confirmReservation = async () => {
     try {
       // Close modal first
@@ -377,24 +389,81 @@ export const useReservationManager = () => {
         return;
       }
 
-      // Step 1: Add all selected products to reservation list and collect reservation IDs
-      const addToReservationResponses = await Promise.all(
-        finalSelectedProducts.map((productId) =>
-          addToReservation(productId, 1, selectedReleaseId)
-        )
-      );
+      // Get token from store (assumes user is logged in and token is available)
+      if (!selectedReleaseId) {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => (
+            <Toast nativeID={"toast-" + id} action="error">
+              <ToastTitle>Missing release.</ToastTitle>
+            </Toast>
+          ),
+        });
+        return;
+      }
 
-      // Extract reservation IDs from the responses
-      const reservationIds = addToReservationResponses.map(
-        (response) => response.data.id
-      );
+      // Step 1: Use reservationListId if exists, otherwise create
+      let currentReservationListId = reservationListId;
+      if (!currentReservationListId) {
+        try {
+          const createRes = await createReservationEntry(selectedReleaseId!);
+          currentReservationListId = createRes.data.reservation_list_id;
+          setReservationListId(currentReservationListId);
+        } catch (err) {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={"toast-" + id} action="error">
+                <ToastTitle>Failed to create reservation entry.</ToastTitle>
+              </Toast>
+            ),
+          });
+          return;
+        }
+      }
 
-      // Step 2: Confirm the reservation by submitting it to the backend
-      await confirmReservationList(
-        selectedReleaseId,
-        reservationIds,
-        finalSelectedProducts
+      // Step 2: Add only products not already in reservation
+      const alreadyReservedIds = productsInReservation.map(
+        (item: any) => item.product_id || item.id
       );
+      const productsToAdd = finalSelectedProducts.filter(
+        (id) => !alreadyReservedIds.includes(id)
+      );
+      if (productsToAdd.length > 0) {
+        try {
+          await addProductsToReservation(
+            currentReservationListId!,
+            productsToAdd,
+            productsToAdd.map(() => 1)
+          );
+        } catch (err) {
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={"toast-" + id} action="error">
+                <ToastTitle>Failed to add products to reservation.</ToastTitle>
+              </Toast>
+            ),
+          });
+          return;
+        }
+      }
+
+      // Step 3: Submit reservation and get receipt
+      try {
+        await submitReservation(currentReservationListId!);
+        // Optionally, handle/display receiptRes.data
+      } catch (err) {
+        toast.show({
+          placement: "top",
+          render: ({ id }) => (
+            <Toast nativeID={"toast-" + id} action="error">
+              <ToastTitle>Failed to submit reservation.</ToastTitle>
+            </Toast>
+          ),
+        });
+        return;
+      }
 
       // Update local products state to show as reserved
       setProducts((prev) =>
@@ -428,24 +497,6 @@ export const useReservationManager = () => {
           </Toast>
         ),
       });
-
-      // Refresh the full reservation list to ensure everything is in sync
-      if (store.user?.id) {
-        getReservationList(store.user.id)
-          .then((res) => {
-            const reservationProducts = res.data.reservations || [];
-            const productIds = reservationProducts
-              .map((item: any) => item.product?.id)
-              .filter((id) => id !== undefined);
-            setUserReservationProductIds(productIds);
-
-            // Update the global orders count in the store to reflect on the profile page
-            store.setOrdersCount(res.data.metadata?.total_count || 0);
-          })
-          .catch((err) => {
-            console.error("Failed to refresh reservation list:", err);
-          });
-      }
     } catch (e) {
       console.log(e);
       toast.show({
@@ -475,7 +526,6 @@ export const useReservationManager = () => {
   // Search functionality
   const performSearch = useCallback(
     debounce(async (query: string) => {
-      console.log("Performing search for:", query);
       if (!query.trim()) {
         // If search is cleared, reload products by release
         loadProductsByRelease(selectedReleaseId, 1, true);
@@ -538,7 +588,6 @@ export const useReservationManager = () => {
   );
 
   const handleSearchChange = (text: string) => {
-    console.log("Search input changed:", text);
     setSearchQuery(text);
     // Don't call performSearch here if text is empty to prevent loops
     if (text.trim()) {
@@ -599,6 +648,35 @@ export const useReservationManager = () => {
     };
     initialize();
   }, []);
+
+  // On latest release load, check if user has a reservation entry
+  useEffect(() => {
+    const checkReservation = async () => {
+      if (selectedReleaseId) {
+        try {
+          const res = await checkReservationEntry(selectedReleaseId);
+          if (res.data.exists) {
+            setReservationListId(res.data.reservation_list_id);
+            // Fetch products in reservation for this entry
+            const prodRes = await fetchReservationProducts(
+              res.data.reservation_list_id
+            );
+            setProductsInReservation(prodRes.data || []);
+          } else {
+            setReservationListId(null);
+            setProductsInReservation([]);
+          }
+        } catch (err) {
+          setReservationListId(null);
+          setProductsInReservation([]);
+        }
+      } else {
+        setReservationListId(null);
+        setProductsInReservation([]);
+      }
+    };
+    checkReservation();
+  }, [selectedReleaseId]);
 
   useEffect(() => {
     if (releaseDates.length > 0) {
@@ -687,7 +765,7 @@ export const useReservationManager = () => {
     // Reservation Methods
     toggleProductSelection,
     toggleMultiSelectMode,
-    showConfirmationDialog,
+    showConfirmationDialog, // Only the async version is exported
     confirmReservation,
     handleCheckboxToggle,
     addToWantListHandler,

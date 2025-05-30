@@ -294,14 +294,14 @@ export default function Home() {
         ListFooterComponent={renderFooter()}
         numColumns={!isGrid ? 2 : 1}
         keyExtractor={(item, index) => `${item.id}_${index}`}
-        renderItem={({ item, i }: { item: ProductT; i: number }) => (
+        renderItem={({ item }: { item: ProductT; i: number }) => (
           <Pressable
             key={item.id}
             onPress={() => {
               navigation.navigate("Product", { product: item });
             }}
           >
-            <View key={i} className="p-2">
+            <View key={item.id} className="p-2">
               {!isGrid ? (
                 <ProductCard isInCart={false} product={item as ProductT} />
               ) : (

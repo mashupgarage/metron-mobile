@@ -619,7 +619,12 @@ export default function ReservationsScreen() {
           onRequestClose={() => setShowConfirmationModal(false)}
         >
           <View className="flex-1 justify-center items-center bg-black/50">
-            <View className="w-[90%] max-h-[80%] bg-white rounded-xl p-5 shadow-lg">
+            <View
+              style={{
+                backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff",
+              }}
+              className="w-[90%] max-h-[80%] rounded-xl p-5 shadow-lg"
+            >
               <Text className="text-lg font-bold mb-2.5">
                 Please Confirm the products you want to request for this
                 release.
@@ -675,15 +680,31 @@ export default function ReservationsScreen() {
                   onPress={() => setShowConfirmationModal(false)}
                   className="py-2.5 px-5 border border-indigo-900 rounded"
                 >
-                  <Text className="text-indigo-900">Cancel</Text>
+                  <Text
+                    style={{
+                      fontFamily: "PublicSans-regular",
+                      color: colorScheme === "dark" ? "#fff" : "#000",
+                    }}
+                  >
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={confirmReservation}
-                  className="py-2.5 px-5 bg-indigo-900 rounded"
+                  className="py-2.5 px-5 rounded"
+                  style={{
+                    backgroundColor:
+                      colorScheme === "dark" ? "#1A237E" : "#1A237E",
+                  }}
                   disabled={confirmationProducts.length === 0}
                 >
-                  <Text className="text-white font-bold">
+                  <Text
+                    style={{
+                      fontFamily: "PublicSans-regular",
+                      color: colorScheme === "dark" ? "#fff" : "#fff",
+                    }}
+                  >
                     Confirm ({confirmationProducts.length})
                   </Text>
                 </TouchableOpacity>

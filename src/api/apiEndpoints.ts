@@ -310,50 +310,83 @@ export const getWantList = async () => {
 export const getReservationList = async (
   userId: number,
   page: number = 1,
-  limit: number = 10
+  limit: number = 20,
+  searchTerm?: string
 ) => {
+  const params: Record<string, any> = {
+    page,
+    limit,
+  };
+  if (searchTerm) {
+    params["search[product]"] = searchTerm;
+  }
   return axiosClient.get(`/reservation_box/${userId}/reservations`, {
-    params: {
-      // status: "",
-      page,
-      limit,
-    },
+    params,
   });
 };
 
 /**
- * Add a product to the authenticated user's reservations.
- * @param productId - The product ID to reserve.
- * @returns Axios promise resolving to the updated reservations list.
- * @example
- * addToReservation(123).then(res => res.data)
+ * Check if a reservation entry exists for the current user and release.
+ * @param releaseId - The release ID to check for.
+ * @returns { exists: boolean, reservation_list_id?: number }
  */
-export const addToReservation = (
-  productId: number,
-  quantity: number,
-  reservation_id: number
-) => {
-  return axiosClient.post(`/reservation_lists/${reservation_id}/reservations`, {
-    reservation: {
-      product_id: productId,
-      quantity: quantity,
-    },
+export const checkReservationEntry = async (releaseId: number) => {
+  return axiosClient.get(`/mobile_reservations/check`, {
+    params: { release_id: releaseId },
   });
 };
 
-export const confirmReservationList = (
-  releaseId: number,
-  reservationIds: number[],
-  productIds: number[]
-) => {
-  return axiosClient.post(`releases/${releaseId}/reservation_lists`, {
-    reservation_list: {
-      release_id: releaseId,
-      reservation_ids: reservationIds,
-      product_ids: productIds,
-    },
+/**
+ * Create a reservation entry for the user and release if not already present.
+ * @param releaseId - The release ID to create for.
+ * @returns { reservation_list_id: number }
+ */
+export const createReservationEntry = async (releaseId: number) => {
+  return axiosClient.post(`/mobile_reservations/create`, {
+    release_id: releaseId,
   });
 };
+
+/**
+ * Add or update products in the reservation entry.
+ * @param reservationListId - The reservation list ID
+ * @param productIds - Array of product IDs
+ * @param quantities - Array of quantities (same order as productIds)
+ * @returns { success: boolean, reservations: [...] }
+ */
+export const addProductsToReservation = async (
+  reservationListId: number,
+  productIds: number[],
+  quantities: number[]
+) => {
+  return axiosClient.post(
+    `/mobile_reservations/${reservationListId}/add_products`,
+    { product_ids: productIds, quantities }
+  );
+};
+
+/**
+ * Submit the reservation entry.
+ * @param reservationListId - The reservation list ID
+ * @returns { success: boolean, reservation_list_id: number }
+ */
+export const submitReservation = async (reservationListId: number) => {
+  return axiosClient.post(
+    `/mobile_reservations/${reservationListId}/submit`,
+    {}
+  );
+};
+
+/**
+ * Fetch products in a reservation entry.
+ * @param reservationListId - The reservation list ID
+ * @returns Array of products in the reservation
+ */
+export const fetchReservationProducts = async (reservationListId: number) => {
+  return axiosClient.get(`/mobile_reservations/${reservationListId}/products`);
+};
+
+// DEPRECATED: Old reservation endpoints below are no longer used for mobile reservations.
 
 /**
  * Fetch the authenticated user's collection (orders).
