@@ -15,14 +15,13 @@ const SeriesCardSkeleton = ({ horizontal = false }) => {
         elevation: 1,
         paddingHorizontal: 12,
         paddingTop: 8,
-        paddingBottom: 8,
         alignSelf: "flex-start",
       }}
     >
       {/* Image skeleton */}
       <View
         style={{
-          height: 200,
+          height: 220,
           width: "90%",
           borderRadius: 8,
           backgroundColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",

@@ -105,9 +105,9 @@ const DetailedCollectionScreen = () => {
       </HStack>
       <FlatList
         data={[...collection].sort((a, b) => a.title.localeCompare(b.title))}
-        numColumns={2}
+        numColumns={3}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingHorizontal: 4, paddingTop: 16 }}
+        contentContainerStyle={{ paddingTop: 16 }}
         renderItem={({ item }) => {
           // grey out products you dont own yet.
           const grayed = !owned.includes(item.id);
@@ -133,7 +133,14 @@ const DetailedCollectionScreen = () => {
           };
 
           return (
-            <Box className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
+            <Box
+              className="flex-1 mb-4"
+              style={{
+                height: 220,
+                width: 135,
+                marginBottom: 16,
+              }}
+            >
               <SeriesCard data={transformed} grayed={grayed} detailedDisplay />
             </Box>
           );

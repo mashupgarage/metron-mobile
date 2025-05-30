@@ -11,6 +11,7 @@ import { Pressable } from "react-native";
 import NavigationHeader from "@/src/components/navigation-header";
 import { useColorScheme } from "react-native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
+import { Spinner } from "@gluestack-ui/themed";
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -34,13 +35,12 @@ const CollectionScreen = () => {
   // Fetch collection from API
   useEffect(() => {
     setLoading(true);
-    setSeriesCount(store.user?.series_ids?.length || 0);
+    setSeriesCount(store.collectionCount);
     // fetch collected series
     getUserCollection()
       .then((res) => {
         setLoading(false);
         setCollectedSeries(res.data.series_stats || []);
-        console.log(res.data.series.map((s) => s.series.title));
         setSeries(
           res.data.series.sort((a: any, b: any) =>
             b.series.title.localeCompare(a.series.title)
@@ -140,20 +140,29 @@ const CollectionScreen = () => {
                     .includes(debouncedQuery.trim().toLowerCase())
               )
         }
-        numColumns={2}
+        numColumns={3}
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()
         }
         contentContainerStyle={{ paddingTop: 16 }}
         renderItem={({ item, index }) =>
           loading ? (
-            <Box key={index} className="flex-1 ml-2 mr-2 mb-4 max-w-[45%]">
+            <Box
+              key={index}
+              style={{ transform: [{ scale: 0.8 }], marginLeft: -12 }}
+              className="flex-1"
+            >
               <SeriesCardSkeleton />
             </Box>
           ) : (
             <Box
               key={item.series.id}
-              className="flex-1 ml-2 mr-2 mb-4 max-w-[50%]"
+              className="flex-1 mb-4"
+              style={{
+                height: 220,
+                width: 135,
+                marginBottom: 36,
+              }}
             >
               <Pressable
                 onPress={() =>

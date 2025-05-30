@@ -21,10 +21,8 @@ export default function Profile(props: { navigation: any }) {
   const colorScheme = useColorScheme();
   const wantlistCount = useWantListStore((state) => state.wantlistCount);
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
-  // Use dedicated slices for ordersCount and collectionCount
-  const ordersCount = store.ordersCount ?? 0;
-  const collectionCount = store.user?.series_ids.length ?? 0;
   const setCollectionCount = (count: number) => store.setCollectionCount(count);
+  const collectionCount = store.collectionCount ?? 0;
 
   const [checkingUser, setCheckingUser] = useState(true);
 
@@ -47,10 +45,10 @@ export default function Profile(props: { navigation: any }) {
         setWantlistCount(0);
       });
 
-    getUserCollection(store.user.id)
+    getUserCollection()
       .then((res) => {
         console.log("actual collection", res.data);
-        setCollectionCount(res.data.ordered_products.length);
+        setCollectionCount(res.data.series.length);
       })
       .catch(() => {
         setCollectionCount(0);

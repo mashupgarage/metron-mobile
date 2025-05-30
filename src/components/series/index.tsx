@@ -83,8 +83,8 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   };
 
   return (
-    <Box className="mb-2 w-[180px]">
-      <View style={{ paddingHorizontal: 12, margin: 4, marginBottom: 0 }}>
+    <Box className="mb-2 w-[135px]">
+      <View style={{ marginBottom: 0 }}>
         <View style={{ position: "relative" }}>
           <Image
             source={
@@ -95,8 +95,8 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             alt={"banner"}
             className={
               imgError
-                ? "pl-4 h-60 p-8 w-[180px] rounded-md"
-                : "h-60 p-2 w-[180px] rounded-md "
+                ? "pl-4 h-60 p-8 w-[135px] rounded-md"
+                : "h-60 p-2 w-[135px] rounded-md "
             }
             style={{ opacity: grayed ? 0.7 : 1 }}
             onError={() => setImgError(true)}
