@@ -292,7 +292,12 @@ export default function Home() {
           </Box>
         }
         ListFooterComponent={renderFooter()}
-        numColumns={!isGrid ? 2 : 1}
+        numColumns={!isGrid ? 3 : 1}
+        style={{
+          columnGap: 12,
+          marginHorizontal: 12,
+        }}
+        contentContainerStyle={{}}
         keyExtractor={(item, index) => `${item.id}_${index}`}
         renderItem={({ item }: { item: ProductT; i: number }) => (
           <Pressable
@@ -301,7 +306,7 @@ export default function Home() {
               navigation.navigate("Product", { product: item });
             }}
           >
-            <View key={item.id} className="p-2">
+            <View key={item.id}>
               {!isGrid ? (
                 <ProductCard isInCart={false} product={item as ProductT} />
               ) : (

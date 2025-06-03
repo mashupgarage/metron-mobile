@@ -144,24 +144,24 @@ const CollectionScreen = () => {
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()
         }
-        contentContainerStyle={{ paddingTop: 16 }}
+        contentContainerStyle={{
+          paddingHorizontal: 24,
+        }}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
         renderItem={({ item, index }) =>
           loading ? (
-            <Box
-              key={index}
-              style={{ transform: [{ scale: 0.8 }], marginLeft: -12 }}
-              className="flex-1"
-            >
+            <Box key={index} className="items-center" style={{ width: 110 }}>
               <SeriesCardSkeleton />
             </Box>
           ) : (
             <Box
               key={item.series.id}
-              className="flex-1 mb-4"
+              className="items-center"
               style={{
-                height: 220,
-                width: 135,
-                marginBottom: 36,
+                width: 110,
+                marginBottom: 16,
               }}
             >
               <Pressable
@@ -186,19 +186,27 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mt-4 mb-2 ml-2"
+              className="mt-4 mb-2 ml-4"
             >
               Top Series Collection
             </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={{ paddingLeft: 0, marginBottom: 16 }}
+              contentContainerStyle={{
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 12,
+                paddingBottom: 16,
+              }}
+              style={{ marginBottom: 16 }}
             >
               {loading ? (
-                <Box className="ml-[4px] flex-row">
+                <Box className="flex-row" style={{ paddingHorizontal: 12 }}>
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <SeriesCardSkeleton key={idx} horizontal />
+                    <Box key={idx} style={{ marginRight: 24 }}>
+                      <SeriesCardSkeleton horizontal />
+                    </Box>
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
@@ -217,7 +225,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
-                    className="ml-[-4px] mr-1"
+                    style={{ marginRight: 28 }}
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
@@ -236,7 +244,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mb-2 ml-2"
+              className="ml-4 pb-4"
             >
               Series Collection
             </Text>

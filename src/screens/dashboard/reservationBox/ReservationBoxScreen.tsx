@@ -22,7 +22,7 @@ import { StatusBar } from "expo-status-bar";
 import ReservationCard from "@/src/components/ReservationCard";
 import NavigationHeader from "@/src/components/navigation-header";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 50;
 
 interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
   product?: {
@@ -72,7 +72,7 @@ export default function ReservationBoxScreen() {
 
   // Centralized color palette for light/dark mode
   const colors = {
-    background: colorScheme === "dark" ? "#181A20" : "#FFFFFF",
+    background: colorScheme === "dark" ? "#121212" : "#fff",
     surface: colorScheme === "dark" ? "#23262F" : "#F3F4F6",
     text: colorScheme === "dark" ? "#F3F4F6" : "#181A20",
     textSecondary: colorScheme === "dark" ? "#B5B5B5" : "#6B7280",
@@ -139,7 +139,7 @@ export default function ReservationBoxScreen() {
     // Grid: image top, text below. List: image left, text right.
     if (isGrid) {
       return (
-        <Pressable key={reservation.id} style={{ flex: 1, padding: 8 }}>
+        <Pressable key={reservation.id}>
           <ReservationCard product={sanitizedProduct} />
         </Pressable>
       );
@@ -237,7 +237,14 @@ export default function ReservationBoxScreen() {
           paddingVertical: 12,
         }}
       >
-        <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "bold",
+            fontFamily: "Urbanist-Bold",
+            color: colors.text,
+          }}
+        >
           Reservation Box
         </Text>
         <TouchableOpacity
@@ -296,7 +303,7 @@ export default function ReservationBoxScreen() {
         <MasonryList
           data={reservations}
           renderItem={renderGridItem}
-          numColumns={2}
+          numColumns={3}
           ListEmptyComponent={
             <View
               style={{
@@ -322,7 +329,7 @@ export default function ReservationBoxScreen() {
             </View>
           }
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
           onEndReached={async () => {
             if (isFetchingMore || page >= totalPages) return;

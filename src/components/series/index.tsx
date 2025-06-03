@@ -94,9 +94,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             }
             alt={"banner"}
             className={
-              imgError
-                ? "pl-4 h-60 p-8 w-[135px] rounded-md"
-                : "h-60 p-2 w-[135px] rounded-md "
+              imgError ? "pl-4 h-60 p-8 w-[135px]" : "h-60 p-2 w-[135px] "
             }
             style={{ opacity: grayed ? 0.7 : 1 }}
             onError={() => setImgError(true)}
@@ -110,7 +108,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                 top: 10,
                 right: 10,
                 backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: 16,
+                borderRadius: 0,
                 padding: 6,
                 zIndex: 10,
               }}
@@ -195,7 +193,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                   }}
                   style={{
                     backgroundColor: "rgba(0,0,0,0.7)",
-                    borderRadius: 16,
+                    borderRadius: 0,
                     padding: 10,
                     marginBottom: 10,
                     marginRight: 10,

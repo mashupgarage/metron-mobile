@@ -20,7 +20,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
 
   return (
     <Box className="mb-2">
-      <View style={{ paddingHorizontal: 12, margin: 4, marginBottom: 0 }}>
+      <View style={{ marginBottom: 0, gap: 8, maxWidth: 160 }}>
         <Image
           source={
             imgError || !mainImage
@@ -28,7 +28,9 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
               : { uri: mainImage }
           }
           alt={product.id.toString()}
-          className={imgError ? "pl-4 h-60 w-full bg-gray-200" : "h-60 w-full "}
+          className={
+            imgError ? "pl-4 h-56 w-[160px] bg-gray-200" : "h-56 w-[160px] "
+          }
           resizeMode="contain"
           onError={() => setImgError(true)}
         />
