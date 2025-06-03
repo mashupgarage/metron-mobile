@@ -186,7 +186,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mt-4 mb-2 ml-4"
+              className="mt-4 mb-2 ml-2"
             >
               Top Series Collection
             </Text>
@@ -202,7 +202,7 @@ const CollectionScreen = () => {
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
-                <Box className="ml-2 flex-1 h-20 items-center justify-center">
+                <Box className="ml-2 mr-2 flex-1 h-20 items-center justify-center">
                   <Text
                     style={{
                       fontSize: 16,
@@ -217,7 +217,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
-                    className="ml-[-12px]"
+                    className="ml-[-4px] mr-1"
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
@@ -236,7 +236,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mb-2 ml-4"
+              className="mb-2 ml-2"
             >
               Series Collection
             </Text>
