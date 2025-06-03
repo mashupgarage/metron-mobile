@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, FlatList, ScrollView, TextInput } from "react-native";
+import {
+  Text,
+  FlatList,
+  ScrollView,
+  TextInput,
+  Dimensions,
+} from "react-native";
 import { Box } from "@/src/components/ui/box";
 import { getUserCollection } from "@/src/api/apiEndpoints";
 import { useBoundStore } from "@/src/store";
@@ -16,7 +22,7 @@ import { Spinner } from "@gluestack-ui/themed";
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-
+  const deviceWidth = Dimensions.get("window").width;
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
@@ -140,19 +146,19 @@ const CollectionScreen = () => {
                     .includes(debouncedQuery.trim().toLowerCase())
               )
         }
-        numColumns={3}
+        numColumns={deviceWidth > 325 ? 3 : 2}
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()
         }
         contentContainerStyle={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 4,
         }}
         columnWrapperStyle={{
           justifyContent: "space-between",
         }}
         renderItem={({ item, index }) =>
           loading ? (
-            <Box key={index} className="items-center" style={{ width: 110 }}>
+            <Box key={index} className="items-center" style={{ width: 130 }}>
               <SeriesCardSkeleton />
             </Box>
           ) : (
@@ -160,7 +166,7 @@ const CollectionScreen = () => {
               key={item.series.id}
               className="items-center"
               style={{
-                width: 110,
+                width: deviceWidth / 3,
                 marginBottom: 16,
               }}
             >
@@ -186,7 +192,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mt-4 mb-2 ml-4"
+              className=""
             >
               Top Series Collection
             </Text>
@@ -225,7 +231,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
-                    style={{ marginRight: 28 }}
+                    style={{ marginRight: 12 }}
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
@@ -244,7 +250,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="ml-4 pb-4"
+              className="ml-2 pb-4"
             >
               Series Collection
             </Text>

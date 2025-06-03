@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { Box } from "../ui/box";
 import { Image } from "../ui/image";
 import { Text } from "../ui/text";
-import { Pressable, useColorScheme, View } from "react-native";
+import { Dimensions, Pressable, useColorScheme, View } from "react-native";
 import { addToWantList, addToCart } from "@/src/api/apiEndpoints";
 import { useToast } from "@/src/components/ui/toast";
 import { useBoundStore } from "@/src/store";
@@ -43,6 +43,7 @@ interface SeriesCardProps {
 
 const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   const colorScheme = useColorScheme();
+  const deviceWidth = Dimensions.get("window").width;
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const toast = useToast();
   const [imgError, setImgError] = useState(false);
@@ -83,7 +84,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   };
 
   return (
-    <Box className="mb-2 w-[135px]">
+    <Box className={`mb-2 w-[130px]`}>
       <View style={{ marginBottom: 0 }}>
         <View style={{ position: "relative" }}>
           <Image
@@ -94,7 +95,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             }
             alt={"banner"}
             className={
-              imgError ? "pl-4 h-60 p-8 w-[135px]" : "h-60 p-2 w-[135px] "
+              imgError ? "pl-4 h-60 p-8 w-[130px]" : "h-60 p-2 w-[130px] "
             }
             style={{ opacity: grayed ? 0.7 : 1 }}
             onError={() => setImgError(true)}

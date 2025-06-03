@@ -5,15 +5,13 @@ const SeriesCardSkeleton = ({ horizontal = false }) => {
   return (
     <View
       style={{
-        width: 160,
+        width: 140,
         marginRight: horizontal ? 0 : 0,
         marginBottom: horizontal ? 0 : 16,
         borderRadius: 8,
         shadowColor: colorScheme === "dark" ? "#121212" : "#000",
         shadowOpacity: 0.05,
         shadowRadius: 2,
-        elevation: 1,
-        // paddingHorizontal: 4,
         paddingTop: 8,
         alignSelf: "flex-start",
       }}

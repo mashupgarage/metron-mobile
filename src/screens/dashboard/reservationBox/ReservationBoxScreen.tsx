@@ -378,7 +378,7 @@ export default function ReservationBoxScreen() {
           renderItem={renderGridItem}
           numColumns={1}
           keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
+          contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
           onEndReached={async () => {
             if (isFetchingMore || page >= totalPages) return;
