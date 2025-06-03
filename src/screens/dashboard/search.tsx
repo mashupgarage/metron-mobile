@@ -168,7 +168,10 @@ export default function Search() {
             onEndReached={loadMoreProducts}
             onEndReachedThreshold={0.5}
             ListFooterComponent={renderFooter()}
-            numColumns={2}
+            numColumns={3}
+            style={{
+              columnGap: 12,
+            }}
             keyExtractor={(item, index) => `${item.id}_${index}`}
             contentContainerStyle={{
               paddingHorizontal: 10,
@@ -180,7 +183,7 @@ export default function Search() {
                   navigation.navigate("Product", { product: item as ProductT });
                 }}
               >
-                <View key={i} className="p-2">
+                <View key={i}>
                   <ProductCard isInCart={false} product={item as ProductT} />
                 </View>
               </Pressable>

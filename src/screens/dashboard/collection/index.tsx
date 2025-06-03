@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, FlatList, ScrollView, TextInput } from "react-native";
+import {
+  Text,
+  FlatList,
+  ScrollView,
+  TextInput,
+  Dimensions,
+} from "react-native";
 import { Box } from "@/src/components/ui/box";
 import { getUserCollection } from "@/src/api/apiEndpoints";
 import { useBoundStore } from "@/src/store";
@@ -16,7 +22,7 @@ import { Spinner } from "@gluestack-ui/themed";
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-
+  const deviceWidth = Dimensions.get("window").width;
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
@@ -140,28 +146,28 @@ const CollectionScreen = () => {
                     .includes(debouncedQuery.trim().toLowerCase())
               )
         }
-        numColumns={3}
+        numColumns={deviceWidth > 325 ? 3 : 2}
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()
         }
-        contentContainerStyle={{ paddingTop: 16 }}
+        contentContainerStyle={{
+          paddingHorizontal: 4,
+        }}
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+        }}
         renderItem={({ item, index }) =>
           loading ? (
-            <Box
-              key={index}
-              style={{ transform: [{ scale: 0.8 }], marginLeft: -12 }}
-              className="flex-1"
-            >
+            <Box key={index} className="items-center" style={{ width: 130 }}>
               <SeriesCardSkeleton />
             </Box>
           ) : (
             <Box
               key={item.series.id}
-              className="flex-1 mb-4"
+              className="items-center"
               style={{
-                height: 220,
-                width: 135,
-                marginBottom: 36,
+                width: deviceWidth / 3,
+                marginBottom: 16,
               }}
             >
               <Pressable
@@ -186,23 +192,31 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mt-4 mb-2 ml-4"
+              className=""
             >
               Top Series Collection
             </Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              style={{ paddingLeft: 0, marginBottom: 16 }}
+              contentContainerStyle={{
+                paddingLeft: 12,
+                paddingRight: 12,
+                paddingTop: 12,
+                paddingBottom: 16,
+              }}
+              style={{ marginBottom: 16 }}
             >
               {loading ? (
-                <Box className="ml-[4px] flex-row">
+                <Box className="flex-row" style={{ paddingHorizontal: 12 }}>
                   {Array.from({ length: 4 }).map((_, idx) => (
-                    <SeriesCardSkeleton key={idx} horizontal />
+                    <Box key={idx} style={{ marginRight: 24 }}>
+                      <SeriesCardSkeleton horizontal />
+                    </Box>
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
-                <Box className="ml-2 flex-1 h-20 items-center justify-center">
+                <Box className="ml-2 mr-2 flex-1 h-20 items-center justify-center">
                   <Text
                     style={{
                       fontSize: 16,
@@ -217,7 +231,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
-                    className="ml-[-12px]"
+                    style={{ marginRight: 12 }}
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
@@ -236,7 +250,7 @@ const CollectionScreen = () => {
                 fontFamily: "Urbanist-Bold",
                 color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
               }}
-              className="mb-2 ml-4"
+              className="ml-2 pb-4"
             >
               Series Collection
             </Text>
