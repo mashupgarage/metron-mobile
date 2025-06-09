@@ -1,18 +1,18 @@
-import { Box } from "@/src/components/ui/box";
-import { Image } from "@/src/components/ui/image";
-import { Text } from "@/src/components/ui/text";
-import { useBoundStore } from "@/src/store";
+import { Box } from '@/src/components/ui/box'
+import { Image } from '@/src/components/ui/image'
+import { Text } from '@/src/components/ui/text'
+import { useBoundStore } from '@/src/store'
 import {
   useColorScheme,
   View,
   ActivityIndicator,
   ScrollView,
-} from "react-native";
-import MasonryList from "@react-native-seoul/masonry-list";
+} from 'react-native'
+import MasonryList from '@react-native-seoul/masonry-list'
 
-import ProductCard from "@/src/components/product";
-import { ProductT } from "@/src/utils/types/common";
-import { Pressable } from "react-native-gesture-handler";
+import ProductCard from '@/src/components/product'
+import { ProductT } from '@/src/utils/types/common'
+import { Pressable } from 'react-native-gesture-handler'
 import {
   NavigationProp,
   useNavigation,
@@ -20,95 +20,95 @@ import {
   useRoute,
   RouteProp,
   ParamListBase,
-} from "@react-navigation/native";
-import { HStack } from "@/src/components/ui/hstack";
-import { Button } from "@/src/components/ui/button";
-import { Menu } from "lucide-react-native";
-import { mockedCarouselItems } from "@/src/utils/mock";
-import { useCallback, useEffect, useState } from "react";
+} from '@react-navigation/native'
+import { HStack } from '@/src/components/ui/hstack'
+import { Button } from '@/src/components/ui/button'
+import { Menu } from 'lucide-react-native'
+import { mockedCarouselItems } from '@/src/utils/mock'
+import { useCallback, useEffect, useState } from 'react'
 import {
   fetchCartItems,
   fetchProducts,
   fetchUserProfile,
-} from "@/src/api/apiEndpoints";
-import Constants from "expo-constants";
+} from '@/src/api/apiEndpoints'
+import Constants from 'expo-constants'
 
-import { LayoutGrid, LayoutList } from "lucide-react-native";
+import { LayoutGrid, LayoutList } from 'lucide-react-native'
 
-const PAGE_SIZE = 10; // Define standard page size
+const PAGE_SIZE = 10 // Define standard page size
 
 export default function Home() {
-  const store = useBoundStore();
-  const colorScheme = useColorScheme();
-  const route = useRoute<RouteProp<ParamListBase, "Home">>();
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
+  const store = useBoundStore()
+  const colorScheme = useColorScheme()
+  const route = useRoute<RouteProp<ParamListBase, 'Home'>>()
+  const navigation = useNavigation<NavigationProp<ParamListBase>>()
   const [selectedPill, setSelectedPill] = useState<number | undefined>(
     undefined
-  );
+  )
   const [carouselItems, setCarouselItems] =
-    useState<{ name: string; img_url: string }[]>(mockedCarouselItems);
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [isGrid, setIsGrid] = useState(true);
+    useState<{ name: string; img_url: string }[]>(mockedCarouselItems)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [isGrid, setIsGrid] = useState(true)
 
   console.log(
-    "------------------------------------------------>",
+    '------------------------------------------------>',
     Constants.expoConfig.extra.apiUrl,
-    "<------------------------------------------------"
-  );
+    '<------------------------------------------------'
+  )
 
   // Load first page of products when component mounts or route params change
   useEffect(() => {
-    setSelectedPill(undefined);
-    loadInitialProducts();
+    setSelectedPill(undefined)
+    loadInitialProducts()
     fetchUserProfile(store.user?.id)
       .then((res) => {
-        store.setUser(res.data);
+        store.setUser(res.data)
         fetchCartItems(store.user.id)
           .then((res) => {
-            store.setCartItems(res.data);
+            store.setCartItems(res.data)
           })
           .catch((err) => {
-            console.log(err);
-          });
+            console.log(err)
+          })
       })
       .catch((err) => {
-        console.log(err);
-      });
-  }, [route.params]);
+        console.log(err)
+      })
+  }, [route.params])
 
   // Refetch products when selectedPill changes
   useEffect(() => {
-    loadInitialProducts(selectedPill);
-  }, [selectedPill]);
+    loadInitialProducts(selectedPill)
+  }, [selectedPill])
 
   // Function to load initial products
   const loadInitialProducts = useCallback((pill?: number) => {
-    store.setProductsLoading(true);
-    setCurrentPage(1);
+    store.setProductsLoading(true)
+    setCurrentPage(1)
 
     fetchProducts(pill, 1, PAGE_SIZE)
       .then((res) => {
-        const products = res.data.products || [];
-        const totalCount = res.data.total_count || 0;
-        const pages = res.data.total_pages || 1;
+        const products = res.data.products || []
+        const totalCount = res.data.total_count || 0
+        const pages = res.data.total_pages || 1
 
         store.setProducts({
           products: products,
           total_count: totalCount,
           total_pages: pages,
-        });
+        })
 
-        setTotalPages(pages);
+        setTotalPages(pages)
       })
       .catch((err) => {
-        console.log("Failed to fetch products:", err);
+        console.log('Failed to fetch products:', err)
       })
       .finally(() => {
-        store.setProductsLoading(false);
-      });
-  }, []);
+        store.setProductsLoading(false)
+      })
+  }, [])
 
   // Function to load more products
   const loadMoreProducts = useCallback(async () => {
@@ -118,15 +118,15 @@ export default function Home() {
       currentPage >= totalPages ||
       store.products_list?.loading
     ) {
-      return;
+      return
     }
 
-    setIsFetchingMore(true);
-    const nextPage = currentPage + 1;
+    setIsFetchingMore(true)
+    const nextPage = currentPage + 1
 
     try {
-      const res = await fetchProducts(undefined, nextPage, PAGE_SIZE);
-      const newProducts = res.data.products || [];
+      const res = await fetchProducts(undefined, nextPage, PAGE_SIZE)
+      const newProducts = res.data.products || []
 
       // Update store with new products
       store.appendProducts({
@@ -134,21 +134,21 @@ export default function Home() {
         total_count: res.data.total_count,
         total_pages: res.data.total_pages,
         page: nextPage,
-      });
+      })
 
       // Update local state
-      setCurrentPage(nextPage);
+      setCurrentPage(nextPage)
     } catch (err) {
-      console.error("Failed to fetch more products:", err);
+      console.error('Failed to fetch more products:', err)
     } finally {
-      setIsFetchingMore(false);
+      setIsFetchingMore(false)
     }
-  }, [currentPage, totalPages, isFetchingMore, store.products_list?.loading]);
+  }, [currentPage, totalPages, isFetchingMore, store.products_list?.loading])
 
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
-  const products = store.products_list?.products || [];
-  const isLoading = store.products_list?.loading || false;
-  const totalCount = store.products_list?.total_count || 0;
+  const products = store.products_list?.products || []
+  const isLoading = store.products_list?.loading || false
+  const totalCount = store.products_list?.total_count || 0
 
   // Footer component shown during loading or displaying count
   const renderFooter = () => {
@@ -165,23 +165,23 @@ export default function Home() {
           Showing {products.length} of {totalCount} products
         </Text> */}
       </Box>
-    );
-  };
+    )
+  }
 
   const pills = [
-    { name: "Featured", id: undefined },
-    { name: "Comics", id: 6 },
-    { name: "Graphic Novels", id: 2 },
-    { name: "Manga", id: 4 },
-    { name: "Magazines", id: 3 },
-    { name: "Cards", id: 7 },
-  ];
+    { name: 'Featured', id: undefined },
+    { name: 'Comics', id: 6 },
+    { name: 'Graphic Novels', id: 2 },
+    { name: 'Manga', id: 4 },
+    { name: 'Magazines', id: 3 },
+    { name: 'Cards', id: 7 },
+  ]
 
   return (
     <Box
       className="h-screen w-full pb-24"
       style={{
-        backgroundColor: useColorScheme() === "dark" ? "#121212" : "#fff",
+        backgroundColor: useColorScheme() === 'dark' ? '#121212' : '#fff',
       }}
     >
       {/* Loading overlay */}
@@ -195,7 +195,7 @@ export default function Home() {
             <Box className="h-48">
               <Image
                 className="w-36 absolute h-48 z-10 left-1/2 -translate-x-1/2"
-                source={require("@/src/assets/icon.png")}
+                source={require('@/src/assets/icon.png')}
                 alt="logo"
                 resizeMode="contain"
               />
@@ -217,21 +217,25 @@ export default function Home() {
                   key={pill.id}
                   onPress={() => {
                     // change results based on pill
-                    console.log("pill pressed", pill);
-                    setSelectedPill(pill.id);
+                    console.log('pill pressed', pill)
+                    setSelectedPill(pill.id)
                     store.setProducts({
                       products: [],
                       total_count: 0,
                       total_pages: 1,
-                    });
+                    })
                   }}
-                  variant="solid"
-                  className="rounded-full ml-2"
+                  variant="outline"
+                  className={`rounded-full ml-2 ${
+                    selectedPill === pill.id
+                      ? 'border-blue-500 bg-blue-100'
+                      : 'border-blue-100'
+                  }`}
                 >
                   <Text
                     style={{
-                      fontFamily: "Urbanist-Bold",
-                      color: colorScheme !== "dark" ? "#FFFFFF" : "#202020",
+                      fontFamily: 'Urbanist-Bold',
+                      color: colorScheme !== 'dark' ? '#000000' : '#FFFFFF',
                     }}
                   >
                     {pill.name}
@@ -243,8 +247,8 @@ export default function Home() {
               <Box className="p-2 mt-4">
                 <Text
                   style={{
-                    fontFamily: "Urbanist-Bold",
-                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    fontFamily: 'Urbanist-Bold',
+                    color: colorScheme === 'dark' ? '#FFFFFF' : '#202020',
                     lineHeight: 24,
                     fontSize: 24,
                     marginTop: 8,
@@ -252,39 +256,39 @@ export default function Home() {
                 >
                   {selectedPill !== undefined
                     ? `Featured ${
-                        pills.find((p) => p.id === selectedPill)?.name ?? ""
+                        pills.find((p) => p.id === selectedPill)?.name ?? ''
                       }`
-                    : "Featured Products"}
+                    : 'Featured Products'}
                 </Text>
                 {/* <Text>{totalCount} products total</Text> */}
               </Box>
-              <HStack space={"xl"} className="p-2 mt-4 flex items-center">
+              <HStack space={'xl'} className="p-2 my-4 flex items-center">
                 <Pressable onPress={() => setIsGrid(!isGrid)}>
                   {isGrid ? (
                     <LayoutList
                       size={24}
                       color={
-                        useColorScheme() === "dark" ? "#FFFFFF" : "#202020"
+                        useColorScheme() === 'dark' ? '#FFFFFF' : '#202020'
                       }
                     />
                   ) : (
                     <LayoutGrid
                       size={24}
                       color={
-                        useColorScheme() === "dark" ? "#FFFFFF" : "#202020"
+                        useColorScheme() === 'dark' ? '#FFFFFF' : '#202020'
                       }
                     />
                   )}
                 </Pressable>
                 <Button
                   onPress={() => {
-                    navigation.dispatch(DrawerActions.toggleDrawer());
+                    navigation.dispatch(DrawerActions.toggleDrawer())
                   }}
                   variant="link"
                 >
                   <Menu
                     size={24}
-                    color={useColorScheme() === "dark" ? "#FFFFFF" : "#202020"}
+                    color={useColorScheme() === 'dark' ? '#FFFFFF' : '#202020'}
                   />
                 </Button>
               </HStack>
@@ -303,39 +307,35 @@ export default function Home() {
           <Pressable
             key={item.id}
             onPress={() => {
-              navigation.navigate("Product", { product: item });
+              navigation.navigate('Product', { product: item })
             }}
           >
             <View key={item.id}>
               {!isGrid ? (
                 <ProductCard isInCart={false} product={item as ProductT} />
               ) : (
-                <HStack space="xl">
+                <HStack space="xs" className="mb-3">
                   <Image
-                    className="w-24 h-24"
-                    resizeMode="cover"
+                    className="aspect-[3/4] w-1/4 rounded-sm"
+                    resizeMode="contain"
                     source={{ uri: item.cover_url }}
                     alt={item.title}
                   />
                   <Box>
                     <Text
                       style={{
-                        fontWeight: "bold",
-                        fontFamily: "Urbanist-Black",
-                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                        fontWeight: 'bold',
+                        fontFamily: 'Inter',
+                        color: colorScheme === 'dark' ? '#FFFFFF' : '#202020',
                         maxWidth: 240,
                       }}
                       numberOfLines={1}
                       ellipsizeMode="tail"
+                      className="text-lg"
                     >
                       {item.title}
                     </Text>
-                    <Text
-                      style={{
-                        fontFamily: "PublicSans-Regular",
-                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
-                      }}
-                    >
+                    <Text className="text-md text-gray-500">
                       {item.publisher}
                     </Text>
                   </Box>
@@ -346,5 +346,5 @@ export default function Home() {
         )}
       />
     </Box>
-  );
+  )
 }
