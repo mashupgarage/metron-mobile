@@ -14,7 +14,6 @@ import { useBoundStore } from "./src/store";
 import { useEffect } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { loadAuthTokenToAxios } from "./src/api/tokenManager";
-import { config } from "./src/components/ui/gluestack-ui-provider/config";
 
 const Stack = createNativeStackNavigator();
 
