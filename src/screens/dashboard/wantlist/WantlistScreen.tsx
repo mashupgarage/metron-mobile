@@ -104,7 +104,7 @@ const WantlistScreen = () => {
     available: colorScheme === "dark" ? "#4ADE80" : "#16A34A", // green-400/green-600
     outOfStock: colorScheme === "dark" ? "#F87171" : "#DC2626", // red-400/red-600
     button: colorScheme === "dark" ? "#3B82F6" : "#2563EB", // blue-500/blue-700
-    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
+    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#FFFFFF",
     yellowBg: colorScheme === "dark" ? "#78350F" : "#FEF3C7",
     yellowText: colorScheme === "dark" ? "#FDE68A" : "#92400E",
   };
