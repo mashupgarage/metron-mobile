@@ -60,8 +60,12 @@ interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
 }
 
 import { useColorScheme } from "react-native";
+import { Box } from "@/src/components/ui/box";
 
 const WantlistScreen = () => {
+  const deviceWidth = Dimensions.get("window").width;
+
+  const [imgError, setImgError] = useState(false);
   const [isGrid, setIsGrid] = useState(true);
   const colorScheme = useColorScheme();
   const store = useBoundStore();
@@ -100,7 +104,7 @@ const WantlistScreen = () => {
     available: colorScheme === "dark" ? "#4ADE80" : "#16A34A", // green-400/green-600
     outOfStock: colorScheme === "dark" ? "#F87171" : "#DC2626", // red-400/red-600
     button: colorScheme === "dark" ? "#3B82F6" : "#2563EB", // blue-500/blue-700
-    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
+    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#FFFFFF",
     yellowBg: colorScheme === "dark" ? "#78350F" : "#FEF3C7",
     yellowText: colorScheme === "dark" ? "#FDE68A" : "#92400E",
   };
@@ -242,7 +246,7 @@ const WantlistScreen = () => {
     // Check if item has product
     if (!wantlistItem.product) {
       console.log("Missing product for item:", wantlistItem);
-      return null; // Skip rendering this item
+      return null;
     }
 
     // Get cover URL
@@ -251,24 +255,13 @@ const WantlistScreen = () => {
       wantlistItem.product.id
     );
     const productId = wantlistItem.product.id;
-    const hasImageError = imageErrors[productId] || !coverUrl;
-
-    // Check if product is available (safely check with optional chaining)
     const isAvailable = wantlistItem.product?.quantity
       ? wantlistItem.product.quantity > 0
       : false;
 
-    // Log for debugging
-    if (!coverUrl) {
-      console.log(
-        "Cannot construct image URL because cover_file_name is missing:",
-        wantlistItem.product.title
-      );
-    }
-
     const handleAddToCart = async () => {
       try {
-        if (!store.user || !store.user.id) {
+        if (!store.user?.id) {
           Alert.alert("Error", "You need to be logged in to add items to cart");
           return;
         }
@@ -277,201 +270,243 @@ const WantlistScreen = () => {
           store.user.id,
           wantlistItem.product.id,
           wantlistItem.id
-        ).then(async () => {
-          const res = await fetchCartItems(store.user.id);
-          if (res?.data) {
-            store.setCartItems(res.data);
-            toast.show({
-              placement: "top",
-              render: ({ id }) => {
-                const toastId = "toast-" + id;
-                return (
-                  <Toast nativeID={toastId} action="success">
-                    <ToastTitle>Successfully added to cart!</ToastTitle>
-                  </Toast>
-                );
-              },
-            });
-          }
-        });
-      } catch (error) {
-        // Enhanced error logging
-        console.error("Failed to add to cart. Details:", {
-          error: error,
-          errorMessage:
-            error instanceof Error ? error.message : "Unknown error",
-          errorName: error instanceof Error ? error.name : "Unknown error type",
-          productId: wantlistItem.product.id,
-          productTitle: wantlistItem.product.title,
-          userId: store.user?.id,
-        });
-
-        Alert.alert(
-          "Error",
-          `Failed to add item to cart: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`
         );
+        const res = await fetchCartItems(store.user.id);
+        if (res?.data) {
+          store.setCartItems(res.data);
+          toast.show({
+            placement: "top",
+            render: ({ id }) => (
+              <Toast nativeID={"toast-" + id} action="success">
+                <ToastTitle>Item added to cart</ToastTitle>
+              </Toast>
+            ),
+          });
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        toast.show({
+          placement: "top",
+          render: ({ id }) => (
+            <Toast nativeID={"toast-" + id} action="error">
+              <ToastTitle>
+                {error instanceof Error
+                  ? error.message
+                  : "Failed to add item to cart"}
+              </ToastTitle>
+            </Toast>
+          ),
+        });
       }
     };
 
-    return (
-      <Pressable
-        style={{
-          margin: 8,
-          borderRadius: 16,
-          overflow: "hidden",
-          backgroundColor: colors.surface,
-          shadowColor: colors.cardShadow,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 4,
-          flex: 1,
-        }}
-        onPress={() => {
-          if (wantlistItem.product) {
-            // Create a sanitized copy of the product with a valid cover_url
-            const sanitizedProduct = {
-              ...wantlistItem.product,
-              // Ensure cover_url is a valid string URL
-              cover_url:
-                typeof wantlistItem.product.cover_url === "string" &&
-                wantlistItem.product.cover_url.trim() !== ""
-                  ? wantlistItem.product.cover_url
-                  : wantlistItem.product.cover_file_name
-                  ? `https://assets.comic-odyssey.com/products/covers/medium/${wantlistItem.product.cover_file_name}`
-                  : "",
-            };
+    const navigateToProduct = () => {
+      if (wantlistItem.product) {
+        // @ts-ignore
+        navigation.navigate("Product", {
+          product: {
+            ...wantlistItem.product,
+            cover_url:
+              wantlistItem.product.cover_url ||
+              (wantlistItem.product.cover_file_name
+                ? `https://assets.comic-odyssey.com/products/covers/medium/${wantlistItem.product.cover_file_name}`
+                : ""),
+          },
+        });
+      }
+    };
 
-            // @ts-ignore
-            navigation.navigate("Product", {
-              product: sanitizedProduct,
-            });
-          }
-        }}
-      >
-        {hasImageError ? (
-          // Show placeholder when there's an error or no URL
+    // Grid view item
+    if (isGrid) {
+      return (
+        <Pressable
+          key={`${wantlistItem.id}-${i}`}
+          onPress={navigateToProduct}
+          style={{
+            width: "100%",
+            aspectRatio: 2 / 3,
+            padding: 4,
+          }}
+        >
           <View
             style={{
-              width: "100%",
-              height: 176,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: colors.placeholder,
-              borderRadius: 16,
+              flex: 1,
+              backgroundColor: colors.surface,
+              borderRadius: 8,
+              overflow: "hidden",
+              shadowColor: colors.cardShadow,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 2,
             }}
           >
             <Image
-              source={require("@/src/assets/icon.png")}
-              style={{ width: 80, height: 80, opacity: 0.6 }}
-              resizeMode="contain"
-            />
-          </View>
-        ) : (
-          // Try to load actual image
-          <Image
-            source={{ uri: coverUrl }}
-            style={{
-              width: "100%",
-              height: 176,
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-            }}
-            resizeMode="cover"
-            onError={() => {
-              setImageErrors((prev) => ({ ...prev, [productId]: true }));
-            }}
-          />
-        )}
-        <View style={{ padding: 12 }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "bold",
-              marginBottom: 4,
-              color: colors.text,
-            }}
-            numberOfLines={1}
-          >
-            {wantlistItem.product.title}
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              marginBottom: 4,
-              color: colors.textSecondary,
-            }}
-          >
-            {wantlistItem.product.cover_price
-              ? `$${wantlistItem.product.cover_price}`
-              : "Price unavailable"}
-          </Text>
-          {wantlistItem.product.creators && (
-            <Text
+              source={{ uri: coverUrl }}
               style={{
-                fontSize: 12,
+                width: "100%",
+                height: 105,
+                backgroundColor: colors.placeholder,
+              }}
+              resizeMode="cover"
+            />
+            <View style={{ padding: 8 }}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontFamily: "Urbanist-Bold",
+                  fontSize: 14,
+                  color: colors.text,
+                  marginBottom: 2,
+                }}
+              >
+                {wantlistItem.product.title}
+              </Text>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontFamily: "PublicSans-Regular",
+                  fontSize: 12,
+                  color: colors.textSecondary,
+                  marginBottom: 4,
+                }}
+              >
+                {wantlistItem.product.creators}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={handleAddToCart}
+                  disabled={!isAvailable}
+                  style={[
+                    {
+                      backgroundColor: isAvailable
+                        ? colors.primary
+                        : colors.border,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      borderRadius: 4,
+                    },
+                    !isAvailable && { opacity: 0.5 },
+                  ]}
+                >
+                  <Text
+                    style={{
+                      color: colors.buttonText,
+                      fontSize: 12,
+                      fontFamily: "Urbanist-SemiBold",
+                    }}
+                  >
+                    {isAvailable ? "Add to Cart" : "Out of Stock"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Pressable>
+      );
+    }
+
+    // List view item
+    return (
+      <Pressable
+        key={`${wantlistItem.id}-${i}`}
+        onPress={navigateToProduct}
+        style={{
+          flexDirection: "row",
+          padding: 12,
+          marginVertical: 4,
+          marginHorizontal: 8,
+          backgroundColor: colors.surface,
+          borderRadius: 8,
+          shadowColor: colors.cardShadow,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 2,
+          elevation: 2,
+        }}
+      >
+        <Image
+          source={{ uri: coverUrl }}
+          style={{
+            width: 60,
+            height: 90,
+            borderRadius: 4,
+            backgroundColor: colors.placeholder,
+            marginRight: 12,
+          }}
+          resizeMode="cover"
+        />
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <View>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colors.text,
+                marginBottom: 4,
+              }}
+            >
+              {wantlistItem.product.title}
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={{
+                fontFamily: "PublicSans-Regular",
+                fontSize: 14,
                 color: colors.textSecondary,
                 marginBottom: 4,
               }}
-              numberOfLines={1}
             >
               {wantlistItem.product.creators}
             </Text>
-          )}
-          {wantlistItem.product.issue_number && (
-            <Text
-              style={{
-                fontSize: 12,
-                color: colors.textSecondary,
-                marginBottom: 4,
-              }}
-            >
-              Issue: {wantlistItem.product.issue_number}
-            </Text>
-          )}
-
-          {/* Availability indicator and Add to Cart button */}
+          </View>
           <View
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
-              marginTop: 8,
             }}
           >
             <Text
               style={{
-                color: isAvailable ? colors.available : colors.outOfStock,
-                fontSize: 14,
-                fontWeight: "bold",
+                fontFamily: "Urbanist-Bold",
+                fontSize: 16,
+                color: colors.primary,
               }}
             >
-              {isAvailable ? "Available" : "Out of Stock"}
+              {wantlistItem.product.formatted_price ||
+                wantlistItem.product.cover_price}
             </Text>
-
-            {isAvailable && (
-              <TouchableOpacity
+            <TouchableOpacity
+              onPress={handleAddToCart}
+              disabled={!isAvailable}
+              style={[
+                {
+                  backgroundColor: isAvailable ? colors.primary : colors.border,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 4,
+                },
+                !isAvailable && { opacity: 0.5 },
+              ]}
+            >
+              <Text
                 style={{
-                  marginTop: 0,
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  borderRadius: 8,
+                  color: colors.buttonText,
+                  fontSize: 14,
+                  fontFamily: "Urbanist-SemiBold",
                 }}
-                onPress={handleAddToCart}
               >
-                <Text
-                  style={{
-                    color: colors.buttonText,
-                    fontWeight: "bold",
-                    textAlign: "center",
-                  }}
-                >
-                  Add to Cart
-                </Text>
-              </TouchableOpacity>
-            )}
+                {isAvailable ? "Add to Cart" : "Out of Stock"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Pressable>
@@ -574,30 +609,32 @@ const WantlistScreen = () => {
 
       {/* Main Content */}
       {isGrid ? (
-        <MasonryList
-          data={wantlistItems}
-          renderItem={({ item, i }) => {
-            const product = getProductData(item as ExtendedWantListItemT);
-            return product
-              ? renderGridItem({ item: item as ExtendedWantListItemT, i })
-              : null;
-          }}
-          numColumns={2}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-          onEndReached={loadMoreItems}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            isFetchingMore && page < totalPages ? (
-              <ActivityIndicator
-                size="small"
-                color={colors.primary}
-                style={{ margin: 16 }}
-              />
-            ) : null
-          }
-        />
+        <View style={{ flex: 1, paddingHorizontal: 8 }}>
+          <MasonryList
+            data={wantlistItems}
+            renderItem={({ item, i }) => {
+              // Ensure item is of type ExtendedWantListItemT
+              const listItem = item as ExtendedWantListItemT;
+              return renderGridItem({ item: listItem, i });
+            }}
+            numColumns={3}
+            contentContainerStyle={{
+              paddingBottom: 20,
+            }}
+            showsVerticalScrollIndicator={false}
+            onEndReached={loadMoreItems}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              isFetchingMore && page < totalPages ? (
+                <ActivityIndicator
+                  size="small"
+                  color={colors.primary}
+                  style={{ margin: 16 }}
+                />
+              ) : null
+            }
+          />
+        </View>
       ) : (
         <FlatList
           data={wantlistItems}
