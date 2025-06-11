@@ -647,6 +647,9 @@ export default function Product(props: {
             {/* Add to Cart Button */}
             <Button
               action="primary"
+              style={{
+                backgroundColor: theme.primary[500],
+              }}
               className="rounded-full h-16 w-16"
               onPress={async () => handleAddToCart()}
               disabled={maxQuantity === 0 || !isQuantityValid}

@@ -516,7 +516,13 @@ const WantlistScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        paddingTop: theme.spacing.xl,
+      }}
+    >
       <NavigationHeader />
 
       {/* Header with title and view toggle */}

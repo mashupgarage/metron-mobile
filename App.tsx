@@ -38,8 +38,8 @@ function useThemeInitializer() {
   const colorScheme = useColorScheme();
 
   useEffect(() => {
-    setTheme(colorScheme === "dark");
-  }, [colorScheme, setTheme]);
+    setTheme(true);
+  }, [colorScheme]);
 }
 
 export default function App() {

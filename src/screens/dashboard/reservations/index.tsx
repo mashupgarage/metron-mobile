@@ -271,8 +271,10 @@ export default function ReservationsScreen() {
                 return (
                   <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
                     <Text
-                      style={{ fontFamily: "PublicSans-regular" }}
-                      className="text-amber-800"
+                      style={{
+                        fontFamily: "PublicSans-regular",
+                        color: theme.warning,
+                      }}
                     >
                       This release is now closed.
                     </Text>

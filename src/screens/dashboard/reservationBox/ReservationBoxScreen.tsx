@@ -225,7 +225,11 @@ export default function ReservationBoxScreen() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, paddingTop: 16, backgroundColor: colors.background }}
+      style={{
+        flex: 1,
+        paddingTop: theme.spacing.xl,
+        backgroundColor: colors.background,
+      }}
     >
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <NavigationHeader />

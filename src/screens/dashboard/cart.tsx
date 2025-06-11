@@ -228,8 +228,8 @@ export default function Cart() {
   return (
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <Text
-        style={{ fontFamily: "Urbanist-Bold" }}
-        className={`text-2xl font-bold m-4 text-left ${theme.text}`}
+        style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+        className={`text-2xl font-bold m-4 text-left`}
       >
         Your Cart{" "}
         {groupedCartItems.length !== 0 && `(${groupedCartItems.length} items)`}
