@@ -22,6 +22,7 @@ const DashboardTab = createBottomTabNavigator();
 
 const DashboardTabs = () => {
   const cartItems = useBoundStore((state) => state.cartItems);
+  const theme = useBoundStore((state) => state.theme);
   const uniqueItemCount = new Set(cartItems.map((item) => item.id)).size;
 
   const screenConfig = ({
@@ -31,7 +32,7 @@ const DashboardTabs = () => {
   }): BottomTabNavigationOptions => ({
     headerShown: false,
     tabBarStyle: {
-      backgroundColor: useColorScheme() === "dark" ? "#121212" : "#ffffff",
+      backgroundColor: theme.background,
     },
     tabBarIcon: ({ color }) => iconDisplay(route.name, color, 24),
     tabBarBadge:
@@ -40,6 +41,9 @@ const DashboardTabs = () => {
           ? undefined
           : uniqueItemCount
         : undefined,
+    tabBarBadgeStyle: {
+      backgroundColor: theme.error,
+    },
   });
 
   const iconDisplay = (route: string, color: string, size: number) => {
@@ -58,12 +62,11 @@ const DashboardTabs = () => {
               width: 70,
               height: 70,
               borderRadius: 50,
-              backgroundColor:
-                useColorScheme() === "dark" ? "#121212" : "#ffffff",
+              backgroundColor: theme.background,
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 12,
-              shadowColor: useColorScheme() !== "dark" ? "#121212" : "#ffffff",
+              shadowColor: theme.background !== "dark" ? "#121212" : "#ffffff",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.1,
               shadowRadius: 6,

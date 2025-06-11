@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Text } from "./ui/text";
 import { X } from "lucide-react-native";
+import { useBoundStore } from "../store";
 
 interface ReleaseDate {
   id: number;
@@ -35,6 +36,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
 }) => {
   const drawerAnimation = useRef(new Animated.Value(-300)).current;
   const colorScheme = useColorScheme();
+  const { theme } = useBoundStore();
   useEffect(() => {
     if (visible) {
       Animated.timing(drawerAnimation, {
@@ -68,7 +70,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
             left: 0,
             bottom: 0,
             width: 300,
-            backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
+            backgroundColor: theme.background,
             zIndex: 2,
             transform: [{ translateX: drawerAnimation }],
           },
@@ -83,7 +85,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
               Release History
             </Text>
             <TouchableOpacity onPress={onClose}>
-              <X size={24} color={colorScheme === "dark" ? "white" : "black"} />
+              <X size={24} color={theme.text} />
             </TouchableOpacity>
           </View>
 
@@ -110,7 +112,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   item.id === selectedReleaseId ? "bg-primary-50" : ""
                 }`}
                 style={{
-                  backgroundColor: colorScheme === "dark" ? "#1e1e1e" : "#fff",
+                  backgroundColor: theme.background,
                 }}
                 onPress={() => {
                   onSelectDate(item.id, item.date);
@@ -124,16 +126,15 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                 </Text>
                 <View
                   style={{
-                    backgroundColor:
-                      colorScheme === "dark"
-                        ? "rgb(23,90,160)"
-                        : "rgb(43,100,207)",
+                    backgroundColor: theme.primary[500],
                   }}
                   className=" rounded px-2 py-0.5"
                 >
                   <Text
-                    style={{ fontFamily: "PublicSans-regular" }}
-                    className="text-white text-sm"
+                    style={{
+                      fontFamily: "PublicSans-regular",
+                      color: "#fff",
+                    }}
                   >
                     {item.count}
                   </Text>

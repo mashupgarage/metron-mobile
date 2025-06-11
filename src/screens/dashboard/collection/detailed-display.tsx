@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, FlatList, ActivityIndicator } from "react-native";
+import { Text, FlatList, ActivityIndicator, View } from "react-native";
 import { Box } from "@/src/components/ui/box";
 import { useBoundStore } from "@/src/store";
 import SeriesCard from "@/src/components/series";
 import NavigationHeader from "@/src/components/navigation-header";
-import { useColorScheme } from "react-native";
 import { getCollectionSeriesStatus } from "@/src/api/apiEndpoints";
 import { useRoute } from "@react-navigation/native";
 import { getWantList } from "@/src/api/apiEndpoints";
@@ -14,9 +13,8 @@ import { HStack } from "@/src/components/ui/hstack";
 const DetailedCollectionScreen = () => {
   const [wantList, setWantList] = useState<number[]>([]);
 
-  const store = useBoundStore();
+  const theme = useBoundStore((state) => state.theme);
   const route = useRoute();
-  const colorScheme = useColorScheme();
   const [total_owned, setTotalOwned] = useState<number>(0);
   const [total_products, setTotalProducts] = useState<number>(0);
   const [collection, setCollection] = useState<any[]>([]);
@@ -60,10 +58,10 @@ const DetailedCollectionScreen = () => {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+          backgroundColor: theme.background,
         }}
       >
-        <ActivityIndicator size="large" color="#2563eb" />
+        <ActivityIndicator size="large" color={theme.primary[500]} />
       </SafeAreaView>
     );
   }
@@ -72,7 +70,7 @@ const DetailedCollectionScreen = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+        backgroundColor: theme.background,
       }}
     >
       {/* Header */}
@@ -86,7 +84,7 @@ const DetailedCollectionScreen = () => {
             fontWeight: "bold",
             maxWidth: "60%",
             fontFamily: "Inter",
-            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+            color: theme.text,
           }}
         >
           {title || ""}
@@ -97,55 +95,65 @@ const DetailedCollectionScreen = () => {
           style={{
             fontSize: 16,
             fontFamily: "Inter",
-            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+            color: theme.text,
           }}
         >
           {total_owned ?? 0} of {total_products ?? 0} Collected
         </Text>
       </HStack>
-      <FlatList
-        data={[...collection].sort((a, b) => a.title.localeCompare(b.title))}
-        numColumns={3}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingTop: 16 }}
-        renderItem={({ item }) => {
-          // grey out products you dont own yet.
-          const grayed = !owned.includes(item.id);
-          const transformed = {
-            series_id: item.id,
-            series: {
-              id: item.id,
-              title: item.title,
-            },
-            count: item.count,
-            publisher: item.publisher,
-            last_product: {
-              id: item.id,
-              title: item.title,
-              image_url: item.image_url,
-            },
-            owned_products: item.owned_products,
-            unowned_products: item.unowned_products,
-            cover_url_large: item.cover_url_large,
-            product_items_count: item.product_items_count,
-            in_want_list: !wantList.includes(item.id),
-            ...item,
-          };
+      <View
+        style={{ marginLeft: theme.spacing.xs, marginRight: theme.spacing.xs }}
+      >
+        <FlatList
+          data={[...collection].sort((a, b) => a.title.localeCompare(b.title))}
+          numColumns={3}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{
+            paddingTop: theme.spacing.md,
+          }}
+          renderItem={({ item }) => {
+            // grey out products you dont own yet.
+            const grayed = !owned.includes(item.id);
+            const transformed = {
+              series_id: item.id,
+              series: {
+                id: item.id,
+                title: item.title,
+              },
+              count: item.count,
+              publisher: item.publisher,
+              last_product: {
+                id: item.id,
+                title: item.title,
+                image_url: item.image_url,
+              },
+              owned_products: item.owned_products,
+              unowned_products: item.unowned_products,
+              cover_url_large: item.cover_url_large,
+              product_items_count: item.product_items_count,
+              in_want_list: !wantList.includes(item.id),
+              ...item,
+            };
 
-          return (
-            <Box
-              className="flex-1 mb-4"
-              style={{
-                height: 220,
-                width: 135,
-                marginBottom: 16,
-              }}
-            >
-              <SeriesCard data={transformed} grayed={grayed} detailedDisplay />
-            </Box>
-          );
-        }}
-      />
+            return (
+              <Box
+                className="flex-1 mb-4"
+                style={{
+                  height: 220,
+                  width: 135,
+                  marginBottom: 16,
+                }}
+              >
+                <SeriesCard
+                  data={transformed}
+                  grayed={grayed}
+                  detailedDisplay
+                />
+              </Box>
+            );
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 };

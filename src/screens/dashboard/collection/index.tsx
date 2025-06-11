@@ -29,6 +29,7 @@ const CollectionScreen = () => {
     }, 300);
     return () => clearTimeout(handler);
   }, [searchQuery]);
+  const theme = useBoundStore((state) => state.theme);
   const store = useBoundStore();
   const colorScheme = useColorScheme();
   const [seriesCount, setSeriesCount] = useState(0);
@@ -63,7 +64,7 @@ const CollectionScreen = () => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+        backgroundColor: theme.background,
       }}
     >
       {/* Header */}
@@ -74,7 +75,7 @@ const CollectionScreen = () => {
             fontSize: 24,
             fontWeight: "bold",
             fontFamily: "Urbanist-Bold",
-            color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+            color: theme.text,
           }}
         >
           Your Collection
@@ -84,7 +85,7 @@ const CollectionScreen = () => {
             style={{
               fontSize: 16,
               fontFamily: "Urbanist-Bold",
-              color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+              color: theme.text,
             }}
           >
             {seriesCount}
@@ -93,22 +94,27 @@ const CollectionScreen = () => {
       </Box>
 
       {/* Search Bar */}
-      <Box style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+      <Box
+        style={{
+          paddingHorizontal: theme.spacing.md,
+          marginBottom: theme.spacing.md,
+        }}
+      >
         <Box style={{ position: "relative" }}>
           <TextInput
             placeholder="Search by title..."
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{
-              backgroundColor: "#f0f0f0",
+              backgroundColor: theme.background,
               borderRadius: 8,
               padding: 10,
               fontSize: 16,
               borderWidth: 1,
-              borderColor: "#e0e0e0",
+              borderColor: theme.border,
               paddingRight: 36, // leave space for clear button
             }}
-            placeholderTextColor="#888"
+            placeholderTextColor={theme.text}
           />
           {searchQuery.length > 0 && (
             <Pressable
@@ -151,7 +157,7 @@ const CollectionScreen = () => {
           loading ? idx.toString() : item.series.id.toString()
         }
         contentContainerStyle={{
-          paddingHorizontal: 4,
+          paddingHorizontal: theme.spacing.xs,
         }}
         columnWrapperStyle={{
           justifyContent: "space-between",
@@ -167,7 +173,7 @@ const CollectionScreen = () => {
               className="items-center"
               style={{
                 width: deviceWidth / 3,
-                marginBottom: 16,
+                marginBottom: theme.spacing.md,
               }}
             >
               <Pressable
@@ -188,9 +194,10 @@ const CollectionScreen = () => {
             <Text
               style={{
                 fontSize: 24,
+                marginLeft: theme.spacing.xs,
                 fontWeight: "bold",
                 fontFamily: "Urbanist-Bold",
-                color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+                color: theme.text,
               }}
               className=""
             >
@@ -200,12 +207,12 @@ const CollectionScreen = () => {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
-                paddingLeft: 12,
-                paddingRight: 12,
-                paddingTop: 12,
-                paddingBottom: 16,
+                paddingLeft: theme.spacing.md,
+                paddingRight: theme.spacing.md,
+                paddingTop: theme.spacing.md,
+                paddingBottom: theme.spacing.md,
               }}
-              style={{ marginBottom: 16 }}
+              style={{ marginBottom: theme.spacing.md }}
             >
               {loading ? (
                 <Box className="flex-row" style={{ paddingHorizontal: 12 }}>
@@ -221,7 +228,7 @@ const CollectionScreen = () => {
                     style={{
                       fontSize: 16,
                       fontFamily: "Urbanist-Bold",
-                      color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+                      color: theme.text,
                     }}
                   >
                     No collected series yet.
@@ -231,7 +238,7 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     key={s.series.id}
-                    style={{ marginRight: 12 }}
+                    style={{ marginRight: theme.spacing.lg }}
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
@@ -248,7 +255,7 @@ const CollectionScreen = () => {
                 fontSize: 24,
                 fontWeight: "bold",
                 fontFamily: "Urbanist-Bold",
-                color: colorScheme === "dark" ? "#FFFFFF" : "#181718",
+                color: theme.text,
               }}
               className="ml-2 pb-4"
             >
