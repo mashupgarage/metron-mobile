@@ -3,7 +3,7 @@ import { useBoundStore } from "@/src/store";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, FlatList, useColorScheme } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ProductT, CartItemT } from "@/src/utils/types/common";
+import { CartItemT } from "@/src/utils/types/common";
 import { Box } from "@/src/components/ui/box";
 import { Image } from "@/src/components/ui/image";
 import { Trash2, CheckIcon } from "lucide-react-native";
@@ -24,6 +24,7 @@ import { Toast, ToastTitle } from "@/src/components/ui/toast";
 
 export default function Cart() {
   const store = useBoundStore();
+  const theme = useBoundStore((state) => state.theme);
   const navigation = useNavigation();
   const toast = useToast();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
@@ -152,19 +153,26 @@ export default function Cart() {
     item: CartItemT & { cartQuantity: number };
   }) => (
     <Box
-      className={`flex-row items-center p-2 border-b ${
-        colorScheme === "dark" ? "border-b-mdark-surface" : "border-b-gray-200"
-      }`}
+      style={{
+        borderColor: theme.border,
+      }}
+      className={`flex-row items-center p-2 border-b`}
     >
       <Checkbox
         aria-label={`Select item ${item.product.title}`}
         value={item.id.toString()}
+        style={{
+          borderColor: theme.border,
+        }}
         isChecked={selectedItems.has(item.id)}
         onChange={() => toggleItemSelection(item.id)}
         className="mr-2 p-2"
       >
         <CheckboxIndicator>
-          <CheckboxIconComponent as={CheckIcon} />
+          <CheckboxIconComponent
+            style={{ color: theme.white }}
+            as={CheckIcon}
+          />
         </CheckboxIndicator>
 
         <Image
@@ -174,26 +182,28 @@ export default function Cart() {
         />
         <View className="flex-1">
           <Text
-            style={{ fontFamily: "Urbanist-Bold" }}
-            className={`font-semibold ${
-              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-            }`}
+            style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+            className={`font-semibold`}
           >
             {item.product.title}
           </Text>
           <Text
-            style={{ fontFamily: "PublicSans-regular", marginTop: 8 }}
-            className={`${
-              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-            }`}
+            style={{
+              fontFamily: "PublicSans-regular",
+              marginTop: 8,
+              color: theme.text,
+            }}
+            className={`font-semibold`}
           >
             NM: {item.product_item_id}
           </Text>
           <Text
-            style={{ fontFamily: "PublicSans-regular", marginTop: 4 }}
-            className={`${
-              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-            }`}
+            style={{
+              fontFamily: "PublicSans-regular",
+              marginTop: 4,
+              color: theme.text,
+            }}
+            className={`font-semibold`}
           >
             Price:{" "}
             {item.product.formatted_price ||
@@ -206,7 +216,7 @@ export default function Cart() {
           className="p-2 ml-auto self-center"
           onPress={() => handleRemoveCompletely(item.id)}
         >
-          <Trash2 size={18} color="red" />
+          <Trash2 size={18} color={theme.error} />
         </Button>
       </Checkbox>
     </Box>
@@ -216,23 +226,20 @@ export default function Cart() {
 
   const colorScheme = useColorScheme();
   return (
-    <SafeAreaView
-      className={`flex-1 ${
-        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-      }`}
-    >
+    <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <Text
         style={{ fontFamily: "Urbanist-Bold" }}
-        className={`text-2xl font-bold m-4 text-left ${
-          colorScheme === "dark" ? "text-mdark-text" : "text-[#222]"
-        }`}
+        className={`text-2xl font-bold m-4 text-left ${theme.text}`}
       >
         Your Cart{" "}
         {groupedCartItems.length !== 0 && `(${groupedCartItems.length} items)`}
       </Text>
       <View className="flex-1">
         {groupedCartItems.length === 0 ? (
-          <Text className="mt-12 text-lg text-gray-400 text-center">
+          <Text
+            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+            className="mt-12 text-lg  text-center"
+          >
             Your cart is empty.
           </Text>
         ) : (
@@ -247,19 +254,21 @@ export default function Cart() {
       </View>
       {groupedCartItems.length > 0 && (
         <View
-          className={`absolute left-0 right-0 bottom-0 ${
-            colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-          } pb-4 pt-2 items-center`}
+          style={{ backgroundColor: theme.background }}
+          className={`absolute left-0 right-0 bottom-0 pb-4 pt-2 items-center`}
         >
           <View className="flex-row mx-1">
             <Button
               onPress={handleCheckout}
               size="xl"
+              style={{ backgroundColor: theme.gray[900] }}
               isDisabled={selectedItems.size === 0}
               disabled={selectedItems.size === 0}
               className="flex-1"
             >
-              <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+              <ButtonText
+                style={{ fontFamily: "PublicSans-regular", color: theme.white }}
+              >
                 Checkout ({totalSelectedItems} Selected)
               </ButtonText>
             </Button>

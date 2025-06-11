@@ -36,7 +36,6 @@ import {
 } from "@/src/api/apiEndpoints";
 
 import {
-  useProductOwned,
   useProductSeriesStatus,
   useProductRecommendations,
 } from "./productHooks";
@@ -59,28 +58,12 @@ export default function Product(props: {
   const colorScheme = useColorScheme();
   const { route } = props;
   const { params } = route;
-  const {
-    product,
-    fromReservations,
-    reservationId,
-    reservationList,
-    fromCollection,
-  } = params;
+  const { product, reservationList, fromCollection } = params;
   const { data: seriesStatus, loading: seriesLoading } = useProductSeriesStatus(
     product.id
   );
   const { data: recommendations, loading: recsLoading } =
     useProductRecommendations(product.id);
-
-  // Local state for reservation list so we can update it after reservation
-  const [localReservationList, setLocalReservationList] = useState<any[]>(
-    reservationList || []
-  );
-
-  // Check if this product is already reserved in the user's reservation list
-  const isAlreadyReserved = Array.isArray(localReservationList)
-    ? localReservationList.some((r) => r.product?.id === product.id)
-    : false;
 
   const [productItems, setProductItems] = useState<any[]>([]);
   const [selectedProductItemId, setSelectedProductItemId] = useState<
@@ -346,23 +329,13 @@ export default function Product(props: {
               fontSize: 24,
               lineHeight: 24,
               color: theme.text,
+              marginTop: theme.spacing.md,
             }}
             className="px-4 mt-6 mb-2"
           >
             {product?.title}
           </Text>
           <View className="px-4 mt-6 mb-2">
-            {/* <Text
-            style={{
-              color: "#2563eb",
-              textDecorationLine: "underline",
-              fontWeight: "500",
-              marginBottom: 8,
-            }}
-            onPress={() => {}}
-          >
-            Part of Amazing Spider-Man Series &gt;
-          </Text> */}
             <Text
               style={{
                 fontFamily: "PublicSans-regular",
@@ -390,11 +363,14 @@ export default function Product(props: {
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
                     color: theme.text,
+                    marginTop: theme.spacing.md,
                   }}
                 >
                   Creators
                 </Text>
-                <Text style={{ marginBottom: 8 }}>{product?.creators}</Text>
+                <Text style={{ marginBottom: theme.spacing.md }}>
+                  {product?.creators}
+                </Text>
               </>
             )}
             <Text
@@ -410,7 +386,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
+                marginBottom: theme.spacing.md,
                 color: theme.text,
               }}
             >
@@ -429,7 +405,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
+                marginBottom: theme.spacing.md,
                 color: theme.text,
               }}
             >
@@ -449,7 +425,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
+                marginBottom: theme.spacing.md,
                 color: theme.text,
               }}
             >
@@ -464,6 +440,7 @@ export default function Product(props: {
                   style={{
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
+                    marginBottom: theme.spacing.sm,
                     color: theme.text,
                   }}
                 >
@@ -475,7 +452,7 @@ export default function Product(props: {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: 4,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   {seriesLoading ? (
@@ -507,7 +484,7 @@ export default function Product(props: {
                         style={{
                           fontFamily: "PublicSans-regular",
                           fontSize: 16,
-                          color: colorScheme === "dark" ? "#FFFFFF" : "#2563eb",
+                          color: theme.text,
                         }}
                       >
                         {(() => {
@@ -538,9 +515,9 @@ export default function Product(props: {
                 <View
                   style={{
                     height: 8,
-                    backgroundColor: "#e5e7eb",
+                    backgroundColor: theme.border,
                     borderRadius: 4,
-                    marginBottom: 12,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   <View
@@ -549,7 +526,7 @@ export default function Product(props: {
                         ? `${seriesStatus.completion_percent ?? 0}%`
                         : "0%",
                       height: 8,
-                      backgroundColor: "#2563eb",
+                      backgroundColor: theme.primary[500],
                       borderRadius: 4,
                     }}
                   />
@@ -559,7 +536,8 @@ export default function Product(props: {
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
                     color: theme.text,
-                    marginBottom: 16,
+                    marginTop: theme.spacing.md,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   You may also like
@@ -592,12 +570,12 @@ export default function Product(props: {
           <View
             style={{
               flexDirection: "row",
-              padding: 16,
+              padding: theme.spacing.md,
               backgroundColor: theme.background,
               borderTopWidth: 1,
               borderColor: theme.border,
               alignItems: "center",
-              gap: 12,
+              gap: theme.spacing.md,
             }}
           >
             {/* Want List Button */}
@@ -643,17 +621,17 @@ export default function Product(props: {
                 borderColor: theme.border,
                 borderRadius: 14,
                 backgroundColor: theme.background,
-                paddingVertical: 14,
-                marginRight: 6,
+                paddingVertical: theme.spacing.md,
+                marginRight: theme.spacing.md,
                 opacity: isWanted ? 0.6 : 1,
               }}
             >
               {/* Heart icon from lucide-react-native */}
               <Heart
-                fill={theme.text}
+                fill={"transparent"}
                 color={theme.text}
                 size={24}
-                style={{ marginRight: 8 }}
+                style={{ marginRight: theme.spacing.md }}
               />
               <Text
                 style={{
@@ -673,7 +651,7 @@ export default function Product(props: {
               onPress={async () => handleAddToCart()}
               disabled={maxQuantity === 0 || !isQuantityValid}
             >
-              <ShoppingCart color="#fff" size={24} />
+              <ShoppingCart color={theme.white} size={24} />
             </Button>
           </View>
         </ScrollView>

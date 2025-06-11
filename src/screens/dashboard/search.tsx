@@ -4,7 +4,6 @@ import { searchMarketplaceProducts } from "@/src/api/apiEndpoints";
 import { Input, InputField } from "@/src/components/ui/input";
 import { Button, ButtonText, ButtonSpinner } from "@/src/components/ui/button";
 import { Text } from "@/src/components/ui/text";
-import { Image } from "@/src/components/ui/image";
 import { ProductT } from "@/src/utils/types/common";
 import { HStack } from "@/src/components/ui/hstack";
 import { VStack } from "@/src/components/ui/vstack";
@@ -15,9 +14,11 @@ import { DashboardStackParams } from "@/src/utils/types/navigation";
 import DashboardLayout from "./_layout";
 import ProductCard from "@/src/components/product";
 import { Pressable } from "react-native-gesture-handler";
+import { useBoundStore } from "@/src/store";
 
 export default function Search() {
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
+  const theme = useBoundStore((state) => state.theme);
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<ProductT[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,10 +41,8 @@ export default function Search() {
 
     try {
       const response = await searchMarketplaceProducts(searchQuery, page);
-
       // Check what structure the data is in and handle accordingly
       const productsArray = response.data.products || response.data.data || [];
-
       // Access products array correctly
       if (page === 1) {
         setProducts(productsArray);
@@ -83,13 +82,21 @@ export default function Search() {
       <Box className="py-4 flex justify-center items-center">
         {(loading || isFetchingMore) && (
           <>
-            <ActivityIndicator size="small" color="#0000ff" />
-            <Text className="mt-2">Loading products...</Text>
+            <ActivityIndicator size="small" color={theme.primary[500]} />
+            <Text
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className="mt-2"
+            >
+              Loading products...
+            </Text>
           </>
         )}
 
         {products.length > 0 && (
-          <Text className="text-sm text-gray-500 mt-2">
+          <Text
+            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+            className="text-sm mt-2"
+          >
             Showing {products.length} of {totalCount} products
           </Text>
         )}
@@ -144,6 +151,7 @@ export default function Search() {
             </Input>
             <Button
               size="md"
+              style={{ backgroundColor: theme.primary[500] }}
               onPress={() => handleSearch(1)}
               disabled={loading || searchQuery.trim() === ""}
               className="rounded-lg px-4"
@@ -158,7 +166,14 @@ export default function Search() {
             </Button>
           </HStack>
 
-          {error ? <Text className="text-red-500 mb-2">{error}</Text> : null}
+          {error ? (
+            <Text
+              style={{ fontFamily: "PublicSans-regular" }}
+              className="text-red-500 mb-2"
+            >
+              {error}
+            </Text>
+          ) : null}
         </VStack>
 
         {products.length > 0 ? (
