@@ -1,3 +1,11 @@
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+};
+
 export const colors = {
   // Primary colors
   primary: {
@@ -36,6 +44,7 @@ export const colors = {
 
 export const lightTheme = {
   ...colors,
+  spacing,
   background: colors.white,
   text: colors.gray[900],
   border: colors.gray[200],
@@ -45,19 +54,12 @@ export const lightTheme = {
 
 export const darkTheme = {
   ...colors,
+  spacing,
   background: "#1a1a1a",
   text: colors.gray[100],
   border: colors.gray[700],
   card: colors.gray[800],
   notification: colors.primary[500],
-};
-
-export const spacing = {
-  xs: "4px",
-  sm: "8px",
-  md: "12px",
-  lg: "16px",
-  xl: "24px",
 };
 
 export type ThemeType = typeof lightTheme;
