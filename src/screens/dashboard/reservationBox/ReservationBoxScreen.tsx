@@ -49,6 +49,7 @@ const getCoverUrl = (coverFileName?: string) =>
 
 export default function ReservationBoxScreen() {
   const [isGrid, setIsGrid] = useState(true);
+  const theme = useBoundStore((state) => state.theme);
   const colorScheme = useColorScheme();
   const store = useBoundStore();
   const navigation = useNavigation();
@@ -72,16 +73,16 @@ export default function ReservationBoxScreen() {
 
   // Centralized color palette for light/dark mode
   const colors = {
-    background: colorScheme === "dark" ? "#121212" : "#fff",
-    surface: colorScheme === "dark" ? "#23262F" : "#F3F4F6",
-    text: colorScheme === "dark" ? "#F3F4F6" : "#181A20",
-    textSecondary: colorScheme === "dark" ? "#B5B5B5" : "#6B7280",
-    border: colorScheme === "dark" ? "#23262F" : "#E5E7EB",
-    placeholder: colorScheme === "dark" ? "#23262F" : "#E5E7EB",
-    primary: "#3B82F6",
-    error: "#EF4444",
-    cardShadow: colorScheme === "dark" ? "#000000" : "#D1D5DB",
-    icon: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
+    background: theme.background,
+    surface: theme.surface,
+    text: theme.text,
+    textSecondary: theme.white,
+    border: theme.border,
+    placeholder: theme.white,
+    primary: theme.primary,
+    error: theme.error,
+    cardShadow: theme.gray[900],
+    icon: theme.text,
   };
 
   // Initial load
@@ -186,7 +187,7 @@ export default function ReservationBoxScreen() {
                 numberOfLines={1}
                 style={{
                   fontFamily: "PublicSans-Regular",
-                  color: colors.textSecondary,
+                  color: colors.text,
                   fontSize: 13,
                 }}
               >
@@ -197,7 +198,7 @@ export default function ReservationBoxScreen() {
                   numberOfLines={1}
                   style={{
                     fontFamily: "PublicSans-Regular",
-                    color: colors.textSecondary,
+                    color: colors.text,
                     fontSize: 12,
                   }}
                 >
@@ -205,7 +206,7 @@ export default function ReservationBoxScreen() {
                 </Text>
               ) : null}
               <Text
-                style={{ color: colors.textSecondary, fontSize: 12 }}
+                style={{ color: colors.text, fontSize: 12 }}
                 numberOfLines={1}
               >
                 Status:{" "}
@@ -275,7 +276,7 @@ export default function ReservationBoxScreen() {
               color: colors.text,
               paddingRight: 36,
             }}
-            placeholderTextColor={colors.textSecondary}
+            placeholderTextColor={theme.textSecondary}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
@@ -302,6 +303,7 @@ export default function ReservationBoxScreen() {
       {isGrid ? (
         <MasonryList
           data={reservations}
+          // @ts-ignore
           renderItem={renderGridItem}
           numColumns={3}
           ListEmptyComponent={
@@ -318,7 +320,7 @@ export default function ReservationBoxScreen() {
               <Text
                 style={{
                   fontFamily: "PublicSans-Regular",
-                  color: colors.textSecondary,
+                  color: colors.text,
                 }}
               >
                 We couldn't find any items in your reservation box
@@ -366,7 +368,7 @@ export default function ReservationBoxScreen() {
             isFetchingMore && page < totalPages ? (
               <ActivityIndicator
                 size="small"
-                color={colors.primary}
+                color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
             ) : null
@@ -415,7 +417,7 @@ export default function ReservationBoxScreen() {
             isFetchingMore && page < totalPages ? (
               <ActivityIndicator
                 size="small"
-                color={colors.primary}
+                color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
             ) : null

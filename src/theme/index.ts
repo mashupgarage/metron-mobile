@@ -46,20 +46,26 @@ export const lightTheme = {
   ...colors,
   spacing,
   background: colors.white,
+  background2: colors.gray[100],
   text: colors.gray[900],
+  textSecondary: colors.gray[600],
   border: colors.gray[200],
   card: colors.white,
   notification: colors.primary[500],
+  surface: colors.gray[100],
 };
 
 export const darkTheme = {
   ...colors,
   spacing,
   background: "#1a1a1a",
+  background2: colors.gray[800],
   text: colors.gray[100],
+  textSecondary: colors.gray[600],
   border: colors.gray[700],
   card: colors.gray[800],
   notification: colors.primary[500],
+  surface: colors.gray[800],
 };
 
 export type ThemeType = typeof lightTheme;

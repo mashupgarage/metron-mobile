@@ -63,11 +63,11 @@ import { useColorScheme } from "react-native";
 import { Box } from "@/src/components/ui/box";
 
 const WantlistScreen = () => {
+  const theme = useBoundStore((state) => state.theme);
   const deviceWidth = Dimensions.get("window").width;
 
   const [imgError, setImgError] = useState(false);
   const [isGrid, setIsGrid] = useState(true);
-  const colorScheme = useColorScheme();
   const store = useBoundStore();
   const navigation = useNavigation();
   const toast = useToast();
@@ -91,22 +91,22 @@ const WantlistScreen = () => {
 
   // Centralized color palette for light/dark mode
   const colors = {
-    background: colorScheme === "dark" ? "#181A20" : "#FFFFFF",
-    surface: colorScheme === "dark" ? "#23262F" : "#F3F4F6",
-    text: colorScheme === "dark" ? "#F3F4F6" : "#181A20",
-    textSecondary: colorScheme === "dark" ? "#B5B5B5" : "#6B7280",
-    border: colorScheme === "dark" ? "#23262F" : "#E5E7EB",
-    placeholder: colorScheme === "dark" ? "#444857" : "#E5E7EB",
-    primary: "#3B82F6",
-    error: "#EF4444",
-    cardShadow: colorScheme === "dark" ? "#000000" : "#D1D5DB",
-    icon: colorScheme === "dark" ? "#FFFFFF" : "#181A20",
-    available: colorScheme === "dark" ? "#4ADE80" : "#16A34A", // green-400/green-600
-    outOfStock: colorScheme === "dark" ? "#F87171" : "#DC2626", // red-400/red-600
-    button: colorScheme === "dark" ? "#3B82F6" : "#2563EB", // blue-500/blue-700
-    buttonText: colorScheme === "dark" ? "#FFFFFF" : "#FFFFFF",
-    yellowBg: colorScheme === "dark" ? "#78350F" : "#FEF3C7",
-    yellowText: colorScheme === "dark" ? "#FDE68A" : "#92400E",
+    background: theme.background,
+    surface: theme.surface,
+    text: theme.text,
+    textSecondary: theme.textSecondary,
+    border: theme.border,
+    placeholder: theme.textSecondary,
+    primary: theme.primary,
+    error: theme.error,
+    cardShadow: theme.gray[900],
+    icon: theme.text,
+    available: theme.success,
+    outOfStock: theme.gray[500],
+    button: theme.primary,
+    buttonText: theme.text,
+    yellowBg: theme.warning,
+    yellowText: theme.white,
   };
 
   useEffect(() => {
@@ -211,7 +211,7 @@ const WantlistScreen = () => {
               });
           }}
           style={{
-            backgroundColor: colors.primary,
+            backgroundColor: theme.primary[500],
             padding: 12,
             borderRadius: 8,
             marginTop: 10,
@@ -386,8 +386,8 @@ const WantlistScreen = () => {
                   style={[
                     {
                       backgroundColor: isAvailable
-                        ? colors.primary
-                        : colors.border,
+                        ? colors.available
+                        : colors.outOfStock,
                       paddingHorizontal: 8,
                       paddingVertical: 4,
                       borderRadius: 4,
@@ -397,7 +397,7 @@ const WantlistScreen = () => {
                 >
                   <Text
                     style={{
-                      color: colors.buttonText,
+                      color: theme.white,
                       fontSize: 12,
                       fontFamily: "Urbanist-SemiBold",
                     }}
@@ -478,7 +478,7 @@ const WantlistScreen = () => {
               style={{
                 fontFamily: "Urbanist-Bold",
                 fontSize: 16,
-                color: colors.primary,
+                color: theme.text,
               }}
             >
               {wantlistItem.product.formatted_price ||
@@ -489,7 +489,9 @@ const WantlistScreen = () => {
               disabled={!isAvailable}
               style={[
                 {
-                  backgroundColor: isAvailable ? colors.primary : colors.border,
+                  backgroundColor: isAvailable
+                    ? colors.available
+                    : colors.error,
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 4,
@@ -515,7 +517,6 @@ const WantlistScreen = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <NavigationHeader />
 
       {/* Header with title and view toggle */}
@@ -628,7 +629,7 @@ const WantlistScreen = () => {
               isFetchingMore && page < totalPages ? (
                 <ActivityIndicator
                   size="small"
-                  color={colors.primary}
+                  color={colors.primary[500]}
                   style={{ margin: 16 }}
                 />
               ) : null
@@ -651,7 +652,7 @@ const WantlistScreen = () => {
             isFetchingMore && page < totalPages ? (
               <ActivityIndicator
                 size="small"
-                color={colors.primary}
+                color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
             ) : null

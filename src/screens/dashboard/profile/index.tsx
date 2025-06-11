@@ -18,6 +18,7 @@ import { removeAuthToken } from "@/src/api/tokenManager";
 
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore();
+  const theme = useBoundStore((state) => state.theme);
   const colorScheme = useColorScheme();
   const wantlistCount = useWantListStore((state) => state.wantlistCount);
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
@@ -62,12 +63,10 @@ export default function Profile(props: { navigation: any }) {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: colorScheme === "dark" ? "#1a1a1a" : "#fff",
+          backgroundColor: theme.background,
         }}
       >
-        <Text style={{ color: colorScheme === "dark" ? "#fff" : "#000" }}>
-          Loading...
-        </Text>
+        <Text style={{ color: theme.text }}>Loading...</Text>
       </View>
     );
   }
@@ -85,23 +84,23 @@ export default function Profile(props: { navigation: any }) {
     <SafeAreaView
       style={{
         paddingTop: 24,
+        backgroundColor: theme.background,
       }}
-      className={`flex-1 ${
-        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-      }`}
+      className={"flex-1"}
     >
       <View
-        className={`flex-row items-center justify-between py-4 px-5 border-b ${
-          colorScheme === "dark"
-            ? "border-b-mdark-surface"
-            : "border-b-gray-200"
-        }`}
+        style={{ borderColor: theme.border, borderBottomWidth: 1 }}
+        className={`flex-row items-center justify-between py-4 px-5`}
       >
         {/* <Text className="text-xl font-semibold">Profile</Text> */}
         <View />
         <TouchableOpacity onPress={handleEditProfile}>
           <Text
-            style={{ fontFamily: "PublicSans-regular", fontSize: 16 }}
+            style={{
+              fontFamily: "PublicSans-regular",
+              color: theme.text,
+              fontSize: 16,
+            }}
             className="font-semibold text-primary-600"
           >
             Edit
@@ -116,26 +115,23 @@ export default function Profile(props: { navigation: any }) {
             className="w-24 h-24 rounded-full mb-3"
           />
           <Text
-            style={{ fontFamily: "Urbanist-Bold" }}
-            className={`text-xl font-bold mb-1 ${
-              colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-            }`}
+            style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+            className={`text-xl font-bold mb-1`}
           >
             {store.user?.full_name}
           </Text>
           <Text
-            style={{ fontFamily: "PublicSans-regular" }}
-            className={`text-base ${
-              colorScheme === "dark"
-                ? "text-mdark-textSecondary"
-                : "text-gray-500"
-            }`}
+            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+            className={`text-base`}
           >
             {store.user?.email}
           </Text>
         </View>
 
-        <View className="flex-row justify-around py-5 border-y border-gray-200 mx-4">
+        <View
+          style={{ borderColor: theme.border }}
+          className={`flex-row justify-around py-5 border-y mx-4`}
+        >
           {/* <View className="items-center">
             <Text
               className={`text-2xl font-bold ${
@@ -156,51 +152,41 @@ export default function Profile(props: { navigation: any }) {
           </View> */}
           <View className="items-center">
             <Text
-              style={{ fontFamily: "Urbanist-Bold" }}
-              className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-              }`}
+              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+              className={`text-2xl font-bold`}
             >
               {collectionCount}
             </Text>
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`text-base ${
-                colorScheme === "dark"
-                  ? "text-mdark-textSecondary"
-                  : "text-gray-500"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`text-base`}
             >
               Series Collections
             </Text>
           </View>
           <View className="items-center">
             <Text
-              style={{ fontFamily: "Urbanist-Bold" }}
-              className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-              }`}
+              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+              className={`text-2xl font-bold`}
             >
               {wantlistCount}
             </Text>
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`text-base ${
-                colorScheme === "dark"
-                  ? "text-mdark-textSecondary"
-                  : "text-gray-500"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`text-base`}
             >
               Wantlist
             </Text>
           </View>
         </View>
 
-        <View className="flex-row flex-wrap justify-between px-4 py-6">
+        <View
+          style={{ borderColor: theme.border }}
+          className="flex-row flex-wrap justify-between px-4 py-6"
+        >
           <TouchableOpacity
-            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
-            }`}
+            style={{ backgroundColor: theme.background2 }}
+            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
               props.navigation.navigate("ReservationBoxScreen");
             }}
@@ -208,22 +194,18 @@ export default function Profile(props: { navigation: any }) {
             <Ionicons
               name="cube-outline"
               size={24}
-              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+              color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`mt-2 text-base text-center`}
             >
               Reservation Box
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ fontFamily: "PublicSans-regular" }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
-            }`}
+            style={{ backgroundColor: theme.background2 }}
+            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
               props.navigation.navigate("WantlistScreen");
             }}
@@ -231,22 +213,18 @@ export default function Profile(props: { navigation: any }) {
             <Ionicons
               name="list-outline"
               size={24}
-              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+              color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`mt-2 text-base text-center`}
             >
               Wantlist
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ fontFamily: "PublicSans-regular" }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4 ${
-              colorScheme === "dark" ? "bg-mdark-surface" : "bg-gray-100"
-            }`}
+            style={{ backgroundColor: theme.background2 }}
+            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
               console.log("clicked");
               props.navigation.navigate("Collection");
@@ -255,13 +233,11 @@ export default function Profile(props: { navigation: any }) {
             <Ionicons
               name="cube-outline"
               size={24}
-              color={colorScheme === "dark" ? "#90cdf4" : "#4285F4"}
+              color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`mt-2 text-base text-center ${
-                colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`mt-2 text-base text-center`}
             >
               My Collection
             </Text>
@@ -271,9 +247,7 @@ export default function Profile(props: { navigation: any }) {
       {/* Logout Button at Bottom */}
       <View className="px-4 pb-8 absolute left-0 right-0 bottom-0 bg-transparent">
         <TouchableOpacity
-          className={`flex-row items-center justify-between py-4  ${
-            colorScheme === "dark" ? "border-b-[#333]" : "border-b-[#f0f0f0]"
-          }`}
+          className={`flex-row items-center justify-between py-4  ${`border-b-${theme.border}`}`}
           onPress={() => {
             removeAuthToken();
             store.setOnboardingDone(true);
@@ -284,25 +258,15 @@ export default function Profile(props: { navigation: any }) {
           }}
         >
           <View className="flex-row items-center">
-            <Ionicons
-              name="log-out-outline"
-              size={22}
-              color={colorScheme === "dark" ? "#ffffff" : "#333"}
-            />
+            <Ionicons name="log-out-outline" size={22} color={theme.text} />
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className={`ml-3 text-base ${
-                colorScheme === "dark" ? "text-[#ffffff]" : "text-[#333]"
-              }`}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`ml-3 text-base`}
             >
               Logout
             </Text>
           </View>
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color={colorScheme === "dark" ? "#999" : "#999"}
-          />
+          <Ionicons name="chevron-forward" size={20} color={theme.text} />
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />
