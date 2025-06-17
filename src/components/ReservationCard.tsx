@@ -3,7 +3,8 @@ import { FC, useState } from "react";
 import { Box } from "./ui/box";
 import { Image } from "./ui/image";
 import { Text } from "./ui/text";
-import { Dimensions, useColorScheme, View } from "react-native";
+import { Dimensions, View } from "react-native";
+import { useBoundStore } from "../store";
 
 interface ReservationCardProps {
   product: ProductT;
@@ -11,8 +12,8 @@ interface ReservationCardProps {
 
 const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
   const [imgError, setImgError] = useState(false);
+  const theme = useBoundStore((state) => state.theme);
   const deviceWidth = Dimensions.get("window").width;
-  const colorScheme = useColorScheme();
 
   const mainImage = product.cover_url || undefined;
 
@@ -38,7 +39,10 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           {/* Show full screen icon if owned */}
 
           <View className="absolute top-0 left-0 right-0 bottom-0 h-full bg-black/50 justify-center items-center">
-            <Text className="font-bold mt-8 text-white">
+            <Text
+              className="font-bold mt-8"
+              style={{ color: theme.white, fontSize: 12 }}
+            >
               {product.status === "for_approval"
                 ? "Pending Approval"
                 : product.status}
@@ -50,7 +54,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
             numberOfLines={1}
             style={{
               fontFamily: "Urbanist-Bold",
-              color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              color: theme.text,
             }}
           >
             {product.title}
@@ -59,7 +63,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
             numberOfLines={1}
             style={{
               fontFamily: "PublicSans-regular",
-              color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+              color: theme.text,
             }}
             className="text-gray-600"
           >

@@ -22,7 +22,7 @@ export default function SignIn(props: {
   const { setLoading, setUser } = useBoundStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const theme = useBoundStore((state) => state.theme);
   const navigation = useNavigation<NavigationProp<AuthStackParams>>();
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function SignIn(props: {
   return (
     <AuthLayout showBackButton={true} navigation={props.navigation}>
       <React.Fragment>
-        <Text className="mt-8 mb-8" size="3xl" bold>
+        <Text className="mt-8 mb-8" size="3xl" bold style={{ color: theme.text }}>
           Welcome Back!
         </Text>
         <SignInForm
@@ -78,7 +78,7 @@ export default function SignIn(props: {
         <StatusBar style="auto" />
         <Divider withText={false} />
         <HStack className="justify-center items-center">
-          <Text>Don't you have an account? </Text>
+          <Text style={{ color: theme.text }}>Don't you have an account? </Text>
           <Button
             variant="link"
             onPress={() => {

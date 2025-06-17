@@ -10,6 +10,7 @@ const NavigationHeader = ({
 }) => {
   const navigation = useNavigation();
   const colorScheme = useColorScheme();
+  const theme = useBoundStore((state) => state.theme);
   const cartCount = useBoundStore((state) => state.cartItems.length);
   return (
     <View className="mb-4 flex">
@@ -21,8 +22,8 @@ const NavigationHeader = ({
           className="absolute ml-4"
           variant="link"
         >
-          <ArrowLeft color={colorScheme === "dark" ? "#FFFFFF" : "#181718"} />
-          <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+          <ArrowLeft color={theme.text} />
+          <ButtonText style={{ fontFamily: "PublicSans-regular", color: theme.text }}>
             Back
           </ButtonText>
         </Button>
@@ -46,9 +47,9 @@ const NavigationHeader = ({
               />
             )}
             <ShoppingBag
-              color={colorScheme === "dark" ? "#FFFFFF" : "#181718"}
+              color={theme.text}
             />
-            <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+            <ButtonText style={{ fontFamily: "PublicSans-regular", color: theme.text }}>
               My Cart
             </ButtonText>
           </Button>

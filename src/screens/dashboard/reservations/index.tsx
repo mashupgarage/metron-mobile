@@ -35,6 +35,7 @@ import { useReservationManager } from "./useReservationManager";
 export default function ReservationsScreen() {
   const colorScheme = useColorScheme();
   const store = useBoundStore();
+  const { theme } = store;
   const toast = useToast();
 
   const {
@@ -134,20 +135,15 @@ export default function ReservationsScreen() {
             {showSearchBar ? (
               <View className="flex-row items-center mt-4 mb-4">
                 <View className="flex-1 flex-row items-center border border-gray-300 rounded-lg px-2 py-1">
-                  <Search
-                    size={18}
-                    color={colorScheme === "dark" ? "white" : "black"}
-                  />
+                  <Search size={18} color={theme.text} />
                   <TextInput
                     className="flex-1 ml-2 py-1"
                     placeholder="Search comics..."
                     value={searchQuery}
                     style={{
-                      color: colorScheme === "dark" ? "white" : "black",
+                      color: theme.text,
                     }}
-                    placeholderTextColor={
-                      colorScheme === "dark" ? "white" : "black"
-                    }
+                    placeholderTextColor={theme.text}
                     onChangeText={handleSearchChange}
                     onSubmitEditing={() => {
                       console.log("Search submitted:", searchQuery);
@@ -160,7 +156,7 @@ export default function ReservationsScreen() {
                   />
                   {searchQuery.length > 0 && (
                     <TouchableOpacity onPress={clearSearch}>
-                      <X size={18} color="#666" />
+                      <X size={18} color={theme.text} />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -181,7 +177,7 @@ export default function ReservationsScreen() {
                     className="mr-4"
                     onPress={() => setShowSearchBar(true)}
                   >
-                    <Search size={24} color="#666" />
+                    <Search size={24} color={theme.text} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -225,10 +221,7 @@ export default function ReservationsScreen() {
                     </Pressable>
                   )}
                   <TouchableOpacity onPress={toggleDrawer} className="p-2">
-                    <Menu
-                      size={24}
-                      color={colorScheme === "dark" ? "#ffffff" : "#333"}
-                    />
+                    <Menu size={24} color={theme.text} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -278,8 +271,10 @@ export default function ReservationsScreen() {
                 return (
                   <View className="bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200">
                     <Text
-                      style={{ fontFamily: "PublicSans-regular" }}
-                      className="text-amber-800"
+                      style={{
+                        fontFamily: "PublicSans-regular",
+                        color: theme.warning,
+                      }}
                     >
                       This release is now closed.
                     </Text>
@@ -291,7 +286,7 @@ export default function ReservationsScreen() {
 
             {isSearching && (
               <View className="items-center py-2">
-                <ActivityIndicator size="small" color="#1A237E" />
+                <ActivityIndicator size="small" color={theme.primary[500]} />
               </View>
             )}
 
@@ -360,7 +355,10 @@ export default function ReservationsScreen() {
               <Box className="py-4 flex justify-center items-center">
                 {(loading || isFetchingMore) && (
                   <View>
-                    <ActivityIndicator size="small" color="#1A237E" />
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.primary[500]}
+                    />
                     <Text className="mt-2">Loading products...</Text>
                   </View>
                 )}
@@ -412,7 +410,7 @@ export default function ReservationsScreen() {
                       isMultiSelectMode && isSelected
                         ? {
                             borderWidth: 1,
-                            borderColor: "#1976D2",
+                            borderColor: theme.primary[500],
                             borderRadius: 4,
                           }
                         : {}
@@ -494,7 +492,7 @@ export default function ReservationsScreen() {
                         isMultiSelectMode && isSelected
                           ? {
                               borderWidth: 4,
-                              borderColor: "#1976D2",
+                              borderColor: theme.primary[500],
                               borderRadius: 12,
                             }
                           : {},
@@ -530,7 +528,7 @@ export default function ReservationsScreen() {
                                 isMultiSelectMode && isSelected
                                   ? {
                                       borderWidth: 2,
-                                      borderColor: "#1A237E",
+                                      borderColor: theme.primary[500],
                                       borderRadius: 8,
                                     }
                                   : {}
@@ -621,7 +619,7 @@ export default function ReservationsScreen() {
           <View className="flex-1 justify-center items-center bg-black/50">
             <View
               style={{
-                backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff",
+                backgroundColor: theme.background,
               }}
               className="w-[90%] max-h-[80%] rounded-xl p-5 shadow-lg"
             >
@@ -683,7 +681,7 @@ export default function ReservationsScreen() {
                   <Text
                     style={{
                       fontFamily: "PublicSans-regular",
-                      color: colorScheme === "dark" ? "#fff" : "#000",
+                      color: theme.text,
                     }}
                   >
                     Cancel
@@ -694,15 +692,14 @@ export default function ReservationsScreen() {
                   onPress={confirmReservation}
                   className="py-2.5 px-5 rounded"
                   style={{
-                    backgroundColor:
-                      colorScheme === "dark" ? "#1A237E" : "#1A237E",
+                    backgroundColor: theme.primary[500],
                   }}
                   disabled={confirmationProducts.length === 0}
                 >
                   <Text
                     style={{
                       fontFamily: "PublicSans-regular",
-                      color: colorScheme === "dark" ? "#fff" : "#fff",
+                      color: theme.text,
                     }}
                   >
                     Confirm ({confirmationProducts.length})

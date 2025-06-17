@@ -28,7 +28,6 @@ import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import ImageViewing from "react-native-image-viewing";
 import {
-  addToReservation,
   addToWantList,
   getWantList,
   addToCart,
@@ -37,12 +36,12 @@ import {
 } from "@/src/api/apiEndpoints";
 
 import {
-  useProductOwned,
   useProductSeriesStatus,
   useProductRecommendations,
 } from "./productHooks";
 import ProductCard from "@/src/components/product";
 import { VStack } from "@/src/components/ui/vstack";
+import { useReservationManager } from "../reservations/useReservationManager";
 
 export default function Product(props: {
   route: {
@@ -55,32 +54,16 @@ export default function Product(props: {
     };
   };
 }) {
+  const theme = useBoundStore((state) => state.theme);
   const colorScheme = useColorScheme();
   const { route } = props;
   const { params } = route;
-  const {
-    product,
-    fromReservations,
-    reservationId,
-    reservationList,
-    fromCollection,
-  } = params;
-
+  const { product, reservationList, fromCollection } = params;
   const { data: seriesStatus, loading: seriesLoading } = useProductSeriesStatus(
     product.id
   );
   const { data: recommendations, loading: recsLoading } =
     useProductRecommendations(product.id);
-
-  // Local state for reservation list so we can update it after reservation
-  const [localReservationList, setLocalReservationList] = useState<any[]>(
-    reservationList || []
-  );
-
-  // Check if this product is already reserved in the user's reservation list
-  const isAlreadyReserved = Array.isArray(localReservationList)
-    ? localReservationList.some((r) => r.product?.id === product.id)
-    : false;
 
   const [productItems, setProductItems] = useState<any[]>([]);
   const [selectedProductItemId, setSelectedProductItemId] = useState<
@@ -206,75 +189,11 @@ export default function Product(props: {
     }
   };
 
-  // Reservation handler for reservations entry point
-  const handleAddToReservation = () => {
-    if (fromReservations && isAlreadyReserved) {
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast-" + id;
-          return (
-            <Toast nativeID={toastId} action="error">
-              <ToastTitle>This product is already reserved!</ToastTitle>
-            </Toast>
-          );
-        },
-      });
-      return;
-    }
-    if (maxQuantity > 0 && isQuantityValid) {
-      addToReservation(product.id, quantity, reservationId)
-        .then((res) => {
-          // Dynamically update localReservationList so button disables and count updates
-          setLocalReservationList((prev) => [
-            ...prev,
-            {
-              ...res.data.reservation,
-              product,
-            },
-          ]);
-          toast.show({
-            placement: "top",
-            render: ({ id }) => {
-              const toastId = "toast-" + id;
-              return (
-                <Toast nativeID={toastId} action="success">
-                  <ToastTitle>Reserved product!</ToastTitle>
-                </Toast>
-              );
-            },
-          });
-        })
-        .catch(() => {
-          toast.show({
-            placement: "top",
-            render: ({ id }) => {
-              const toastId = "toast-" + id;
-              return (
-                <Toast nativeID={toastId} action="error">
-                  <ToastTitle>Failed to reserve product!</ToastTitle>
-                </Toast>
-              );
-            },
-          });
-        });
-    } else {
-      toast.show({
-        placement: "top",
-        render: ({ id }) => (
-          <Toast nativeID={"toast-" + id} action="error">
-            <ToastTitle>Product out of stock or invalid.</ToastTitle>
-          </Toast>
-        ),
-      });
-    }
-  };
-
   return (
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff",
+        backgroundColor: theme.background,
       }}
     >
       <KeyboardAvoidingView
@@ -284,7 +203,7 @@ export default function Product(props: {
       >
         <Box
           style={{
-            backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff",
+            backgroundColor: theme.background,
             height: 40,
           }}
         >
@@ -409,29 +328,19 @@ export default function Product(props: {
               fontFamily: "Urbanist-Bold",
               fontSize: 24,
               lineHeight: 24,
-              color: colorScheme === "dark" ? "#fff" : "#000",
+              color: theme.text,
+              marginTop: theme.spacing.md,
             }}
             className="px-4 mt-6 mb-2"
           >
             {product?.title}
           </Text>
           <View className="px-4 mt-6 mb-2">
-            {/* <Text
-            style={{
-              color: "#2563eb",
-              textDecorationLine: "underline",
-              fontWeight: "500",
-              marginBottom: 8,
-            }}
-            onPress={() => {}}
-          >
-            Part of Amazing Spider-Man Series &gt;
-          </Text> */}
             <Text
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                color: theme.text,
               }}
             >
               {product?.description ?? ""}
@@ -440,7 +349,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "Urbanist-Bold",
                 fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                color: theme.text,
               }}
             >
               Publisher
@@ -453,19 +362,22 @@ export default function Product(props: {
                   style={{
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
-                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    color: theme.text,
+                    marginTop: theme.spacing.md,
                   }}
                 >
                   Creators
                 </Text>
-                <Text style={{ marginBottom: 8 }}>{product?.creators}</Text>
+                <Text style={{ marginBottom: theme.spacing.md }}>
+                  {product?.creators}
+                </Text>
               </>
             )}
             <Text
               style={{
                 fontFamily: "Urbanist-Bold",
                 fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                color: theme.text,
               }}
             >
               ISBN/UPC
@@ -474,8 +386,8 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                marginBottom: theme.spacing.md,
+                color: theme.text,
               }}
             >
               {product?.isbn || product?.upc}
@@ -484,7 +396,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "Urbanist-Bold",
                 fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                color: theme.text,
               }}
             >
               Price
@@ -493,8 +405,8 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                marginBottom: theme.spacing.md,
+                color: theme.text,
               }}
             >
               {product?.formatted_price ??
@@ -504,7 +416,7 @@ export default function Product(props: {
               style={{
                 fontFamily: "Urbanist-Bold",
                 fontSize: 16,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                color: theme.text,
               }}
             >
               Available Quantity
@@ -513,8 +425,8 @@ export default function Product(props: {
               style={{
                 fontFamily: "PublicSans-regular",
                 fontSize: 16,
-                marginBottom: 8,
-                color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                marginBottom: theme.spacing.md,
+                color: theme.text,
               }}
             >
               {product?.quantity ?? "Out of Stock"}
@@ -528,7 +440,8 @@ export default function Product(props: {
                   style={{
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
-                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                    marginBottom: theme.spacing.sm,
+                    color: theme.text,
                   }}
                 >
                   Your Collection Status
@@ -539,7 +452,7 @@ export default function Product(props: {
                     flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    marginBottom: 4,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   {seriesLoading ? (
@@ -547,7 +460,7 @@ export default function Product(props: {
                       style={{
                         fontFamily: "PublicSans-regular",
                         fontSize: 16,
-                        color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                        color: theme.text,
                       }}
                     >
                       Loading...
@@ -558,7 +471,7 @@ export default function Product(props: {
                         style={{
                           fontFamily: "PublicSans-regular",
                           fontSize: 16,
-                          color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
+                          color: theme.text,
                         }}
                       >
                         {seriesStatus?.related_series?.collected ?? 0} of{" "}
@@ -571,7 +484,7 @@ export default function Product(props: {
                         style={{
                           fontFamily: "PublicSans-regular",
                           fontSize: 16,
-                          color: colorScheme === "dark" ? "#FFFFFF" : "#2563eb",
+                          color: theme.text,
                         }}
                       >
                         {(() => {
@@ -592,7 +505,7 @@ export default function Product(props: {
                       style={{
                         fontFamily: "PublicSans-regular",
                         fontSize: 16,
-                        color: colorScheme === "dark" ? "#FFFFFF" : "#374151",
+                        color: theme.text,
                       }}
                     >
                       No series data
@@ -602,9 +515,9 @@ export default function Product(props: {
                 <View
                   style={{
                     height: 8,
-                    backgroundColor: "#e5e7eb",
+                    backgroundColor: theme.border,
                     borderRadius: 4,
-                    marginBottom: 12,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   <View
@@ -613,7 +526,7 @@ export default function Product(props: {
                         ? `${seriesStatus.completion_percent ?? 0}%`
                         : "0%",
                       height: 8,
-                      backgroundColor: "#2563eb",
+                      backgroundColor: theme.primary[500],
                       borderRadius: 4,
                     }}
                   />
@@ -622,8 +535,9 @@ export default function Product(props: {
                   style={{
                     fontFamily: "Urbanist-Bold",
                     fontSize: 16,
-                    color: colorScheme === "dark" ? "#FFFFFF" : "#202020",
-                    marginBottom: 16,
+                    color: theme.text,
+                    marginTop: theme.spacing.md,
+                    marginBottom: theme.spacing.md,
                   }}
                 >
                   You may also like
@@ -640,9 +554,9 @@ export default function Product(props: {
                   )}
                   ListEmptyComponent={() =>
                     recsLoading ? (
-                      <Text style={{ color: "#6b7280" }}>Loading...</Text>
+                      <Text style={{ color: theme.text }}>Loading...</Text>
                     ) : (
-                      <Text style={{ color: "#6b7280" }}>
+                      <Text style={{ color: theme.text }}>
                         No recommendations
                       </Text>
                     )
@@ -656,12 +570,12 @@ export default function Product(props: {
           <View
             style={{
               flexDirection: "row",
-              padding: 16,
-              backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
+              padding: theme.spacing.md,
+              backgroundColor: theme.background,
               borderTopWidth: 1,
-              borderColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",
+              borderColor: theme.border,
               alignItems: "center",
-              gap: 12,
+              gap: theme.spacing.md,
             }}
           >
             {/* Want List Button */}
@@ -704,26 +618,26 @@ export default function Product(props: {
                 alignItems: "center",
                 justifyContent: "center",
                 borderWidth: 1,
-                borderColor: colorScheme === "dark" ? "#121212" : "#d1d5db",
+                borderColor: theme.border,
                 borderRadius: 14,
-                backgroundColor: colorScheme === "dark" ? "#121212" : "#fff",
-                paddingVertical: 14,
-                marginRight: 6,
+                backgroundColor: theme.background,
+                paddingVertical: theme.spacing.md,
+                marginRight: theme.spacing.md,
                 opacity: isWanted ? 0.6 : 1,
               }}
             >
               {/* Heart icon from lucide-react-native */}
               <Heart
-                fill={colorScheme === "dark" ? "#fff" : "#111"}
-                color={colorScheme === "dark" ? "#fff" : "#111"}
+                fill={"transparent"}
+                color={theme.text}
                 size={24}
-                style={{ marginRight: 8 }}
+                style={{ marginRight: theme.spacing.md }}
               />
               <Text
                 style={{
                   fontFamily: "Urbanist-Bold",
                   fontSize: 16,
-                  color: colorScheme === "dark" ? "#fff" : "#111",
+                  color: theme.text,
                 }}
               >
                 {isWanted ? "Already added to want list" : "Add to want list"}
@@ -733,11 +647,14 @@ export default function Product(props: {
             {/* Add to Cart Button */}
             <Button
               action="primary"
+              style={{
+                backgroundColor: theme.primary[500],
+              }}
               className="rounded-full h-16 w-16"
               onPress={async () => handleAddToCart()}
               disabled={maxQuantity === 0 || !isQuantityValid}
             >
-              <ShoppingCart color="#fff" size={24} />
+              <ShoppingCart color={theme.white} size={24} />
             </Button>
           </View>
         </ScrollView>

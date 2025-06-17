@@ -33,6 +33,7 @@ const SignInForm: FC<SignInFormProps> = ({
 }) => {
   const store = useBoundStore();
   const isLoading = store.isLoading;
+  const theme = useBoundStore((state) => state.theme);
 
   const [isInvalidEmail, setInvalidEmail] = useState(false);
   const [isInvalidPassword, setInvalidPassword] = useState(false);
@@ -91,7 +92,7 @@ const SignInForm: FC<SignInFormProps> = ({
       </FormControl>
       <HStack className="justify-between">
         <Button variant="link" className="mt-4">
-          <Text underline>Forgot Password?</Text>
+          <Text style={{ color: theme.text }} underline>Forgot Password?</Text>
         </Button>
         <Button
           className="mt-4 rounded-[8px]"
