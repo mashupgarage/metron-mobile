@@ -3,7 +3,8 @@ import { FC, useState } from 'react'
 import { Box } from '../ui/box'
 import { Image } from '../ui/image'
 import { Text } from '../ui/text'
-import { useColorScheme, View } from 'react-native'
+import { View } from 'react-native'
+import { useBoundStore } from '@/src/store'
 
 interface ProductCardProps {
   product: ProductT
@@ -13,8 +14,7 @@ interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
   const { product } = data
   const [imgError, setImgError] = useState(false)
-
-  const colorScheme = useColorScheme()
+  const theme = useBoundStore((state) => state.theme)
 
   const mainImage = product.cover_url || undefined
 
@@ -43,6 +43,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
               fontWeight: 'bold',
               fontFamily: 'Inter',
               maxWidth: 240,
+              color: theme.text,
             }}
             numberOfLines={1}
             ellipsizeMode="tail"
@@ -51,11 +52,11 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
             {product.title}
           </Text>
           {product.formatted_price && (
-            <Text className="text-green-700 font-bold">
+            <Text style={{ color: theme.text }} className="text-green-700 font-bold">
               {product.formatted_price}
             </Text>
           )}
-          <Text numberOfLines={1} className="text-gray-600 text-sm">
+          <Text numberOfLines={1} style={{ color: theme.text }} className="text-gray-600 text-sm">
             {product.creators}
           </Text>
         </View>

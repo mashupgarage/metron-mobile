@@ -25,11 +25,12 @@ export default function SignUp(props: {
   const [fullName, setFullName] = useState("");
   const toast = useToast();
   const navigation = useNavigation<NavigationProp<AuthStackParams>>();
+  const theme = useBoundStore((state) => state.theme);
 
   return (
     <AuthLayout showBackButton={false} navigation={props.navigation}>
       <React.Fragment>
-        <Text className="mt-8 mb-8" size="3xl" bold>
+        <Text className="mt-8 mb-8" size="3xl" bold style={{ color: theme.text }}>
           Create your Account
         </Text>
         <SignUpForm
@@ -91,7 +92,7 @@ export default function SignUp(props: {
         <StatusBar style="auto" />
         <Divider withText={false} />
         <HStack className="justify-center items-center">
-          <Text>Have an account? </Text>
+          <Text style={{ color: theme.text }}>Have an account? </Text>
           <Button
             variant="link"
             onPress={() => {

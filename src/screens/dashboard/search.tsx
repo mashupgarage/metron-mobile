@@ -159,7 +159,7 @@ export default function Search() {
               {loading ? (
                 <ButtonSpinner />
               ) : (
-                <ButtonText style={{ fontFamily: "PublicSans-regular" }}>
+                <ButtonText style={{ fontFamily: "PublicSans-regular", color: theme.white }}>
                   Search
                 </ButtonText>
               )}

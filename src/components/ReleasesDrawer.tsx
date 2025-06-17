@@ -35,7 +35,6 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
   onShowAllReleases,
 }) => {
   const drawerAnimation = useRef(new Animated.Value(-300)).current;
-  const colorScheme = useColorScheme();
   const { theme } = useBoundStore();
   useEffect(() => {
     if (visible) {
@@ -79,7 +78,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
         <SafeAreaView className="flex-1">
           <View className="p-4 border-b flex-row justify-between items-center">
             <Text
-              style={{ fontFamily: "Urbanist-Bold" }}
+              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
               className="text-xl font-bold"
             >
               Release History
@@ -98,7 +97,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
               }}
             >
               <Text
-                style={{ fontFamily: "PublicSans-regular" }}
+                style={{ fontFamily: "PublicSans-regular", color: theme.text }}
                 className="text-base"
               >
                 LATEST RELEASE
@@ -119,7 +118,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                 }}
               >
                 <Text
-                  style={{ fontFamily: "PublicSans-regular" }}
+                  style={{ fontFamily: "PublicSans-regular", color: theme.text }}
                   className="text-base"
                 >
                   {item.date}

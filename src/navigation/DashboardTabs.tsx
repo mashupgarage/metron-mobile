@@ -66,9 +66,9 @@ const DashboardTabs = () => {
               alignItems: "center",
               justifyContent: "center",
               marginBottom: 12,
-              shadowColor: theme.background !== "dark" ? "#121212" : "#ffffff",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.1,
+              shadowColor: theme.black,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.5,
               shadowRadius: 6,
               elevation: 8,
             }}
