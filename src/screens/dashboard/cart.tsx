@@ -21,12 +21,14 @@ import {
 } from "@/src/api/apiEndpoints";
 import { useToast } from "@gluestack-ui/themed";
 import { Toast, ToastTitle } from "@/src/components/ui/toast";
+import { DashboardStackParams } from "@/src/utils/types/navigation";
+import { NavigationProp } from "@react-navigation/native";
 
 export default function Cart() {
   const store = useBoundStore();
   const isDark = useBoundStore((state) => state.isDark);
   const theme = useBoundStore((state) => state.theme);
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
   const toast = useToast();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
@@ -119,29 +121,22 @@ export default function Cart() {
       }));
 
     if (itemsToCheckout.length === 0) {
-      console.log("No items selected for checkout.");
-      alert("Please select items to checkout.");
+      toast.show({
+        placement: "top",
+        render: ({ id }: any) => (
+          <Toast nativeID={"toast-" + id} action="error">
+            <ToastTitle>Please select items to checkout.</ToastTitle>
+          </Toast>
+        ),
+      });
       return;
     }
 
     if (store.user) {
-      console.log("Checkout Selected Items:", itemsToCheckout);
-      toast.show({
-        placement: "top",
-        render: ({ id }) => {
-          const toastId = "toast-" + id;
-          return (
-            <Toast nativeID={toastId} action="info">
-              <ToastTitle>
-                Checkout functionality to be implemented soon
-              </ToastTitle>
-            </Toast>
-          );
-        },
+      navigation.navigate("CheckoutScreen", {
+        itemsToCheckout,
       });
-      // TODO: Implement actual checkout logic (e.g., navigate to checkout flow) with itemsToCheckout
     } else {
-      console.log("User not authenticated, redirecting to Auth stack...");
       navigation.navigate("Auth" as never);
     }
   };
@@ -258,8 +253,8 @@ export default function Cart() {
         >
           <View className="flex-row mx-1">
             <Button
-              onPress={handleCheckout}
               size="xl"
+              onPress={handleCheckout}
               style={{ backgroundColor: theme.primary[900] }}
               isDisabled={selectedItems.size === 0}
               disabled={selectedItems.size === 0}

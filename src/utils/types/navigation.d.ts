@@ -15,4 +15,5 @@ export interface DashboardStackParams {
   Wantlist: undefined;
   CGCSubmit: undefined;
   DetailedCollectionScreen: { seriesId: number };
+  CheckoutScreen: { itemsToCheckout: any[] };
 }
