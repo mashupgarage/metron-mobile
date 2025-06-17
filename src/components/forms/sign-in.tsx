@@ -91,9 +91,9 @@ const SignInForm: FC<SignInFormProps> = ({
         )}
       </FormControl>
       <HStack className="justify-between">
-        <Button variant="link" className="mt-4">
+        {/* <Button variant="link" className="mt-4">
           <Text style={{ color: theme.text }} underline>Forgot Password?</Text>
-        </Button>
+        </Button> */}
         <Button
           className="mt-4 rounded-[8px]"
           size={size}

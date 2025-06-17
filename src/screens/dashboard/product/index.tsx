@@ -189,6 +189,8 @@ export default function Product(props: {
     }
   };
 
+  console.log(product);
+
   return (
     <SafeAreaView
       style={{

@@ -24,17 +24,16 @@ import { Toast, ToastTitle } from "@/src/components/ui/toast";
 
 export default function Cart() {
   const store = useBoundStore();
+  const isDark = useBoundStore((state) => state.isDark);
   const theme = useBoundStore((state) => state.theme);
   const navigation = useNavigation();
   const toast = useToast();
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    console.log("fetching cart....", store.cartItems);
     if (store.user !== null) {
       fetchCartItems(store.user.id)
         .then((res) => {
-          console.log("cart items", res.data);
           store.setCartItems(res.data);
         })
         .catch((err) => {
@@ -163,6 +162,7 @@ export default function Cart() {
         value={item.id.toString()}
         style={{
           borderColor: theme.border,
+          backgroundColor: theme.background,
         }}
         isChecked={selectedItems.has(item.id)}
         onChange={() => toggleItemSelection(item.id)}
@@ -170,7 +170,7 @@ export default function Cart() {
       >
         <CheckboxIndicator>
           <CheckboxIconComponent
-            style={{ color: theme.white }}
+            style={{ color: theme.primary[500] }}
             as={CheckIcon}
           />
         </CheckboxIndicator>
@@ -223,10 +223,9 @@ export default function Cart() {
   );
 
   const totalSelectedItems = selectedItems.size;
-
-  const colorScheme = useColorScheme();
   return (
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
+      <StatusBar style={isDark === true ? "light" : "dark"} />
       <Text
         style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
         className={`text-2xl font-bold m-4 text-left`}
@@ -261,7 +260,7 @@ export default function Cart() {
             <Button
               onPress={handleCheckout}
               size="xl"
-              style={{ backgroundColor: theme.gray[900] }}
+              style={{ backgroundColor: theme.primary[900] }}
               isDisabled={selectedItems.size === 0}
               disabled={selectedItems.size === 0}
               className="flex-1"

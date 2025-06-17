@@ -461,3 +461,26 @@ export const fetchProductSeriesStatus = async (productId: number) => {
 export const fetchProductRecommendations = async (productId: number) => {
   return axiosClient.get(`/products/${productId}/recommendations`);
 };
+
+
+// =========================
+// Cart Endpoints
+// =========================
+
+export const checkoutCartItems = async (userId: number, payload: {
+  order: {
+    notes: string;
+    branch: number; // branch id
+    phone_number: string;
+    shipping_address: string;
+    shipping_region: string;
+    total_price: number;
+    delivery_option: "store";
+    transaction_source: "paypal"
+    status: "pending",
+    
+  }
+}) => {
+  return axiosClient.post(`users/${userId}/checkout`, payload);
+  
+}

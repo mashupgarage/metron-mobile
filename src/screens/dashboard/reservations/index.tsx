@@ -31,11 +31,11 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import { useBoundStore } from "@/src/store";
 import { useReservationManager } from "./useReservationManager";
+import { StatusBar } from "expo-status-bar";
 
 export default function ReservationsScreen() {
-  const colorScheme = useColorScheme();
   const store = useBoundStore();
-  const { theme } = store;
+  const { theme, isDark } = store;
   const toast = useToast();
 
   const {
@@ -116,6 +116,7 @@ export default function ReservationsScreen() {
   return (
     <DashboardLayout>
       <>
+        <StatusBar style={isDark ? "light" : "dark"} />
         <Box className="h-screen w-full">
           <ReleasesDrawer
             visible={showDrawer}
@@ -169,8 +170,11 @@ export default function ReservationsScreen() {
               </View>
             ) : (
               <View className="flex-row justify-between items-center mb-4 mt-4">
-                <Text className="font-bold text-lg">
-                  {/* {formatDateHuman(selectedDate)} */}
+                <Text
+                  style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+                  className={`text-2xl font-bold text-left`}
+                >
+                  Releases
                 </Text>
                 <View className="flex-row items-center">
                   <TouchableOpacity
@@ -343,7 +347,7 @@ export default function ReservationsScreen() {
                         : "The reservation list is already closed or was not found."}
                     </Text>
                     {searchQuery.length === 0 && (
-                      <Text>
+                      <Text style={{ fontFamily: "PublicSans-regular", color: theme.text }}>
                         Please come back on Friday for the new releases!
                       </Text>
                     )}
@@ -359,12 +363,12 @@ export default function ReservationsScreen() {
                       size="small"
                       color={theme.primary[500]}
                     />
-                    <Text className="mt-2">Loading products...</Text>
+                    <Text className="mt-2" style={{ fontFamily: "PublicSans-regular", color: theme.text }}>Loading products...</Text>
                   </View>
                 )}
 
                 {Array.isArray(products) && products.length > 0 && (
-                  <Text className="text-sm text-gray-500 mt-2">
+                  <Text className="text-sm text-gray-500 mt-2" style={{ fontFamily: "PublicSans-regular", color: theme.text }}>Showing {products.length} of {totalCount} products
                     Showing {products.length} of {totalCount} products
                   </Text>
                 )}
@@ -547,14 +551,14 @@ export default function ReservationsScreen() {
                           )}
                           <View className="mt-2">
                             <Text
-                              style={{ fontFamily: "Urbanist-Bold" }}
+                              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
                               numberOfLines={1}
                               className="font-bold"
                             >
                               {product.title}
                             </Text>
                             <Text
-                              style={{ fontFamily: "PublicSans-regular" }}
+                              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
                               numberOfLines={1}
                               className="text-gray-600"
                             >
