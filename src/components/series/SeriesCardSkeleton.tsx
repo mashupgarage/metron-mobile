@@ -1,15 +1,16 @@
 import React from "react";
-import { useColorScheme, View } from "react-native";
+import { Dimensions, View } from "react-native";
+import { useBoundStore } from "@/src/store";
 const SeriesCardSkeleton = ({ horizontal = false }) => {
-  const colorScheme = useColorScheme();
+  const theme = useBoundStore((state) => state.theme)
+  const thirdWidth = Dimensions.get('window').width / 3;
   return (
     <View
       style={{
-        width: 140,
-        marginRight: horizontal ? 0 : 0,
-        marginBottom: horizontal ? 0 : 16,
-        borderRadius: 8,
-        shadowColor: colorScheme === "dark" ? "#121212" : "#000",
+        width: thirdWidth * 0.9,
+        borderRadius: 2,
+        marginHorizontal: theme.spacing.xs,
+        shadowColor: theme.background2,
         shadowOpacity: 0.05,
         shadowRadius: 2,
         paddingTop: 8,
@@ -19,11 +20,11 @@ const SeriesCardSkeleton = ({ horizontal = false }) => {
       {/* Image skeleton */}
       <View
         style={{
-          height: 220,
-          width: "90%",
-          borderRadius: 8,
-          backgroundColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",
-          marginBottom: 12,
+          height: 200,
+          width: "100%",
+          backgroundColor: theme.background2,
+          marginBottom: theme.spacing.xs,
+          borderRadius: 2,
         }}
       />
       {/* Title skeleton */}
@@ -31,18 +32,18 @@ const SeriesCardSkeleton = ({ horizontal = false }) => {
         style={{
           height: 18,
           width: "70%",
-          backgroundColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",
-          borderRadius: 4,
-          marginBottom: 8,
+          backgroundColor: theme.background2,
+          marginBottom: theme.spacing.xs,
+          borderRadius: 2,
         }}
       />
       {/* Subtitle skeleton */}
       <View
         style={{
-          height: 14,
-          width: "50%",
-          borderRadius: 4,
-          backgroundColor: colorScheme === "dark" ? "#121212" : "#e5e7eb",
+          height: 18,
+          width: "70%",
+          borderRadius: 2,
+          backgroundColor: theme.background2,
         }}
       />
     </View>

@@ -12,6 +12,7 @@ import {
   useColorScheme,
   ScrollView,
   Pressable,
+  Dimensions,
 } from "react-native";
 import { Button } from "@/src/components/ui/button";
 import { useNavigation } from "@react-navigation/native";
@@ -356,7 +357,7 @@ export default function Product(props: {
             >
               Publisher
             </Text>
-            <Text style={{ marginBottom: 8 }}>{product?.publisher}</Text>
+            <Text style={{ marginBottom: 8, color: theme.text }}>{product?.publisher}</Text>
 
             {product?.creators && (
               <>
@@ -370,7 +371,7 @@ export default function Product(props: {
                 >
                   Creators
                 </Text>
-                <Text style={{ marginBottom: theme.spacing.md }}>
+                <Text style={{ marginBottom: theme.spacing.md, color: theme.text }}>
                   {product?.creators}
                 </Text>
               </>
@@ -550,7 +551,7 @@ export default function Product(props: {
                   showsHorizontalScrollIndicator={false}
                   keyExtractor={(item, idx) => `${item.id}_${idx}`}
                   renderItem={({ item }) => (
-                    <Box className="max-w-[180px]">
+                    <Box style={{ maxWidth: Dimensions.get('window').width / 3, marginRight: theme.spacing.md }}>
                       <ProductCard product={item} />
                     </Box>
                   )}
@@ -563,7 +564,7 @@ export default function Product(props: {
                       </Text>
                     )
                   }
-                  style={{ marginBottom: 16 }}
+                  style={{ marginBottom: theme.spacing.md }}
                 />
               </VStack>
             )}

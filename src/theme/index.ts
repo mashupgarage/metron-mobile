@@ -59,7 +59,7 @@ export const darkTheme = {
   ...colors,
   spacing,
   background: "#1a1a1a",
-  background2: colors.gray[800],
+  background2: "#2a2a2a",
   text: colors.gray[100],
   textSecondary: colors.gray[600],
   border: colors.gray[700],

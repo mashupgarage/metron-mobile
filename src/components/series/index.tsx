@@ -43,6 +43,7 @@ interface SeriesCardProps {
 
 const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   const colorScheme = useColorScheme();
+  const theme = useBoundStore(state => state.theme)
   const deviceWidth = Dimensions.get("window").width;
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const toast = useToast();
@@ -206,11 +207,11 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                   <HStack className="flex-row items-center" space="md">
                     <Download
                       size={28}
-                      color={colorScheme === "dark" ? "#FFFFFF" : "#DADADA"}
+                      color={theme.text}
                     />
                     <Text
                       style={{
-                        color: colorScheme === "dark" ? "#FFFFFF" : "#DADADA",
+                        color: theme.text,
                       }}
                     >
                       Download
@@ -257,12 +258,12 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
           )}
         </View>
         <View className="mt-2 px-2">
-          <Text numberOfLines={1} className="font-bold">
+          <Text numberOfLines={1} style={{ color: theme.text }} className="font-bold">
             {data.series.title}
           </Text>
 
           {data.owned_products && (
-            <Text className=" font-bold">
+            <Text style={{ color: theme.text }} className=" font-bold">
               {data.owned_products} out of{" "}
               {data.owned_products + data.unowned_products}
             </Text>

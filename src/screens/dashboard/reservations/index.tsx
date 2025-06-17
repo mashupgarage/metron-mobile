@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Modal,
   ScrollView,
-  useColorScheme,
+  Dimensions,
 } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 // @ts-ignore
@@ -37,6 +37,7 @@ export default function ReservationsScreen() {
   const store = useBoundStore();
   const { theme, isDark } = store;
   const toast = useToast();
+  const thirdWidth = Dimensions.get('window').width / 3;
 
   const {
     // State
@@ -165,7 +166,7 @@ export default function ReservationsScreen() {
                   className="ml-2 p-2"
                   onPress={() => setShowSearchBar(false)}
                 >
-                  <Text>Cancel</Text>
+                  <Text style={{ fontFamily: "Urbanist-Bold", color: theme.text }}>Cancel</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -208,7 +209,7 @@ export default function ReservationsScreen() {
                     }}
                   >
                     {isMultiSelectMode ? (
-                      <Text className="mr-4">Cancel</Text>
+                      <Text className="mr-4" style={{ fontFamily: "Inter", color: theme.text }}>Cancel</Text>
                     ) : (
                       <ClipboardCheck
                         size={24}
@@ -219,7 +220,7 @@ export default function ReservationsScreen() {
                   </TouchableOpacity>
                   {selectedProducts.length > 0 && (
                     <Pressable onPress={showConfirmationDialog}>
-                      <Text className="font-bold">
+                      <Text className="font-bold" style={{ fontFamily: "Inter", color: theme.text }}>
                         Confirm ({selectedProducts.length})
                       </Text>
                     </Pressable>
@@ -231,7 +232,7 @@ export default function ReservationsScreen() {
               </View>
             )}
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
               className="mb-2 text-sm"
             >
               {(() => {
@@ -393,14 +394,14 @@ export default function ReservationsScreen() {
                 </Text>
               </View>
             }
-            numColumns={2}
+            numColumns={3}
             keyExtractor={(item: any) => {
               // Use _uniqueKey from search results if available, otherwise use product id
               return item._uniqueKey || `${item.id}_${Date.now()}`;
             }}
-            contentContainerStyle={{
-              padding: 12,
-              paddingBottom: 0,
+            style={{
+              columnGap: 12,
+              marginHorizontal: 10,
             }}
             renderItem={({ item, i }) => {
               const product = item as ProductT;
@@ -409,14 +410,13 @@ export default function ReservationsScreen() {
               return (
                 <>
                   <View
-                    className="p-0"
                     style={
                       isMultiSelectMode && isSelected
                         ? {
-                            borderWidth: 1,
-                            borderColor: theme.primary[500],
-                            borderRadius: 4,
-                          }
+                          backgroundColor: theme.primary[800],
+                          width: thirdWidth * 0.9,
+                          flex: 1,
+                        }
                         : {}
                     }
                   >
@@ -497,14 +497,14 @@ export default function ReservationsScreen() {
                           ? {
                               borderWidth: 4,
                               borderColor: theme.primary[500],
-                              borderRadius: 12,
+                              borderRadius: 8,
                             }
                           : {},
                       ]}
                     >
                       <Box className="mb-2">
-                        <View
-                          style={{ padding: 4, margin: 8, marginBottom: 0 }}
+                        <View style={{ width: thirdWidth * 0.9 }}
+                          className="grid grid-cols-3"
                         >
                           {product.cover_url && !imageErrors[product.id] ? (
                             // Show actual image if URL exists and no error
@@ -517,7 +517,7 @@ export default function ReservationsScreen() {
                                   }`,
                               }}
                               alt={product.id.toString()}
-                              className="h-48 w-full rounded-md"
+                              className={'h-56 w-[150px]'}
                               resizeMode="cover"
                               onError={() => {
                                 console.log(
@@ -528,19 +528,10 @@ export default function ReservationsScreen() {
                                   [product.id]: true,
                                 }));
                               }}
-                              style={
-                                isMultiSelectMode && isSelected
-                                  ? {
-                                      borderWidth: 2,
-                                      borderColor: theme.primary[500],
-                                      borderRadius: 8,
-                                    }
-                                  : {}
-                              }
                             />
                           ) : (
                             // Show placeholder when URL is missing or there was an error
-                            <View className="h-48 w-full rounded-md bg-gray-200 flex items-center justify-center">
+                            <View className="h-56 w-[160px] bg-gray-200 flex items-center justify-center">
                               <Image
                                 source={ComicOdysseyIcon}
                                 alt="Placeholder"
@@ -551,8 +542,14 @@ export default function ReservationsScreen() {
                           )}
                           <View className="mt-2">
                             <Text
-                              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+                              style={{
+                                fontWeight: 'bold',
+                                fontFamily: 'Inter',
+                                maxWidth: thirdWidth * 0.9,
+                                color: theme.text,
+                              }}
                               numberOfLines={1}
+                              ellipsizeMode="tail"
                               className="font-bold"
                             >
                               {product.title}
@@ -560,6 +557,7 @@ export default function ReservationsScreen() {
                             <Text
                               style={{ fontFamily: "PublicSans-regular", color: theme.text }}
                               numberOfLines={1}
+                              ellipsizeMode="tail"
                               className="text-gray-600"
                             >
                               {product.creators}
@@ -584,7 +582,7 @@ export default function ReservationsScreen() {
                     </Pressable>
                   </View>
                   <TouchableOpacity
-                    className={`px-4 ${
+                    className={`px-0 py-4 ${
                       isWanted ? "opacity-50" : "opacity-100"
                     }`}
                     disabled={isWanted}
@@ -600,8 +598,7 @@ export default function ReservationsScreen() {
                     }}
                   >
                     <Text
-                      style={{ fontFamily: "PublicSans-regular" }}
-                      className="text-indigo-900 font-medium"
+                      style={{ fontFamily: "PublicSans-regular", color: theme.primary[400] }}
                     >
                       {isWanted ? "Wanted!" : "I want this"}
                     </Text>

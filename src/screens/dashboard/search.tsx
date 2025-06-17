@@ -91,15 +91,6 @@ export default function Search() {
             </Text>
           </>
         )}
-
-        {products.length > 0 && (
-          <Text
-            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
-            className="text-sm mt-2"
-          >
-            Showing {products.length} of {totalCount} products
-          </Text>
-        )}
       </Box>
     );
   };

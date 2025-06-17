@@ -3,7 +3,7 @@ import { FC, useState } from 'react'
 import { Box } from '../ui/box'
 import { Image } from '../ui/image'
 import { Text } from '../ui/text'
-import { View } from 'react-native'
+import { Dimensions, View } from 'react-native'
 import { useBoundStore } from '@/src/store'
 
 interface ProductCardProps {
@@ -17,11 +17,13 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
   const theme = useBoundStore((state) => state.theme)
 
   const mainImage = product.cover_url || undefined
+  const thirdWidth = Dimensions.get('window').width / 3;
 
   return (
     <Box className="mb-2">
       <View
-        style={{ marginBottom: 0, gap: 8, maxWidth: 160 }}
+        style={{
+          marginBottom: 0, width: thirdWidth * 0.9 }}
         className="grid grid-cols-3"
       >
         <Image
@@ -42,7 +44,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
             style={{
               fontWeight: 'bold',
               fontFamily: 'Inter',
-              maxWidth: 240,
+              maxWidth: thirdWidth * 0.9,
               color: theme.text,
             }}
             numberOfLines={1}

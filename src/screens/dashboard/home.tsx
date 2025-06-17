@@ -7,6 +7,7 @@ import {
   View,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import MasonryList from "@react-native-seoul/masonry-list";
 
@@ -39,7 +40,6 @@ const PAGE_SIZE = 10; // Define standard page size
 
 export default function Home() {
   const store = useBoundStore();
-  const colorScheme = useColorScheme();
   const theme = useBoundStore((state) => state.theme);
   const route = useRoute<RouteProp<ParamListBase, "Home">>();
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
@@ -52,6 +52,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isGrid, setIsGrid] = useState(true);
+  const thirdWidth = Dimensions.get('window').width / 3;
 
   console.log(
     "------------------------------------------------>",
@@ -318,7 +319,7 @@ export default function Home() {
                         fontWeight: "bold",
                         fontFamily: "Inter",
                         color: theme.text,
-                        maxWidth: 240,
+                        maxWidth: Dimensions.get('window').width - thirdWidth,
                       }}
                       numberOfLines={1}
                       ellipsizeMode="tail"

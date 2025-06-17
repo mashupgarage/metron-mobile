@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, FlatList, ActivityIndicator, View } from "react-native";
+import { Text, FlatList, ActivityIndicator, View, Dimensions } from "react-native";
 import { Box } from "@/src/components/ui/box";
 import { useBoundStore } from "@/src/store";
 import SeriesCard from "@/src/components/series";
@@ -12,6 +12,7 @@ import { HStack } from "@/src/components/ui/hstack";
 
 const DetailedCollectionScreen = () => {
   const [wantList, setWantList] = useState<number[]>([]);
+  const deviceWidth = Dimensions.get("window").width;
 
   const theme = useBoundStore((state) => state.theme);
   const route = useRoute();
@@ -85,6 +86,7 @@ const DetailedCollectionScreen = () => {
             maxWidth: "60%",
             fontFamily: "Inter",
             color: theme.text,
+            marginLeft: theme.spacing.md,
           }}
         >
           {title || ""}
@@ -96,6 +98,7 @@ const DetailedCollectionScreen = () => {
             fontSize: 16,
             fontFamily: "Inter",
             color: theme.text,
+            marginRight: theme.spacing.md,
           }}
         >
           {total_owned ?? 0} of {total_products ?? 0} Collected
@@ -106,10 +109,18 @@ const DetailedCollectionScreen = () => {
       >
         <FlatList
           data={[...collection].sort((a, b) => a.title.localeCompare(b.title))}
-          numColumns={3}
+          numColumns={deviceWidth > 325 ? 3 : 2}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{
             paddingTop: theme.spacing.md,
+            paddingHorizontal: theme.spacing.md,
+          }}
+          style={{
+            columnGap: 12,
+            marginHorizontal: 12,
+          }}
+          columnWrapperStyle={{
+            justifyContent: "space-between",
           }}
           renderItem={({ item }) => {
             // grey out products you dont own yet.
@@ -137,11 +148,10 @@ const DetailedCollectionScreen = () => {
 
             return (
               <Box
-                className="flex-1 mb-4"
+                className="mb-4"
                 style={{
                   height: 220,
                   width: 135,
-                  marginBottom: 16,
                 }}
               >
                 <SeriesCard

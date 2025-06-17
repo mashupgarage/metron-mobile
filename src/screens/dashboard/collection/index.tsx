@@ -15,9 +15,7 @@ import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
 import NavigationHeader from "@/src/components/navigation-header";
-import { useColorScheme } from "react-native";
 import { DashboardStackParams } from "@/src/utils/types/navigation";
-import { Spinner } from "@gluestack-ui/themed";
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +29,6 @@ const CollectionScreen = () => {
   }, [searchQuery]);
   const theme = useBoundStore((state) => state.theme);
   const store = useBoundStore();
-  const colorScheme = useColorScheme();
   const [seriesCount, setSeriesCount] = useState(0);
   const [collectedSeries, setCollectedSeries] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
@@ -76,6 +73,7 @@ const CollectionScreen = () => {
             fontWeight: "bold",
             fontFamily: "Urbanist-Bold",
             color: theme.text,
+            marginLeft: theme.spacing.sm,
           }}
         >
           Your Collection
@@ -86,6 +84,7 @@ const CollectionScreen = () => {
               fontSize: 16,
               fontFamily: "Urbanist-Bold",
               color: theme.text,
+              marginRight: theme.spacing.sm,
             }}
           >
             {seriesCount}
@@ -96,7 +95,7 @@ const CollectionScreen = () => {
       {/* Search Bar */}
       <Box
         style={{
-          paddingHorizontal: theme.spacing.md,
+          paddingHorizontal: theme.spacing.lg,
           marginBottom: theme.spacing.md,
         }}
       >
@@ -157,24 +156,24 @@ const CollectionScreen = () => {
           loading ? idx.toString() : item.series.id.toString()
         }
         contentContainerStyle={{
-          paddingHorizontal: theme.spacing.xs,
+          paddingHorizontal: theme.spacing.md,
+        }}
+        style={{
+          columnGap: 12,
+          marginHorizontal: 12,
         }}
         columnWrapperStyle={{
           justifyContent: "space-between",
         }}
         renderItem={({ item, index }) =>
           loading ? (
-            <Box key={index} className="items-center" style={{ width: 130 }}>
+            <Box key={index} className="items-center">
               <SeriesCardSkeleton />
             </Box>
           ) : (
             <Box
               key={item.series.id}
               className="items-center"
-              style={{
-                width: deviceWidth / 3,
-                marginBottom: theme.spacing.md,
-              }}
             >
               <Pressable
                 onPress={() =>
@@ -194,36 +193,25 @@ const CollectionScreen = () => {
             <Text
               style={{
                 fontSize: 24,
-                marginLeft: theme.spacing.xs,
                 fontWeight: "bold",
                 fontFamily: "Urbanist-Bold",
                 color: theme.text,
               }}
-              className=""
             >
               Top Series Collection
             </Text>
             <ScrollView
               horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingLeft: theme.spacing.md,
-                paddingRight: theme.spacing.md,
-                paddingTop: theme.spacing.md,
-                paddingBottom: theme.spacing.md,
-              }}
               style={{ marginBottom: theme.spacing.md }}
             >
               {loading ? (
-                <Box className="flex-row" style={{ paddingHorizontal: 12 }}>
-                  {Array.from({ length: 4 }).map((_, idx) => (
-                    <Box key={idx} style={{ marginRight: 24 }}>
-                      <SeriesCardSkeleton horizontal />
-                    </Box>
+                <Box className="flex-row">
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                      <SeriesCardSkeleton key={idx} horizontal />
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
-                <Box className="ml-2 mr-2 flex-1 h-20 items-center justify-center">
+                <Box className="flex-1 h-20 items-center justify-center">
                   <Text
                     style={{
                       fontSize: 16,
@@ -237,8 +225,11 @@ const CollectionScreen = () => {
               ) : (
                 collectedSeries.map((s) => (
                   <Pressable
+                    style={{
+                      width: deviceWidth / 3 * 0.9,
+                      marginRight: theme.spacing.xs,
+                    }}
                     key={s.series.id}
-                    style={{ marginRight: theme.spacing.lg }}
                     onPress={() =>
                       navigation.navigate("DetailedCollectionScreen", {
                         seriesId: s.series.id,
