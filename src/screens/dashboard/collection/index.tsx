@@ -200,17 +200,16 @@ const CollectionScreen = () => {
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
-                <Box className='flex-1 h-20 items-center justify-center'>
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontFamily: "Urbanist-Bold",
-                      color: theme.text,
-                    }}
-                  >
-                    No collected series yet.
-                  </Text>
-                </Box>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontFamily: "Urbanist-Bold",
+                    color: theme.text,
+                    marginLeft: theme.spacing.md,
+                  }}
+                >
+                  No collected series yet.
+                </Text>
               ) : (
                 collectedSeries.map((s) => (
                   <Pressable

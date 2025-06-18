@@ -1,5 +1,5 @@
-import { useBoundStore } from "@/src/store";
-import { StatusBar } from "expo-status-bar";
+import { useBoundStore } from "@/src/store"
+import { StatusBar } from "expo-status-bar"
 import {
   Text,
   View,
@@ -8,53 +8,52 @@ import {
   ScrollView,
   SafeAreaView,
   useColorScheme,
-} from "react-native";
-import { useEffect, useState } from "react";
-import { useWantListStore } from "@/src/store/slices/WantListSlice";
-import { Ionicons } from "@expo/vector-icons";
-import { getWantList, getUserCollection } from "@/src/api/apiEndpoints";
+} from "react-native"
+import { useEffect, useState } from "react"
+import { useWantListStore } from "@/src/store/slices/WantListSlice"
+import { Ionicons } from "@expo/vector-icons"
+import { getWantList, getUserCollection } from "@/src/api/apiEndpoints"
 
-import { removeAuthToken } from "@/src/api/tokenManager";
+import { removeAuthToken } from "@/src/api/tokenManager"
 
 export default function Profile(props: { navigation: any }) {
-  const store = useBoundStore();
-  const theme = useBoundStore((state) => state.theme);
-  const colorScheme = useColorScheme();
-  const wantlistCount = useWantListStore((state) => state.wantlistCount);
-  const setWantlistCount = useWantListStore((state) => state.setWantlistCount);
-  const setCollectionCount = (count: number) => store.setCollectionCount(count);
-  const collectionCount = store.collectionCount ?? 0;
+  const store = useBoundStore()
+  const theme = useBoundStore((state) => state.theme)
+  const colorScheme = useColorScheme()
+  const wantlistCount = useWantListStore((state) => state.wantlistCount)
+  const setWantlistCount = useWantListStore((state) => state.setWantlistCount)
+  const setCollectionCount = (count: number) => store.setCollectionCount(count)
+  const collectionCount = store.collectionCount ?? 0
 
-  const [checkingUser, setCheckingUser] = useState(true);
+  const [checkingUser, setCheckingUser] = useState(true)
 
   useEffect(() => {
     // Stall and check user existence
     if (!store.user) {
-      setCheckingUser(true);
+      setCheckingUser(true)
       setTimeout(() => {
-        props.navigation.replace("Auth", { screen: "SignIn" });
-      }, 300); // Small delay for loader effect
-      return;
+        props.navigation.replace("Auth", { screen: "SignIn" })
+      }, 300) // Small delay for loader effect
+      return
     }
-    setCheckingUser(false);
+    setCheckingUser(false)
     // Fetch wantlist count on mount
     getWantList()
       .then((res) => {
-        setWantlistCount(res.data.want_lists.length);
+        setWantlistCount(res.data.want_lists.length)
       })
       .catch(() => {
-        setWantlistCount(0);
-      });
+        setWantlistCount(0)
+      })
 
     getUserCollection()
       .then((res) => {
-        console.log("actual collection", res.data);
-        setCollectionCount(res.data.series.length);
+        setCollectionCount(res.data.series.length)
       })
       .catch(() => {
-        setCollectionCount(0);
-      });
-  }, [store.user, props.navigation]);
+        setCollectionCount(0)
+      })
+  }, [store.user, props.navigation])
 
   if (checkingUser) {
     return (
@@ -68,17 +67,12 @@ export default function Profile(props: { navigation: any }) {
       >
         <Text style={{ color: theme.text }}>Loading...</Text>
       </View>
-    );
+    )
   }
 
   const handleEditProfile = () => {
-    props.navigation.navigate("EditProfile");
-  };
-
-  const handleSettingPress = (setting: string) => {
-    // Handle settings navigation
-    console.log(`${setting} pressed`);
-  };
+    props.navigation.navigate("EditProfile")
+  }
 
   return (
     <SafeAreaView
@@ -88,6 +82,7 @@ export default function Profile(props: { navigation: any }) {
       }}
       className={"flex-1"}
     >
+      <StatusBar style={store.isDark ? "light" : "dark"} />
       <View
         style={{ borderColor: theme.border, borderBottomWidth: 1 }}
         className={`flex-row items-center justify-between py-4 px-5`}
@@ -101,18 +96,18 @@ export default function Profile(props: { navigation: any }) {
               color: theme.text,
               fontSize: 16,
             }}
-            className="font-semibold text-primary-600"
+            className='font-semibold text-primary-600'
           >
             Edit
           </Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView className="flex-1 pb-32">
-        <View className="items-center py-6">
+      <ScrollView className='flex-1 pb-32'>
+        <View className='items-center py-6'>
           <Image
             source={{ uri: "https://picsum.photos/200" }}
-            className="w-24 h-24 rounded-full mb-3"
+            className='w-24 h-24 rounded-full mb-3'
           />
           <Text
             style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
@@ -150,7 +145,7 @@ export default function Profile(props: { navigation: any }) {
               Orders
             </Text>
           </View> */}
-          <View className="items-center">
+          <View className='items-center'>
             <Text
               style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
               className={`text-2xl font-bold`}
@@ -164,7 +159,7 @@ export default function Profile(props: { navigation: any }) {
               Series Collections
             </Text>
           </View>
-          <View className="items-center">
+          <View className='items-center'>
             <Text
               style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
               className={`text-2xl font-bold`}
@@ -182,17 +177,17 @@ export default function Profile(props: { navigation: any }) {
 
         <View
           style={{ borderColor: theme.border }}
-          className="flex-row flex-wrap justify-between px-4 py-6"
+          className='flex-row flex-wrap justify-between px-4 py-6'
         >
           <TouchableOpacity
             style={{ backgroundColor: theme.background2 }}
             className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
-              props.navigation.navigate("ReservationBoxScreen");
+              props.navigation.navigate("ReservationBoxScreen")
             }}
           >
             <Ionicons
-              name="cube-outline"
+              name='cube-outline'
               size={24}
               color={theme.primary[500]}
             />
@@ -207,11 +202,11 @@ export default function Profile(props: { navigation: any }) {
             style={{ backgroundColor: theme.background2 }}
             className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
-              props.navigation.navigate("WantlistScreen");
+              props.navigation.navigate("OrdersScreen")
             }}
           >
             <Ionicons
-              name="list-outline"
+              name='basket-outline'
               size={24}
               color={theme.primary[500]}
             />
@@ -219,19 +214,19 @@ export default function Profile(props: { navigation: any }) {
               style={{ fontFamily: "PublicSans-regular", color: theme.text }}
               className={`mt-2 text-base text-center`}
             >
-              Wantlist
+              My Orders
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={{ backgroundColor: theme.background2 }}
             className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
-              console.log("clicked");
-              props.navigation.navigate("Collection");
+              console.log("clicked")
+              props.navigation.navigate("Collection")
             }}
           >
             <Ionicons
-              name="cube-outline"
+              name='cube-outline'
               size={24}
               color={theme.primary[500]}
             />
@@ -242,23 +237,42 @@ export default function Profile(props: { navigation: any }) {
               My Collection
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={{ backgroundColor: theme.background2 }}
+            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
+            onPress={() => {
+              props.navigation.navigate("WantlistScreen")
+            }}
+          >
+            <Ionicons
+              name='list-outline'
+              size={24}
+              color={theme.primary[500]}
+            />
+            <Text
+              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              className={`mt-2 text-base text-center`}
+            >
+              Wantlist
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       {/* Logout Button at Bottom */}
-      <View className="px-4 pb-8 absolute left-0 right-0 bottom-0 bg-transparent">
+      <View className='px-4 pb-8 absolute left-0 right-0 bottom-0 bg-transparent'>
         <TouchableOpacity
           className={`flex-row items-center justify-between py-4  ${`border-b-${theme.border}`}`}
           onPress={() => {
-            removeAuthToken();
-            store.setOnboardingDone(true);
-            store.setCartItems([]);
-            store.setCartCount(0);
-            store.setCollectionCount(0);
-            store.setUser(null);
+            removeAuthToken()
+            store.setOnboardingDone(true)
+            store.setCartItems([])
+            store.setCartCount(0)
+            store.setCollectionCount(0)
+            store.setUser(null)
           }}
         >
-          <View className="flex-row items-center">
-            <Ionicons name="log-out-outline" size={22} color={theme.text} />
+          <View className='flex-row items-center'>
+            <Ionicons name='log-out-outline' size={22} color={theme.text} />
             <Text
               style={{ fontFamily: "PublicSans-regular", color: theme.text }}
               className={`ml-3 text-base`}
@@ -266,10 +280,9 @@ export default function Profile(props: { navigation: any }) {
               Logout
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color={theme.text} />
+          <Ionicons name='chevron-forward' size={20} color={theme.text} />
         </TouchableOpacity>
       </View>
-      <StatusBar style="auto" />
     </SafeAreaView>
-  );
+  )
 }

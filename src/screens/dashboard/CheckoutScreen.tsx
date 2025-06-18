@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { View, Text, ScrollView } from "react-native"
+import { View, Text, ScrollView, Pressable } from "react-native"
+import * as Clipboard from "expo-clipboard"
 import { useNavigation } from "@react-navigation/native"
 import { useBoundStore } from "@/src/store"
 import { Button, ButtonText } from "@/src/components/ui/button"
@@ -49,7 +50,7 @@ interface CheckoutFormState {
   total_price: number
   delivery_option: "shipping" | "store"
   shipping_total: number
-  transaction_source: "paypal" | "bank_deposit" | "cod"
+  transaction_source: "paypal" | "bank_deposit" | "cod" | "pay_at_store"
   status: "pending"
 }
 
@@ -71,12 +72,10 @@ export default function CheckoutScreen({ route }: any) {
       cartItems.reduce((sum: number, item: any) => sum + Number(item.price), 0),
     [cartItems]
   )
-  const [deliveryOption, setDeliveryOption] = useState<"shipping" | "store">(
-    "store"
-  )
+  const [deliveryOption, setDeliveryOption] = useState<string>("Store Pick-up")
   const [transactionSource, setTransactionSource] = useState<
-    "paypal" | "bank_deposit" | "cod"
-  >("paypal")
+    "paypal" | "bank_deposit" | "cod" | "pay_at_store"
+  >("pay_at_store")
   const shippingTotal = 0
   const discountTotal = 0
   const totalPrice = subTotal + shippingTotal - discountTotal
@@ -91,7 +90,7 @@ export default function CheckoutScreen({ route }: any) {
     discount_total: discountTotal,
     sub_total_price: subTotal,
     total_price: totalPrice,
-    delivery_option: deliveryOption,
+    delivery_option: deliveryOption as "shipping" | "store",
     shipping_total: shippingTotal,
     transaction_source: transactionSource,
     status: "pending",
@@ -101,7 +100,7 @@ export default function CheckoutScreen({ route }: any) {
   React.useEffect(() => {
     setForm((prev) => ({
       ...prev,
-      delivery_option: deliveryOption,
+      delivery_option: deliveryOption as "shipping" | "store",
       transaction_source: transactionSource,
       shipping_total: shippingTotal,
       discount_total: discountTotal,
@@ -135,23 +134,26 @@ export default function CheckoutScreen({ route }: any) {
       return
     }
     // Validation (add more as needed)
-    if (
-      !form.phone_number ||
-      (deliveryOption === "shipping" &&
-        (!form.shipping_address || !form.shipping_region))
-    ) {
-      toast.show({
-        placement: "top",
-        render: ({ id }: any) => (
-          <Toast nativeID={"toast-" + id} action='error'>
-            <ToastTitle>Fill all required fields.</ToastTitle>
-          </Toast>
-        ),
-      })
-      return
-    }
+    // if (
+    //   !form.phone_number ||
+    //   (deliveryOption === "shipping" &&
+    //     (!form.shipping_address || !form.shipping_region))
+    // ) {
+    //   toast.show({
+    //     placement: "top",
+    //     render: ({ id }: any) => (
+    //       <Toast nativeID={"toast-" + id} action='error'>
+    //         <ToastTitle>Fill all required fields.</ToastTitle>
+    //       </Toast>
+    //     ),
+    //   })
+    //   return
+    // }
     try {
-      await checkoutCartItems(user.id, { order: form as any })
+      console.log({ ...form, delivery_option: "store" })
+      await checkoutCartItems(user.id, {
+        order: { ...form, delivery_option: "store" } as any,
+      })
       toast.show({
         placement: "top",
         render: ({ id }: any) => (
@@ -174,7 +176,7 @@ export default function CheckoutScreen({ route }: any) {
       })
     }
   }
-  const options = ["store"]
+  const options = ["Store Pick-up"]
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -203,7 +205,15 @@ export default function CheckoutScreen({ route }: any) {
             <SelectTrigger variant='outline' size='lg'>
               <SelectInput
                 value={deliveryOption}
-                onChange={(v) => setDeliveryOption(v as unknown as "store" | "shipping")}
+                // @ts-ignore
+                onChange={(e: { target: { value: string } }) => {
+                  console.log(e.target.value)
+                  if (e.target.value === "Store Pick-up") {
+                    setDeliveryOption("store")
+                  } else {
+                    setDeliveryOption("shipping")
+                  }
+                }}
                 placeholder='Select option'
               />
             </SelectTrigger>
@@ -312,7 +322,7 @@ export default function CheckoutScreen({ route }: any) {
               <FormControlLabel>
                 <FormControlLabelText>Branch</FormControlLabelText>
               </FormControlLabel>
-              <Input isDisabled={deliveryOption === "store"}>
+              <Input isDisabled={deliveryOption === "Store Pick-up"}>
                 <InputField
                   type='text'
                   value={form.branch}
@@ -386,6 +396,7 @@ export default function CheckoutScreen({ route }: any) {
             <Textarea size='md'>
               <TextareaInput
                 value={form.notes}
+                numberOfLines={3}
                 onChangeText={(v) => {
                   handleChange("notes", v)
                   if (!v) {
@@ -421,23 +432,138 @@ export default function CheckoutScreen({ route }: any) {
           <RadioGroup
             value={transactionSource}
             onChange={(val) =>
-              setTransactionSource(val as "paypal" | "bank_deposit" | "cod")
+              setTransactionSource(
+                val as "paypal" | "bank_deposit" | "cod" | "pay_at_store"
+              )
             }
           >
-            <Radio value='paypal' size='md'>
+            <Radio value='bank_deposit' size='md'>
               <RadioIndicator>
                 <RadioIcon as={CircleIcon} />
               </RadioIndicator>
-              <RadioLabel>PayPal</RadioLabel>
+              <RadioLabel>Bank Deposit</RadioLabel>
             </Radio>
-            <Radio isDisabled value='cod' size='md'>
+            <Radio value='pay_at_store' size='md'>
               <RadioIndicator>
                 <RadioIcon as={CircleIcon} />
               </RadioIndicator>
-              <RadioLabel>Cash</RadioLabel>
+              <RadioLabel>Pay at Store</RadioLabel>
             </Radio>
           </RadioGroup>
         </View>
+        {transactionSource === "bank_deposit" && (
+          <View style={{ marginBottom: 16 }}>
+            <Text
+              style={{
+                fontWeight: "bold",
+                marginBottom: 8,
+                fontSize: 16,
+                color: theme.text,
+              }}
+            >
+              Instructions to pay via bank
+            </Text>
+            <Text style={{ marginBottom: 8, color: theme.text }}>
+              Deposit the total order amount to any of these bank accounts near
+              you then upload a picture of the deposit slip, using the following
+              details:
+            </Text>
+            <View
+              style={{
+                flexDirection: "column",
+                gap: theme.spacing.md,
+                marginTop: theme.spacing.md,
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: theme.text,
+                    fontSize: 16,
+                    marginBottom: theme.spacing.md,
+                  }}
+                >
+                  Bank: BPI
+                </Text>
+                <Text style={{ color: theme.text }}>
+                  Account Name: Comic Odyssey, Inc.
+                </Text>
+                <Text style={{ color: theme.text }}>
+                  Account Number:{" "}
+                  <Pressable
+                    className='mt-2'
+                    onPress={async () => {
+                      await Clipboard.setStringAsync("2601-0259-41")
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }: any) => (
+                          <Toast nativeID={"toast-" + id} action='success'>
+                            <ToastTitle>Account number copied!</ToastTitle>
+                          </Toast>
+                        ),
+                      })
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        textDecorationLine: "underline",
+                        color: theme.text,
+                        lineHeight: 18,
+                      }}
+                    >
+                      2601-0259-41
+                    </Text>
+                  </Pressable>
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontWeight: "bold",
+                    color: theme.text,
+                    fontSize: 16,
+                    marginBottom: theme.spacing.md,
+                  }}
+                >
+                  Bank: BDO
+                </Text>
+                <Text style={{ color: theme.text }}>
+                  Account Name: Ma. Rowena Sansolis
+                </Text>
+                <Text style={{ color: theme.text }}>
+                  Account Number:{" "}
+                  <Pressable
+                    className='mt-2'
+                    onPress={async () => {
+                      await Clipboard.setStringAsync("0034-1802-0926")
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }: any) => (
+                          <Toast nativeID={"toast-" + id} action='success'>
+                            <ToastTitle>Account number copied!</ToastTitle>
+                          </Toast>
+                        ),
+                      })
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontWeight: "bold",
+                        textDecorationLine: "underline",
+                        color: theme.text,
+                        lineHeight: 18,
+                      }}
+                    >
+                      0034-1802-0926
+                    </Text>
+                  </Pressable>
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
         {/* Order Summary */}
         <View style={{ marginBottom: 16 }}>
           <Text
@@ -454,26 +580,66 @@ export default function CheckoutScreen({ route }: any) {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>Subtotal</Text>
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
+              Subtotal
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
               ₱{subTotal.toFixed(2)}
             </Text>
           </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
               Shipping Fee
             </Text>
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
               ₱{shippingTotal.toFixed(2)}
             </Text>
           </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>Discount</Text>
-            <Text style={{ fontSize: 16, color: theme.text, fontFamily: 'PublicSans-regular' }}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
+              Discount
+            </Text>
+            <Text
+              style={{
+                fontSize: 16,
+                color: theme.text,
+                fontFamily: "PublicSans-regular",
+              }}
+            >
               ₱{discountTotal.toFixed(2)}
             </Text>
           </View>

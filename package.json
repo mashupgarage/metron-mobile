@@ -46,6 +46,7 @@
     "axios": "^1.7.9",
     "babel-plugin-module-resolver": "^5.0.2",
     "expo": "~52.0.25",
+    "expo-clipboard": "^7.1.4",
     "expo-dev-client": "~5.0.20",
     "expo-font": "~13.0.4",
     "expo-media-library": "~17.0.6",

@@ -15,10 +15,12 @@ import DashboardLayout from "./_layout"
 import ProductCard from "@/src/components/product"
 import { Pressable } from "react-native-gesture-handler"
 import { useBoundStore } from "@/src/store"
+import { StatusBar } from "expo-status-bar"
 
 export default function Search() {
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
   const theme = useBoundStore((state) => state.theme)
+  const store = useBoundStore((state) => state)
   const [searchQuery, setSearchQuery] = useState("")
   const [products, setProducts] = useState<ProductT[]>([])
   const [loading, setLoading] = useState(false)
@@ -124,6 +126,7 @@ export default function Search() {
   return (
     <DashboardLayout>
       <Box className='h-screen w-full pb-24'>
+        <StatusBar style={store.isDark ? "light" : "dark"} />
         <VStack className='w-full px-4 mb-2'>
           <HStack className='w-full mb-6 mt-4'>
             <Input
