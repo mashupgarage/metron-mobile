@@ -9,7 +9,6 @@ const SeriesCardSkeleton = ({ horizontal = false }) => {
       style={{
         width: thirdWidth * 0.9,
         borderRadius: 2,
-        marginHorizontal: theme.spacing.xs,
         shadowColor: theme.background2,
         shadowOpacity: 0.05,
         shadowRadius: 2,

@@ -1,24 +1,24 @@
-import { ProductT } from "@/src/utils/types/common";
-import { FC, useState } from "react";
-import { Box } from "./ui/box";
-import { Image } from "./ui/image";
-import { Text } from "./ui/text";
-import { Dimensions, View } from "react-native";
-import { useBoundStore } from "../store";
+import { ProductT } from "@/src/utils/types/common"
+import { FC, useState } from "react"
+import { Box } from "./ui/box"
+import { Image } from "./ui/image"
+import { Text } from "./ui/text"
+import { Dimensions, View } from "react-native"
+import { useBoundStore } from "../store"
 
 interface ReservationCardProps {
-  product: ProductT;
+  product: ProductT
 }
 
 const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
-  const [imgError, setImgError] = useState(false);
-  const theme = useBoundStore((state) => state.theme);
-  const deviceWidth = Dimensions.get("window").width;
+  const [imgError, setImgError] = useState(false)
+  const theme = useBoundStore((state) => state.theme)
+  const deviceWidth = Dimensions.get("window").width
 
-  const mainImage = product.cover_url || undefined;
+  const mainImage = product.cover_url || undefined
 
   return (
-    <Box className={`mb-2 w-[${deviceWidth / 3}px]`}>
+    <Box className={`mb-2 w-[${(deviceWidth / 3) * 0.9}px]`}>
       <View style={{ marginBottom: 0 }}>
         <View style={{ position: "relative" }}>
           <Image
@@ -30,17 +30,17 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
             alt={"banner"}
             className={
               imgError
-                ? `h-56 p-2 w-[${deviceWidth / 3}px] rounded-md`
-                : `h-56 p-2 w-[${deviceWidth / 3}px] rounded-md`
+                ? `h-60 p-2 w-[${(deviceWidth / 3) * 0.9}px] rounded-md`
+                : `h-60 p-2 w-[${(deviceWidth / 3) * 0.9}px] rounded-md`
             }
-            resizeMode="contain"
+            resizeMode='contain'
             onError={() => setImgError(true)}
           />
           {/* Show full screen icon if owned */}
 
-          <View className="absolute top-0 left-0 right-0 bottom-0 h-full bg-black/50 justify-center items-center">
+          <View className='absolute top-0 left-0 right-0 bottom-0 h-full bg-black/50 justify-center items-center'>
             <Text
-              className="font-bold mt-8"
+              className='font-bold mt-8'
               style={{ color: theme.white, fontSize: 12 }}
             >
               {product.status === "for_approval"
@@ -49,7 +49,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
             </Text>
           </View>
         </View>
-        <View className="mt-2">
+        <View className='mt-2'>
           <Text
             numberOfLines={1}
             style={{
@@ -65,14 +65,14 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
               fontFamily: "PublicSans-regular",
               color: theme.text,
             }}
-            className="text-gray-600"
+            className='text-gray-600'
           >
             {product.creators}
           </Text>
         </View>
       </View>
     </Box>
-  );
-};
+  )
+}
 
-export default ReservationCard;
+export default ReservationCard

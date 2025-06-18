@@ -1,61 +1,56 @@
-import React, { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Text,
-  FlatList,
-  ScrollView,
-  TextInput,
-  Dimensions,
-} from "react-native";
-import { Box } from "@/src/components/ui/box";
-import { getUserCollection } from "@/src/api/apiEndpoints";
-import { useBoundStore } from "@/src/store";
-import SeriesCard from "@/src/components/series";
-import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { Pressable } from "react-native";
-import NavigationHeader from "@/src/components/navigation-header";
-import { DashboardStackParams } from "@/src/utils/types/navigation";
+import React, { useState, useEffect } from "react"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { Text, ScrollView, TextInput, Dimensions } from "react-native"
+import MasonryList from "@react-native-seoul/masonry-list"
+import { Box } from "@/src/components/ui/box"
+import { getUserCollection } from "@/src/api/apiEndpoints"
+import { useBoundStore } from "@/src/store"
+import SeriesCard from "@/src/components/series"
+import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton"
+import { NavigationProp, useNavigation } from "@react-navigation/native"
+import { Pressable } from "react-native"
+import NavigationHeader from "@/src/components/navigation-header"
+import { DashboardStackParams } from "@/src/utils/types/navigation"
 
 const CollectionScreen = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const deviceWidth = Dimensions.get("window").width;
+  const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedQuery, setDebouncedQuery] = useState("")
+  const deviceWidth = Dimensions.get("window").width
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
-  const theme = useBoundStore((state) => state.theme);
-  const store = useBoundStore();
-  const [seriesCount, setSeriesCount] = useState(0);
-  const [collectedSeries, setCollectedSeries] = useState<any[]>([]);
-  const [series, setSeries] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+      setDebouncedQuery(searchQuery)
+    }, 300)
+    return () => clearTimeout(handler)
+  }, [searchQuery])
+  const theme = useBoundStore((state) => state.theme)
+  const store = useBoundStore()
+  const [seriesCount, setSeriesCount] = useState(0)
+  const [collectedSeries, setCollectedSeries] = useState<any[]>([])
+  const [series, setSeries] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const navigation = useNavigation<NavigationProp<DashboardStackParams>>();
+  const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
 
   // Fetch collection from API
   useEffect(() => {
-    setLoading(true);
-    setSeriesCount(store.collectionCount);
+    setLoading(true)
+    setSeriesCount(store.collectionCount)
     // fetch collected series
     getUserCollection()
       .then((res) => {
-        setLoading(false);
-        setCollectedSeries(res.data.series_stats || []);
+        setLoading(false)
+        setCollectedSeries(res.data.series_stats || [])
         setSeries(
           res.data.series.sort((a: any, b: any) =>
             b.series.title.localeCompare(a.series.title)
           ) || []
-        );
+        )
       })
       .catch((err) => {
-        setLoading(false);
-        console.log("Failed to load collection", err);
-      });
-  }, []);
+        setLoading(false)
+        console.log("Failed to load collection", err)
+      })
+  }, [])
 
   return (
     <SafeAreaView
@@ -66,25 +61,23 @@ const CollectionScreen = () => {
     >
       {/* Header */}
       <NavigationHeader />
-      <Box className="flex-row items-center justify-between px-4 mt-8 mb-4">
+      <Box className='flex-row items-center justify-between px-4 mt-8 mb-4'>
         <Text
           style={{
             fontSize: 24,
             fontWeight: "bold",
             fontFamily: "Urbanist-Bold",
             color: theme.text,
-            marginLeft: theme.spacing.sm,
           }}
         >
           Your Collection
         </Text>
-        <Box className="flex-row">
+        <Box className='flex-row'>
           <Text
             style={{
               fontSize: 16,
               fontFamily: "Urbanist-Bold",
               color: theme.text,
-              marginRight: theme.spacing.sm,
             }}
           >
             {seriesCount}
@@ -101,7 +94,7 @@ const CollectionScreen = () => {
       >
         <Box style={{ position: "relative" }}>
           <TextInput
-            placeholder="Search by title..."
+            placeholder='Search by title...'
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{
@@ -128,7 +121,7 @@ const CollectionScreen = () => {
                 height: "100%",
                 width: 28,
               }}
-              accessibilityLabel="Clear search"
+              accessibilityLabel='Clear search'
             >
               <Text style={{ fontSize: 18, color: "#888" }}>✕</Text>
             </Pressable>
@@ -137,7 +130,7 @@ const CollectionScreen = () => {
       </Box>
 
       {/* Collection Grid */}
-      <FlatList
+      <MasonryList
         data={
           loading
             ? Array.from({ length: 6 })
@@ -151,42 +144,37 @@ const CollectionScreen = () => {
                     .includes(debouncedQuery.trim().toLowerCase())
               )
         }
+        scrollEnabled
         numColumns={deviceWidth > 325 ? 3 : 2}
         keyExtractor={(item, idx) =>
           loading ? idx.toString() : item.series.id.toString()
         }
-        contentContainerStyle={{
-          paddingHorizontal: theme.spacing.md,
-        }}
         style={{
+          alignSelf: "flex-start",
           columnGap: 12,
           marginHorizontal: 12,
         }}
-        columnWrapperStyle={{
-          justifyContent: "space-between",
-        }}
-        renderItem={({ item, index }) =>
+        renderItem={({ item, i }) =>
           loading ? (
-            <Box key={index} className="items-center">
+            <Box key={i} className='items-center'>
               <SeriesCardSkeleton />
             </Box>
           ) : (
-            <Box
-              key={item.series.id}
-              className="items-center"
-            >
+            <Box key={i} className='items-center'>
               <Pressable
                 onPress={() =>
                   navigation.navigate("DetailedCollectionScreen", {
+                    // @ts-ignore
                     seriesId: item.series.id,
                   })
                 }
               >
-                <SeriesCard data={item} />
+                <SeriesCard data={item as any} />
               </Pressable>
             </Box>
           )
         }
+        contentContainerStyle={{}}
         ListHeaderComponent={
           <>
             {/* Most Collected Series */}
@@ -196,22 +184,23 @@ const CollectionScreen = () => {
                 fontWeight: "bold",
                 fontFamily: "Urbanist-Bold",
                 color: theme.text,
+                marginBottom: theme.spacing.md,
+                marginLeft: theme.spacing.md,
               }}
             >
               Top Series Collection
             </Text>
-            <ScrollView
-              horizontal
-              style={{ marginBottom: theme.spacing.md }}
-            >
+            <ScrollView horizontal style={{ marginBottom: theme.spacing.md }}>
               {loading ? (
-                <Box className="flex-row">
+                <Box className='flex-row'>
                   {Array.from({ length: 3 }).map((_, idx) => (
-                      <SeriesCardSkeleton key={idx} horizontal />
+                    <Box style={{ marginLeft: theme.spacing.md }} key={idx}>
+                      <SeriesCardSkeleton horizontal />
+                    </Box>
                   ))}
                 </Box>
               ) : collectedSeries.length === 0 ? (
-                <Box className="flex-1 h-20 items-center justify-center">
+                <Box className='flex-1 h-20 items-center justify-center'>
                   <Text
                     style={{
                       fontSize: 16,
@@ -226,7 +215,8 @@ const CollectionScreen = () => {
                 collectedSeries.map((s) => (
                   <Pressable
                     style={{
-                      width: deviceWidth / 3 * 0.9,
+                      width: (deviceWidth / 3) * 0.9,
+                      marginLeft: theme.spacing.sm,
                       marginRight: theme.spacing.xs,
                     }}
                     key={s.series.id}
@@ -247,8 +237,9 @@ const CollectionScreen = () => {
                 fontWeight: "bold",
                 fontFamily: "Urbanist-Bold",
                 color: theme.text,
+                marginLeft: theme.spacing.md,
               }}
-              className="ml-2 pb-4"
+              className='ml-2 pb-4'
             >
               Series Collection
             </Text>
@@ -256,7 +247,7 @@ const CollectionScreen = () => {
         }
       />
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default CollectionScreen;
+export default CollectionScreen
