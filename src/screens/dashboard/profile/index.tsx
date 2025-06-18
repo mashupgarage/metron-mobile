@@ -5,27 +5,36 @@ import {
   View,
   Image,
   TouchableOpacity,
-  ScrollView,
   SafeAreaView,
-  useColorScheme,
+  FlatList,
 } from "react-native"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useWantListStore } from "@/src/store/slices/WantListSlice"
 import { Ionicons } from "@expo/vector-icons"
-import { getWantList, getUserCollection } from "@/src/api/apiEndpoints"
+import {
+  getWantList,
+  getUserCollection,
+  getReservationList,
+} from "@/src/api/apiEndpoints"
 
 import { removeAuthToken } from "@/src/api/tokenManager"
+import CollectionScreen from "@/src/screens/dashboard/collection"
+import OrdersScreen from "../orders/OrdersScreen"
+import WantlistScreen from "../wantlist/WantlistScreen"
+import { fonts } from "@/src/theme"
+import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
 
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore()
   const theme = useBoundStore((state) => state.theme)
-  const colorScheme = useColorScheme()
   const wantlistCount = useWantListStore((state) => state.wantlistCount)
   const setWantlistCount = useWantListStore((state) => state.setWantlistCount)
   const setCollectionCount = (count: number) => store.setCollectionCount(count)
   const collectionCount = store.collectionCount ?? 0
+  const [reservationCount, setReservationCount] = useState(0)
 
   const [checkingUser, setCheckingUser] = useState(true)
+  const [selectedTab, setSelectedTab] = useState("collections")
 
   useEffect(() => {
     // Stall and check user existence
@@ -37,7 +46,14 @@ export default function Profile(props: { navigation: any }) {
       return
     }
     setCheckingUser(false)
-    // Fetch wantlist count on mount
+    getReservationList(store.user.id, 1, 50)
+      .then((res) => {
+        console.log("reservations", res.data)
+        setReservationCount(res.data.metadata?.total_count)
+      })
+      .catch(() => {
+        console.log("Failed to fetch reservations")
+      })
     getWantList()
       .then((res) => {
         setWantlistCount(res.data.want_lists.length)
@@ -70,10 +86,6 @@ export default function Profile(props: { navigation: any }) {
     )
   }
 
-  const handleEditProfile = () => {
-    props.navigation.navigate("EditProfile")
-  }
-
   return (
     <SafeAreaView
       style={{
@@ -83,205 +95,121 @@ export default function Profile(props: { navigation: any }) {
       className={"flex-1"}
     >
       <StatusBar style={store.isDark ? "light" : "dark"} />
+      {/* Topbar with avatar, email, settings, and logout */}
       <View
-        style={{ borderColor: theme.border, borderBottomWidth: 1 }}
-        className={`flex-row items-center justify-between py-4 px-5`}
+        style={{
+          borderColor: theme.background2,
+          borderBottomWidth: 1,
+          paddingVertical: 16,
+          paddingHorizontal: 20,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: theme.background,
+        }}
       >
-        {/* <Text className="text-xl font-semibold">Profile</Text> */}
-        <View />
-        <TouchableOpacity onPress={handleEditProfile}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Image
+            source={{ uri: "https://picsum.photos/100" }}
+            style={{ width: 36, height: 36, borderRadius: 18, marginRight: 12 }}
+          />
           <Text
             style={{
               fontFamily: "Inter",
               color: theme.text,
-              fontSize: 16,
+              fontSize: 15,
+              fontWeight: "500",
             }}
-            className='font-semibold text-primary-600'
-          >
-            Edit
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView className='flex-1 pb-32'>
-        <View className='items-center py-6'>
-          <Image
-            source={{ uri: "https://picsum.photos/200" }}
-            className='w-24 h-24 rounded-full mb-3'
-          />
-          <Text
-            style={{ fontFamily: "Inter", color: theme.text }}
-            className={`text-xl font-bold mb-1`}
-          >
-            {store.user?.full_name}
-          </Text>
-          <Text
-            style={{ fontFamily: "Inter", color: theme.text }}
-            className={`text-base`}
           >
             {store.user?.email}
           </Text>
         </View>
-
-        <View
-          style={{ borderColor: theme.border }}
-          className={`flex-row justify-around py-5 border-y mx-4`}
-        >
-          {/* <View className="items-center">
-            <Text
-              className={`text-2xl font-bold ${
-                colorScheme === "dark" ? "text-mdark-text" : "text-gray-900"
-              }`}
-            >
-              {ordersCount}
-            </Text>
-            <Text
-              className={`text-base ${
-                colorScheme === "dark"
-                  ? "text-mdark-textSecondary"
-                  : "text-gray-500"
-              }`}
-            >
-              Orders
-            </Text>
-          </View> */}
-          <View className='items-center'>
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`text-2xl font-bold`}
-            >
-              {collectionCount}
-            </Text>
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`text-base`}
-            >
-              Series Collections
-            </Text>
-          </View>
-          <View className='items-center'>
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`text-2xl font-bold`}
-            >
-              {wantlistCount}
-            </Text>
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`text-base`}
-            >
-              Wantlist
-            </Text>
-          </View>
-        </View>
-
-        <View
-          style={{ borderColor: theme.border }}
-          className='flex-row flex-wrap justify-between px-4 py-6'
-        >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <TouchableOpacity
-            style={{ backgroundColor: theme.background2 }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
-            onPress={() => {
-              props.navigation.navigate("ReservationBoxScreen")
-            }}
+            onPress={() => props.navigation.navigate("EditProfile")}
+            style={{ marginRight: 18 }}
           >
-            <Ionicons
-              name='cube-outline'
-              size={24}
-              color={theme.primary[500]}
-            />
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`mt-2 text-base text-center`}
-            >
-              Reservation Box
-            </Text>
+            <Ionicons name='settings-outline' size={22} color={theme.text} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ backgroundColor: theme.background2 }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
             onPress={() => {
-              props.navigation.navigate("OrdersScreen")
+              removeAuthToken()
+              store.setOnboardingDone(true)
+              store.setCartItems([])
+              store.setCartCount(0)
+              store.setCollectionCount(0)
+              store.setUser(null)
             }}
           >
-            <Ionicons
-              name='basket-outline'
-              size={24}
-              color={theme.primary[500]}
-            />
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`mt-2 text-base text-center`}
-            >
-              My Orders
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ backgroundColor: theme.background2 }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
-            onPress={() => {
-              console.log("clicked")
-              props.navigation.navigate("Collection")
-            }}
-          >
-            <Ionicons
-              name='cube-outline'
-              size={24}
-              color={theme.primary[500]}
-            />
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`mt-2 text-base text-center`}
-            >
-              My Collection
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{ backgroundColor: theme.background2 }}
-            className={`w-[48%] rounded-lg p-4 items-center mb-4`}
-            onPress={() => {
-              props.navigation.navigate("WantlistScreen")
-            }}
-          >
-            <Ionicons
-              name='list-outline'
-              size={24}
-              color={theme.primary[500]}
-            />
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`mt-2 text-base text-center`}
-            >
-              Wantlist
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-      {/* Logout Button at Bottom */}
-      <View className='px-4 pb-8 absolute left-0 right-0 bottom-0 bg-transparent'>
-        <TouchableOpacity
-          className={`flex-row items-center justify-between py-4  ${`border-b-${theme.border}`}`}
-          onPress={() => {
-            removeAuthToken()
-            store.setOnboardingDone(true)
-            store.setCartItems([])
-            store.setCartCount(0)
-            store.setCollectionCount(0)
-            store.setUser(null)
-          }}
-        >
-          <View className='flex-row items-center'>
             <Ionicons name='log-out-outline' size={22} color={theme.text} />
-            <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
-              className={`ml-3 text-base`}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Pill-shaped Tabs */}
+      <View className='p-4 '>
+        <FlatList
+          data={[
+            {
+              key: "collections",
+              label: `Collections`,
+              count: collectionCount,
+            },
+
+            {
+              key: "reservations",
+              label: `Reservations`,
+              count: reservationCount,
+            },
+            { key: "wantlist", label: `Wantlist`, count: wantlistCount },
+            { key: "orders", label: `Orders`, count: store.ordersCount ?? 0 },
+          ]}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.key}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingBottom: 8,
+            backgroundColor: theme.background,
+          }}
+          renderItem={({ item: tab }) => (
+            <TouchableOpacity
+              key={tab.key}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 7,
+                borderRadius: 18,
+                marginRight: 8,
+                backgroundColor:
+                  selectedTab === tab.key
+                    ? theme.primary[500]
+                    : theme.background2,
+              }}
+              onPress={() => setSelectedTab(tab.key)}
             >
-              Logout
-            </Text>
-          </View>
-          <Ionicons name='chevron-forward' size={20} color={theme.text} />
-        </TouchableOpacity>
+              <Text
+                style={{
+                  ...fonts.body,
+                  color: selectedTab === tab.key ? "#fff" : theme.text,
+                  fontWeight: selectedTab === tab.key ? "bold" : "500",
+                }}
+              >
+                {tab.label}{" "}
+                <Text style={{ color: theme.text, ...fonts.label }}>
+                  {tab.count}
+                </Text>
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+
+      {/* Tab Content */}
+      <View style={{ flex: 1, backgroundColor: theme.background }}>
+        {selectedTab === "collections" && <CollectionScreen />}
+        {selectedTab === "reservations" && <ReservationBoxScreen />}
+        {selectedTab === "wantlist" && <WantlistScreen />}
+        {selectedTab === "orders" && <OrdersScreen />}
       </View>
     </SafeAreaView>
   )

@@ -54,18 +54,9 @@ const CollectionScreen = () => {
   }, [])
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: theme.background,
-      }}
-    >
-      {/* Header */}
-      <NavigationHeader />
-      <Box className='flex-row items-center justify-between px-4 mt-8 mb-4'>
-        <Text style={[fonts.title, { color: theme.text }]}>
-          Your Collection
-        </Text>
+    <>
+      <Box className='flex-row items-center justify-between px-4 mb-4'>
+        <Text style={[fonts.title, { color: theme.text }]}>Collections</Text>
         <Box className='flex-row'>
           <Text style={[fonts.body, { color: theme.text }]}>{seriesCount}</Text>
         </Box>
@@ -75,7 +66,7 @@ const CollectionScreen = () => {
       <Box
         style={{
           paddingHorizontal: theme.spacing.lg,
-          marginBottom: theme.spacing.md,
+          marginBottom: theme.spacing.xl,
         }}
       >
         <Box style={{ position: "relative" }}>
@@ -183,13 +174,14 @@ const CollectionScreen = () => {
               style={[
                 fonts.title,
                 {
+                  marginTop: theme.spacing.lg,
                   color: theme.text,
                   marginLeft: theme.spacing.md,
                   marginBottom: theme.spacing.md,
                 },
               ]}
             >
-              Top Series Collection
+              Top Collected Series
             </Text>
             <ScrollView horizontal style={{ marginBottom: theme.spacing.md }}>
               {loading ? (
@@ -249,7 +241,7 @@ const CollectionScreen = () => {
           </>
         }
       />
-    </SafeAreaView>
+    </>
   )
 }
 

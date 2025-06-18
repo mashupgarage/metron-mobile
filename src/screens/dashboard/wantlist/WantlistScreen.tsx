@@ -59,13 +59,14 @@ interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
 
 import { useColorScheme } from "react-native"
 import { Box } from "@/src/components/ui/box"
+import { fonts } from "@/src/theme"
 
 const WantlistScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const deviceWidth = Dimensions.get("window").width
 
   const [imgError, setImgError] = useState(false)
-  const [isGrid, setIsGrid] = useState(true)
+  const [isGrid, setIsGrid] = useState(false)
   const store = useBoundStore()
   const navigation = useNavigation()
   const toast = useToast()
@@ -507,15 +508,7 @@ const WantlistScreen = () => {
   }
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-        paddingTop: theme.spacing.xl,
-      }}
-    >
-      <NavigationHeader />
-
+    <>
       {/* Header with title and view toggle */}
       <View
         style={{
@@ -523,13 +516,18 @@ const WantlistScreen = () => {
           alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: 16,
-          paddingVertical: 12,
         }}
       >
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text }}>
+        <Text
+          style={{
+            ...fonts.title,
+            color: theme.text,
+            marginBottom: theme.spacing.md,
+          }}
+        >
           Want List
         </Text>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{ padding: 8, borderRadius: 999 }}
           onPress={() => setIsGrid((prev) => !prev)}
         >
@@ -538,7 +536,7 @@ const WantlistScreen = () => {
           ) : (
             <LayoutGrid size={24} color={colors.icon} />
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Search Bar */}
@@ -599,8 +597,9 @@ const WantlistScreen = () => {
               lineHeight: 20,
             }}
           >
-            This is your want list. You'll be notified when items become
-            available. Products are first come, first served.
+            This is your want list. You'll be able to add the products listed in
+            here to your cart when they become available. Products are first
+            come, first served.
           </Text>
         </View>
       </View>
@@ -658,13 +657,13 @@ const WantlistScreen = () => {
       )}
 
       {/* Item count footer */}
-      <View style={{ alignItems: "center", marginVertical: 8 }}>
-        <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+      <View style={{ alignItems: "center", marginVertical: 24 }}>
+        <Text style={[fonts.caption, { color: colors.textSecondary }]}>
           Showing {Math.min(wantlistItems.length, totalCount)} of {totalCount}{" "}
           items
         </Text>
       </View>
-    </SafeAreaView>
+    </>
   )
 }
 

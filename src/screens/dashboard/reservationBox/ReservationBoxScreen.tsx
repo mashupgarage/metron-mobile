@@ -221,29 +221,18 @@ export default function ReservationBoxScreen() {
   // No need to filter reservations on the frontend, as search is now server-side
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        paddingTop: theme.spacing.xl,
-        backgroundColor: colors.background,
-      }}
-    >
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <NavigationHeader />
+    <>
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: 16,
-          paddingVertical: 12,
+          marginBottom: theme.spacing.md,
         }}
       >
-        <Text style={[fonts.title, { color: colors.text }]}>
-          Reservation Box
-        </Text>
+        <Text style={[fonts.title, { color: colors.text }]}>Reservations</Text>
         <TouchableOpacity
-          style={{ padding: 8, borderRadius: 999 }}
+          style={{ padding: 0, borderRadius: 999 }}
           onPress={() => setIsGrid((prev) => !prev)}
         >
           {isGrid ? (
@@ -254,7 +243,7 @@ export default function ReservationBoxScreen() {
         </TouchableOpacity>
       </View>
       {/* Search Bar */}
-      <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+      <View style={{ paddingHorizontal: 16, marginBottom: theme.spacing.xl }}>
         <View style={{ position: "relative" }}>
           <TextInput
             placeholder='Search by title...'
@@ -418,12 +407,12 @@ export default function ReservationBoxScreen() {
           }
         />
       )}
-      <View style={{ alignItems: "center", marginVertical: 8 }}>
-        <Text style={[fonts.body, { color: colors.textSecondary }]}>
+      <View style={{ alignItems: "center", marginVertical: 24 }}>
+        <Text style={[fonts.caption, { color: colors.textSecondary }]}>
           Showing {Math.min(reservations.length, totalCount)} of {totalCount}{" "}
           reserved items
         </Text>
       </View>
-    </SafeAreaView>
+    </>
   )
 }

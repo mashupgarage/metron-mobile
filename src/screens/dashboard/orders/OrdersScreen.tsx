@@ -1,20 +1,13 @@
 import { Linking, Pressable, Text, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
 import { useBoundStore } from "@/src/store"
-import NavigationHeader from "@/src/components/navigation-header"
-import { StatusBar } from "expo-status-bar"
 import { useEffect, useState } from "react"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { getOrders } from "@/src/api/apiEndpoints"
 import { Box } from "@/src/components/ui/box"
-import { NavigationProp, useNavigation } from "@react-navigation/native"
-import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { fonts } from "@/src/theme"
 
 const OrdersScreen = () => {
-  const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
   const theme = useBoundStore((state) => state.theme)
-  const store = useBoundStore((state) => state.isDark)
   const user = useBoundStore((state) => state.user)
   const [orders, setOrders] = useState<any[]>([])
 
@@ -119,16 +112,13 @@ const OrdersScreen = () => {
   }
 
   return (
-    <SafeAreaView>
-      <NavigationHeader />
-      <StatusBar style={store ? "light" : "dark"} />
+    <>
       <Text
         style={[
           fonts.title,
           {
             color: theme.text,
             marginHorizontal: theme.spacing.md,
-            marginTop: theme.spacing.xl,
           },
         ]}
       >
@@ -221,7 +211,7 @@ const OrdersScreen = () => {
           renderItem={renderItem}
         />
       </Box>
-    </SafeAreaView>
+    </>
   )
 }
 

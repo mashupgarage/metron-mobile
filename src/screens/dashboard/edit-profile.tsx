@@ -35,6 +35,7 @@ import {
 import NavigationHeader from "@/src/components/navigation-header"
 import { fetchUserProfile, updateUserProfile } from "@/src/api/apiEndpoints"
 import { useBoundStore } from "@/src/store"
+import { fonts } from "@/src/theme"
 
 type DashboardStackParamList = {
   EditProfile: undefined
@@ -50,7 +51,7 @@ type Props = StackScreenProps<DashboardStackParamList, "EditProfile">
 
 const EditProfile = ({ navigation }: Props) => {
   const store = useBoundStore()
-  const colorScheme = useColorScheme()
+  const theme = useBoundStore((state) => state.theme)
   const fullNameArray = store.user?.full_name.split(" ")
   const ln = fullNameArray.pop()
   const fn = fullNameArray.join(" ")
@@ -90,9 +91,8 @@ const EditProfile = ({ navigation }: Props) => {
 
   return (
     <SafeAreaView
-      className={`flex-1 ${
-        colorScheme === "dark" ? "bg-mdark-background" : "bg-white"
-      }`}
+      className={"flex-1"}
+      style={{ backgroundColor: theme.background }}
     >
       <NavigationHeader />
       <KeyboardAvoidingView
@@ -108,7 +108,10 @@ const EditProfile = ({ navigation }: Props) => {
 
         <ScrollView className='flex-1'>
           <Box className='p-5'>
-            <Text className='text-2xl font-semibold mb-6 mt-4'>
+            <Text
+              style={[fonts.title, { color: theme.text }]}
+              className='text-2xl font-semibold mb-6 mt-4'
+            >
               Edit Account
             </Text>
 
@@ -116,7 +119,9 @@ const EditProfile = ({ navigation }: Props) => {
               {/* Email Field */}
               <FormControl className='mb-4'>
                 <FormControlLabel>
-                  <FormControlLabelText>Email</FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
+                    Email
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input size='xl' className='my-1'>
                   <InputField
@@ -132,7 +137,9 @@ const EditProfile = ({ navigation }: Props) => {
               {/* First Name Field */}
               <FormControl className='mb-4'>
                 <FormControlLabel>
-                  <FormControlLabelText>First name</FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
+                    First name
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input size='xl' className='my-1'>
                   <InputField
@@ -146,7 +153,9 @@ const EditProfile = ({ navigation }: Props) => {
               {/* Last Name Field */}
               <FormControl className='mb-4'>
                 <FormControlLabel>
-                  <FormControlLabelText>Last name</FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
+                    Last name
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input size='xl' className='my-1'>
                   <InputField
@@ -160,7 +169,9 @@ const EditProfile = ({ navigation }: Props) => {
               {/* Contact Number Field */}
               <FormControl className='mb-4'>
                 <FormControlLabel>
-                  <FormControlLabelText>Contact number</FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
+                    Contact number
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input size='xl' className='my-1'>
                   <InputField
@@ -175,7 +186,9 @@ const EditProfile = ({ navigation }: Props) => {
               {/* Branch Selection */}
               <FormControl className='mb-4'>
                 <FormControlLabel>
-                  <FormControlLabelText>Branch</FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
+                    Branch
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Select
                   className='mt-2'
@@ -204,7 +217,7 @@ const EditProfile = ({ navigation }: Props) => {
               {/* Default Fulfillment Option */}
               <FormControl className='mb-6'>
                 <FormControlLabel>
-                  <FormControlLabelText>
+                  <FormControlLabelText style={{ color: theme.text }}>
                     Fulfillment Option
                   </FormControlLabelText>
                 </FormControlLabel>
@@ -218,9 +231,7 @@ const EditProfile = ({ navigation }: Props) => {
                   <SelectTrigger size='xl'>
                     <SelectInput placeholder='Select fulfillment option' />
                     <SelectIcon className='mr-3'>
-                      <ChevronDownIcon
-                        color={colorScheme === "dark" ? "#ffffff" : "#333"}
-                      />
+                      <ChevronDownIcon color={theme.text} />
                     </SelectIcon>
                   </SelectTrigger>
                   <SelectPortal>
@@ -238,8 +249,13 @@ const EditProfile = ({ navigation }: Props) => {
             </VStack>
           </Box>
         </ScrollView>
-        <Button size='xl' className='ml-4 mr-4 mb-4' onPress={handleUpdate}>
-          <ButtonText>Update</ButtonText>
+        <Button
+          size='xl'
+          className='ml-4 mr-4 mb-4'
+          style={{ backgroundColor: theme.primary[500] }}
+          onPress={handleUpdate}
+        >
+          <ButtonText style={{ color: theme.white }}>Update</ButtonText>
         </Button>
       </KeyboardAvoidingView>
     </SafeAreaView>
