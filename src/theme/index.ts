@@ -9,13 +9,13 @@ export const spacing = {
 export const fonts = {
   body: {
     fontSize: 16,
-    lineHeight: 18,
+    lineHeight: 24,
     fontFamily: "Inter",
     fontWeight: "normal" as "normal",
   },
   label: {
     fontSize: 16,
-    lineHeight: 20,
+    lineHeight: 24,
     fontFamily: "Inter",
     fontWeight: "bold" as "bold",
   },

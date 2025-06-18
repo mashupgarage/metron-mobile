@@ -345,39 +345,36 @@ export default function CheckoutScreen({ route }: any) {
                   Branch
                 </FormControlLabelText>
               </FormControlLabel>
-              <Input isDisabled={deliveryOption === "Store Pick-up"}>
-                <InputField
-                  type='text'
-                  style={[
-                    {
-                      color: theme.text,
-                      width: "100%",
-                      borderColor: theme.border,
-                      borderWidth: 1,
-                      borderRadius: 4,
-                      paddingTop: 6,
-                      marginBottom: theme.spacing.xs,
-                      height: 38.5,
-                      paddingLeft: theme.spacing.sm,
-                    },
-                    fonts.body,
-                  ]}
-                  value={form.branch}
-                  placeholder='Enter branch name'
-                  onChangeText={(v) => {
-                    handleChange("branch", v)
-                    if (!v) {
-                      setFormErrors((prev) => ({
-                        ...prev,
-                        branch: "Branch is required.",
-                      }))
-                    } else {
-                      setFormErrors((prev) => ({ ...prev, branch: undefined }))
-                    }
-                  }}
-                  autoCapitalize='none'
-                />
-              </Input>
+              <TextInput
+                style={[
+                  fonts.body,
+                  {
+                    color: theme.text,
+                    width: "100%",
+                    height: 38.5,
+                    borderWidth: 1,
+                    lineHeight: 20,
+                    borderColor: theme.border,
+                    borderRadius: 4,
+                    marginBottom: theme.spacing.xs,
+                    paddingLeft: theme.spacing.sm,
+                  },
+                ]}
+                value={form.branch}
+                placeholder='Enter branch name'
+                onChangeText={(v) => {
+                  handleChange("branch", v)
+                  if (!v) {
+                    setFormErrors((prev) => ({
+                      ...prev,
+                      branch: "Branch is required.",
+                    }))
+                  } else {
+                    setFormErrors((prev) => ({ ...prev, branch: undefined }))
+                  }
+                }}
+                autoCapitalize='none'
+              />
               {!!formErrors.branch && (
                 <FormControlError>
                   <FormControlErrorText style={[fonts.body]}>
@@ -421,6 +418,7 @@ export default function CheckoutScreen({ route }: any) {
                   width: "100%",
                   borderColor: theme.border,
                   borderWidth: 1,
+                  lineHeight: 20,
                   borderRadius: 4,
                   paddingVertical: 4,
                   marginBottom: theme.spacing.xs,

@@ -5,6 +5,7 @@ import { Image } from "./ui/image"
 import { Text } from "./ui/text"
 import { Dimensions, View } from "react-native"
 import { useBoundStore } from "../store"
+import { fonts } from "../theme"
 
 interface ReservationCardProps {
   product: ProductT
@@ -39,10 +40,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           {/* Show full screen icon if owned */}
 
           <View className='absolute top-0 left-0 right-0 bottom-0 h-full bg-black/50 justify-center items-center'>
-            <Text
-              className='font-bold mt-8'
-              style={{ color: theme.white, fontSize: 12 }}
-            >
+            <Text style={[fonts.caption, { color: theme.white }]}>
               {product.status === "for_approval"
                 ? "Pending Approval"
                 : product.status}
@@ -50,22 +48,12 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           </View>
         </View>
         <View className='mt-2'>
-          <Text
-            numberOfLines={1}
-            style={{
-              fontFamily: "Inter",
-              color: theme.text,
-            }}
-          >
+          <Text numberOfLines={1} style={[fonts.label, { color: theme.text }]}>
             {product.title}
           </Text>
           <Text
             numberOfLines={1}
-            style={{
-              fontFamily: "Inter",
-              color: theme.text,
-            }}
-            className='text-gray-600'
+            style={[fonts.caption, { color: theme.text }]}
           >
             {product.creators}
           </Text>

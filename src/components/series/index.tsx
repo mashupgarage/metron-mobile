@@ -1,87 +1,88 @@
-import { FC, useState } from "react";
-import { Box } from "../ui/box";
-import { Image } from "../ui/image";
-import { Text } from "../ui/text";
-import { Dimensions, Pressable, View } from "react-native";
-import { addToWantList } from "@/src/api/apiEndpoints";
-import { useToast } from "@/src/components/ui/toast";
-import { useBoundStore } from "@/src/store";
-import { ShoppingCart, StarIcon, ZoomIn, Download } from "lucide-react-native";
-import ImageViewing from "react-native-image-viewing";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
+import { FC, useState } from "react"
+import { Box } from "../ui/box"
+import { Image } from "../ui/image"
+import { Text } from "../ui/text"
+import { Dimensions, Pressable, View } from "react-native"
+import { addToWantList } from "@/src/api/apiEndpoints"
+import { useToast } from "@/src/components/ui/toast"
+import { useBoundStore } from "@/src/store"
+import { ShoppingCart, StarIcon, ZoomIn, Download } from "lucide-react-native"
+import ImageViewing from "react-native-image-viewing"
+import * as FileSystem from "expo-file-system"
+import * as MediaLibrary from "expo-media-library"
 import {
   NavigationProp,
   ParamListBase,
   useNavigation,
-} from "@react-navigation/native";
-import { HStack } from "../ui/hstack";
+} from "@react-navigation/native"
+import { HStack } from "../ui/hstack"
+import { fonts } from "@/src/theme"
 
 interface SeriesCardProps {
   data: {
-    series_id: number;
+    series_id: number
     series: {
-      id: number;
-      title: string;
-    };
-    count: number;
-    publisher: string;
+      id: number
+      title: string
+    }
+    count: number
+    publisher: string
     last_product: {
-      id: number;
-      title: string;
-      image_url: string;
-    };
-    owned_products: number;
-    unowned_products: number;
-    cover_url_large?: string;
-    product_items_count?: number;
-    in_want_list?: boolean;
-  };
-  detailedDisplay?: boolean;
-  grayed?: boolean;
+      id: number
+      title: string
+      image_url: string
+    }
+    owned_products: number
+    unowned_products: number
+    cover_url_large?: string
+    product_items_count?: number
+    in_want_list?: boolean
+  }
+  detailedDisplay?: boolean
+  grayed?: boolean
 }
 
 const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
-  const theme = useBoundStore(state => state.theme)
-  const deviceWidth = Dimensions.get("window").width;
-  const thirdWidth = deviceWidth / 3;
-  const navigation = useNavigation<NavigationProp<ParamListBase>>();
-  const toast = useToast();
-  const [imgError, setImgError] = useState(false);
-  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const theme = useBoundStore((state) => state.theme)
+  const deviceWidth = Dimensions.get("window").width
+  const thirdWidth = deviceWidth / 3
+  const navigation = useNavigation<NavigationProp<ParamListBase>>()
+  const toast = useToast()
+  const [imgError, setImgError] = useState(false)
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   const mainImage =
-    data.last_product?.image_url || data.cover_url_large || undefined;
+    data.last_product?.image_url || data.cover_url_large || undefined
   const handleAddToWantList = async () => {
     try {
-      await addToWantList(data.series.id);
+      await addToWantList(data.series.id)
       toast.show({
         placement: "top",
         render: ({ id }) => (
-          <Text className="text-green-600">Added to Want List!</Text>
+          <Text className='text-green-600'>Added to Want List!</Text>
         ),
-      });
+      })
     } catch (error) {
       toast.show({
         placement: "top",
         render: ({ id }) => (
-          <Text className="text-red-600">Failed to add to Want List.</Text>
+          <Text className='text-red-600'>Failed to add to Want List.</Text>
         ),
-      });
+      })
     }
-  };
+  }
 
   const handleAddToCart = async (item: any) => {
     try {
       navigation.navigate("Product", {
         product: item,
         fromCollection: true,
-      });
+      })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   return (
     <Box className={`mb-2`} style={{ width: thirdWidth * 0.9 }}>
@@ -113,10 +114,10 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                 padding: 6,
                 zIndex: 10,
               }}
-              accessibilityLabel="View cover full screen"
+              accessibilityLabel='View cover full screen'
               hitSlop={8}
             >
-              <ZoomIn size={22} color="#fff" />
+              <ZoomIn size={22} color='#fff' />
             </Pressable>
           )}
           <ImageViewing
@@ -137,11 +138,11 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
               >
                 <Pressable
                   onPress={async () => {
-                    if (!mainImage) return;
-                    setDownloading(true);
+                    if (!mainImage) return
+                    setDownloading(true)
                     try {
                       const { status } =
-                        await MediaLibrary.requestPermissionsAsync();
+                        await MediaLibrary.requestPermissionsAsync()
                       if (status !== "granted") {
                         toast.show({
                           placement: "top",
@@ -150,27 +151,27 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                               Permission denied: Cannot save image.
                             </Text>
                           ),
-                        });
-                        setDownloading(false);
-                        return;
+                        })
+                        setDownloading(false)
+                        return
                       }
                       const fileUri =
                         FileSystem.cacheDirectory +
                         "cover_" +
                         Date.now() +
-                        ".jpg";
+                        ".jpg"
                       const downloadRes = await FileSystem.downloadAsync(
                         mainImage,
                         fileUri
-                      );
+                      )
                       const asset = await MediaLibrary.createAssetAsync(
                         downloadRes.uri
-                      );
+                      )
                       await MediaLibrary.createAlbumAsync(
                         "Download",
                         asset,
                         false
-                      );
+                      )
                       toast.show({
                         placement: "top",
                         render: ({ id }) => (
@@ -178,7 +179,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                             Image saved to gallery.
                           </Text>
                         ),
-                      });
+                      })
                     } catch (err) {
                       toast.show({
                         placement: "top",
@@ -187,9 +188,9 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                             Failed to save image.
                           </Text>
                         ),
-                      });
+                      })
                     } finally {
-                      setDownloading(false);
+                      setDownloading(false)
                     }
                   }}
                   style={{
@@ -199,20 +200,13 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                     marginBottom: 10,
                     marginRight: 10,
                   }}
-                  accessibilityLabel="Download image"
+                  accessibilityLabel='Download image'
                   hitSlop={8}
                   disabled={downloading}
                 >
-                  <HStack className="flex-row items-center" space="md">
-                    <Download
-                      size={28}
-                      color={theme.text}
-                    />
-                    <Text
-                      style={{
-                        color: theme.text,
-                      }}
-                    >
+                  <HStack className='flex-row items-center' space='md'>
+                    <Download size={28} color={theme.text} />
+                    <Text style={[fonts.body, { color: theme.text }]}>
                       Download
                     </Text>
                   </HStack>
@@ -221,11 +215,13 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             )}
           />
           {grayed && (
-            <View className="absolute top-2 left-2 right-2 bottom-2 h-56 bg-black/50 justify-center items-center">
-              <Text className="font-bold text-white">Not Collected</Text>
-              <View className="flex-row gap-2 mt-2">
+            <View className='absolute top-2 left-2 right-2 bottom-2 h-56 bg-black/50 justify-center items-center'>
+              <Text style={[fonts.label, { color: theme.text }]}>
+                Not Collected
+              </Text>
+              <View className='flex-row gap-2 mt-2'>
                 <Pressable
-                  className="p-3 rounded-full"
+                  className='p-3 rounded-full'
                   style={{
                     backgroundColor: "rgba(255,255,255,0.4)",
                     opacity: data.in_want_list ? 1 : 0.7,
@@ -242,7 +238,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                   />
                 </Pressable>
                 <Pressable
-                  className="p-3 rounded-full"
+                  className='p-3 rounded-full'
                   style={{
                     backgroundColor: "rgba(255,255,255,0.4)",
                     opacity: data.product_items_count !== 0 ? 1 : 0.4,
@@ -250,30 +246,33 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                   onPress={() => handleAddToCart(data)}
                   disabled={data.product_items_count === 0}
                 >
-                  <ShoppingCart size={24} color="white" />
+                  <ShoppingCart size={24} color='white' />
                 </Pressable>
               </View>
             </View>
           )}
         </View>
-        <View className="mt-2 px-2">
-          <Text numberOfLines={1} style={{ color: theme.text }} className="font-bold">
+        <View className='mt-2 px-2'>
+          <Text
+            numberOfLines={1}
+            style={[fonts.label, { color: theme.text, fontWeight: "bold" }]}
+          >
             {data.series.title}
           </Text>
 
           {data.owned_products && (
-            <Text style={{ color: theme.text }} className=" font-bold">
+            <Text style={[fonts.caption, { color: theme.text }]}>
               {data.owned_products} out of{" "}
               {data.owned_products + data.unowned_products}
             </Text>
           )}
         </View>
-        <View className="flex-row justify-between items-center mt-1">
+        <View className='flex-row justify-between items-center mt-1'>
           <View style={{ alignItems: "flex-end" }}></View>
         </View>
       </View>
     </Box>
-  );
-};
+  )
+}
 
-export default SeriesCard;
+export default SeriesCard

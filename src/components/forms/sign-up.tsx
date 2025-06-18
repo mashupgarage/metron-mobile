@@ -162,7 +162,8 @@ const SignUpForm: FC<SignUpFormProps> = ({
         </FormControl>
         <HStack className='justify-between'>
           <Button
-            className={"mt-4 w-full rounded-[8px] bg-primary-600"}
+            className={"mt-4 w-full rounded-[4px]"}
+            style={{ backgroundColor: theme.primary[500] }}
             size={size}
             testID='submit-button'
             onPress={() => {
@@ -186,7 +187,9 @@ const SignUpForm: FC<SignUpFormProps> = ({
               }
             }}
           >
-            <ButtonText style={[fonts.body]}>Sign up</ButtonText>
+            <ButtonText style={[fonts.body, { color: theme.white }]}>
+              Sign up
+            </ButtonText>
           </Button>
         </HStack>
       </VStack>

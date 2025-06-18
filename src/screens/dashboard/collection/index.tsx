@@ -11,6 +11,7 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Pressable } from "react-native"
 import NavigationHeader from "@/src/components/navigation-header"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
+import { fonts } from "@/src/theme"
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
@@ -62,26 +63,11 @@ const CollectionScreen = () => {
       {/* Header */}
       <NavigationHeader />
       <Box className='flex-row items-center justify-between px-4 mt-8 mb-4'>
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            fontFamily: "Inter",
-            color: theme.text,
-          }}
-        >
+        <Text style={[fonts.title, { color: theme.text }]}>
           Your Collection
         </Text>
         <Box className='flex-row'>
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: "Inter",
-              color: theme.text,
-            }}
-          >
-            {seriesCount}
-          </Text>
+          <Text style={[fonts.body, { color: theme.text }]}>{seriesCount}</Text>
         </Box>
       </Box>
 
@@ -104,6 +90,7 @@ const CollectionScreen = () => {
               fontSize: 16,
               borderWidth: 1,
               borderColor: theme.border,
+              color: theme.text,
               paddingRight: 36, // leave space for clear button
             }}
             placeholderTextColor={theme.text}
@@ -123,7 +110,7 @@ const CollectionScreen = () => {
               }}
               accessibilityLabel='Clear search'
             >
-              <Text style={{ fontSize: 18, color: "#888" }}>✕</Text>
+              <Text style={[fonts.body, { color: theme.text }]}>✕</Text>
             </Pressable>
           )}
         </Box>
@@ -174,19 +161,33 @@ const CollectionScreen = () => {
             </Box>
           )
         }
+        ListEmptyComponent={
+          <Text
+            style={[
+              fonts.body,
+              {
+                color: theme.text,
+                textAlign: "center",
+                marginVertical: theme.spacing.xl,
+              },
+            ]}
+          >
+            No series found
+          </Text>
+        }
         contentContainerStyle={{}}
         ListHeaderComponent={
           <>
             {/* Most Collected Series */}
             <Text
-              style={{
-                fontSize: 24,
-                fontWeight: "bold",
-                fontFamily: "Inter",
-                color: theme.text,
-                marginBottom: theme.spacing.md,
-                marginLeft: theme.spacing.md,
-              }}
+              style={[
+                fonts.title,
+                {
+                  color: theme.text,
+                  marginLeft: theme.spacing.md,
+                  marginBottom: theme.spacing.md,
+                },
+              ]}
             >
               Top Series Collection
             </Text>
@@ -201,12 +202,15 @@ const CollectionScreen = () => {
                 </Box>
               ) : collectedSeries.length === 0 ? (
                 <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: "Inter",
-                    color: theme.text,
-                    marginLeft: theme.spacing.md,
-                  }}
+                  style={[
+                    fonts.body,
+                    {
+                      width: deviceWidth,
+                      color: theme.text,
+                      textAlign: "center",
+                      marginVertical: theme.spacing.xl,
+                    },
+                  ]}
                 >
                   No collected series yet.
                 </Text>
@@ -231,14 +235,14 @@ const CollectionScreen = () => {
               )}
             </ScrollView>
             <Text
-              style={{
-                fontSize: 24,
-                fontWeight: "bold",
-                fontFamily: "Inter",
-                color: theme.text,
-                marginLeft: theme.spacing.md,
-              }}
-              className='ml-2 pb-4'
+              style={[
+                fonts.title,
+                {
+                  color: theme.text,
+                  marginLeft: theme.spacing.md,
+                  marginBottom: theme.spacing.md,
+                },
+              ]}
             >
               Series Collection
             </Text>

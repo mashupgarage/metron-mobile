@@ -16,11 +16,12 @@ import { LayoutGrid, LayoutList } from "lucide-react-native"
 import { useColorScheme } from "react-native"
 import { useBoundStore } from "@/src/store"
 import { getReservationList } from "@/src/api/apiEndpoints"
-import { ReservationItemT } from "@/src/utils/types/common"
+import { ProductT, ReservationItemT } from "@/src/utils/types/common"
 import { useNavigation } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import ReservationCard from "@/src/components/ReservationCard"
 import NavigationHeader from "@/src/components/navigation-header"
+import { fonts } from "@/src/theme"
 
 const PAGE_SIZE = 50
 
@@ -40,6 +41,7 @@ interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
     issue_number?: string
     quantity?: number
     cover_url?: string
+    publisher?: string
   }
 }
 const getCoverUrl = (coverFileName?: string) =>
@@ -143,7 +145,7 @@ export default function ReservationBoxScreen() {
     if (isGrid) {
       return (
         <Pressable key={reservation.id}>
-          <ReservationCard product={sanitizedProduct} />
+          <ReservationCard product={sanitizedProduct as unknown as ProductT} />
         </Pressable>
       )
     } else {
@@ -174,41 +176,34 @@ export default function ReservationBoxScreen() {
               <Text
                 numberOfLines={1}
                 ellipsizeMode='tail'
-                style={{
-                  fontWeight: "bold",
-                  fontFamily: "Urbanist-Black",
-                  color: colors.text,
-                  fontSize: 15,
-                  marginBottom: 2,
-                  maxWidth: 240,
-                }}
+                style={[fonts.label, { color: colors.text }]}
               >
                 {reservation.product.title}
               </Text>
               <Text
                 numberOfLines={1}
-                style={{
-                  fontFamily: "Inter",
-                  color: colors.text,
-                  fontSize: 13,
-                }}
+                style={[
+                  fonts.caption,
+                  {
+                    color: colors.text,
+                  },
+                ]}
               >
                 {reservation.product.creators}
               </Text>
               {publisher ? (
                 <Text
                   numberOfLines={1}
-                  style={{
-                    fontFamily: "Inter",
-                    color: colors.text,
-                    fontSize: 12,
-                  }}
+                  style={[fonts.caption, { color: colors.text }]}
                 >
                   {publisher}
                 </Text>
               ) : null}
               <Text
-                style={{ color: colors.text, fontSize: 12 }}
+                style={[
+                  fonts.caption,
+                  { color: colors.text, marginTop: theme.spacing.sm },
+                ]}
                 numberOfLines={1}
               >
                 Status:{" "}
@@ -244,14 +239,7 @@ export default function ReservationBoxScreen() {
           paddingVertical: 12,
         }}
       >
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            fontFamily: "Inter",
-            color: colors.text,
-          }}
-        >
+        <Text style={[fonts.title, { color: colors.text }]}>
           Reservation Box
         </Text>
         <TouchableOpacity
@@ -299,7 +287,7 @@ export default function ReservationBoxScreen() {
               }}
               accessibilityLabel='Clear search'
             >
-              <Text style={{ fontSize: 18, color: colors.textSecondary }}>
+              <Text style={[fonts.body, { color: colors.textSecondary }]}>
                 ✕
               </Text>
             </TouchableOpacity>
@@ -328,12 +316,7 @@ export default function ReservationBoxScreen() {
                 padding: 16,
               }}
             >
-              <Text
-                style={{
-                  fontFamily: "Inter",
-                  color: colors.text,
-                }}
-              >
+              <Text style={[fonts.body, { color: colors.text }]}>
                 We couldn't find any items in your reservation box
                 {searchQuery.length > 0
                   ? " that matches, '" + searchQuery + "'"
@@ -436,7 +419,7 @@ export default function ReservationBoxScreen() {
         />
       )}
       <View style={{ alignItems: "center", marginVertical: 8 }}>
-        <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+        <Text style={[fonts.body, { color: colors.textSecondary }]}>
           Showing {Math.min(reservations.length, totalCount)} of {totalCount}{" "}
           reserved items
         </Text>

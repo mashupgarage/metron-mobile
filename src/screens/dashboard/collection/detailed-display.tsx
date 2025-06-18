@@ -11,6 +11,7 @@ import { getWantList } from "@/src/api/apiEndpoints"
 import { HStack } from "@/src/components/ui/hstack"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { ProductT } from "@/src/utils/types/common"
+import { fonts } from "@/src/theme"
 
 const DetailedCollectionScreen = () => {
   const [wantList, setWantList] = useState<number[]>([])
@@ -82,26 +83,28 @@ const DetailedCollectionScreen = () => {
         <Text
           numberOfLines={3}
           ellipsizeMode='tail'
-          style={{
-            fontSize: 18,
-            fontWeight: "bold",
-            maxWidth: "60%",
-            fontFamily: "Inter",
-            color: theme.text,
-            marginLeft: theme.spacing.xs,
-          }}
+          style={[
+            fonts.title,
+            {
+              color: theme.text,
+              maxWidth: "60%",
+              marginLeft: theme.spacing.xs,
+              fontWeight: "bold",
+            },
+          ]}
         >
           {title || ""}
         </Text>
 
         <Text
           numberOfLines={2}
-          style={{
-            fontSize: 16,
-            fontFamily: "Inter",
-            color: theme.text,
-            marginRight: theme.spacing.xs,
-          }}
+          style={[
+            fonts.body,
+            {
+              color: theme.text,
+              marginRight: theme.spacing.xs,
+            },
+          ]}
         >
           {total_owned ?? 0} of {total_products ?? 0} Collected
         </Text>

@@ -104,6 +104,7 @@ const SignInForm: FC<SignInFormProps> = ({
         <Button
           className='mt-4 rounded-[8px]'
           size={size}
+          style={{ backgroundColor: theme.primary[500] }}
           disabled={isLoading}
           testID='submit-button'
           onPress={() => {
@@ -115,7 +116,9 @@ const SignInForm: FC<SignInFormProps> = ({
             }
           }}
         >
-          <ButtonText style={[fonts.body]}>Sign in</ButtonText>
+          <ButtonText style={[fonts.body, { color: theme.white }]}>
+            Sign in
+          </ButtonText>
           {isLoading && <ButtonSpinner />}
         </Button>
       </HStack>

@@ -9,6 +9,7 @@ import { getOrders } from "@/src/api/apiEndpoints"
 import { Box } from "@/src/components/ui/box"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
+import { fonts } from "@/src/theme"
 
 const OrdersScreen = () => {
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
@@ -65,18 +66,21 @@ const OrdersScreen = () => {
             }}
           >
             <Text
-              style={{
-                flex: 1.2,
-                color: theme.primary[500],
-                textDecorationLine: "underline",
-              }}
+              style={[
+                fonts.label,
+                {
+                  flex: 1.2,
+                  color: theme.primary[500],
+                  textDecorationLine: "underline",
+                },
+              ]}
             >
-              {item.id}
+              #{item.id}
             </Text>
-            <Text style={{ flex: 2, color: theme.text }}>
+            <Text style={[fonts.body, { flex: 2, color: theme.text }]}>
               {item.formatted_status}
             </Text>
-            <Text style={{ flex: 1.5, color: statusColor, fontWeight: "bold" }}>
+            <Text style={[fonts.body, { flex: 1.5, color: statusColor }]}>
               {getPaymentStatus(item)}
             </Text>
           </View>
@@ -90,25 +94,26 @@ const OrdersScreen = () => {
       <NavigationHeader />
       <StatusBar style={store ? "light" : "dark"} />
       <Text
-        style={{
-          fontSize: 24,
-          paddingLeft: theme.spacing.md,
-          paddingRight: theme.spacing.md,
-          marginTop: theme.spacing.xl,
-          fontWeight: "bold",
-          fontFamily: "Inter",
-          color: theme.text,
-        }}
+        style={[
+          fonts.title,
+          {
+            color: theme.text,
+            marginHorizontal: theme.spacing.md,
+            marginTop: theme.spacing.xl,
+          },
+        ]}
       >
         My Orders
       </Text>
       <Text
-        style={{
-          padding: theme.spacing.md,
-          marginBottom: theme.spacing.md,
-          fontFamily: "Inter",
-          color: theme.text,
-        }}
+        style={[
+          fonts.body,
+          {
+            color: theme.text,
+            marginVertical: theme.spacing.md,
+            marginHorizontal: theme.spacing.md,
+          },
+        ]}
       >
         This is a list of all your orders, track orders, pay, and manage your
         orders here.
@@ -116,6 +121,7 @@ const OrdersScreen = () => {
       <Box
         className='h-screen w-full pb-24'
         style={{
+          marginTop: theme.spacing.md,
           backgroundColor: theme.background,
         }}
       >
@@ -134,17 +140,35 @@ const OrdersScreen = () => {
               }}
             >
               <Text
-                style={{ flex: 1.2, fontWeight: "bold", color: theme.text }}
+                style={[
+                  fonts.label,
+                  {
+                    flex: 1.2,
+                    color: theme.text,
+                  },
+                ]}
               >
                 Order ID
               </Text>
               <Text
-                style={{ flex: 1.5, fontWeight: "bold", color: theme.text }}
+                style={[
+                  fonts.label,
+                  {
+                    flex: 1.5,
+                    color: theme.text,
+                  },
+                ]}
               >
                 Order Status
               </Text>
               <Text
-                style={{ flex: 1.5, fontWeight: "bold", color: theme.text }}
+                style={[
+                  fonts.label,
+                  {
+                    flex: 1.5,
+                    color: theme.text,
+                  },
+                ]}
               >
                 Payment Status
               </Text>

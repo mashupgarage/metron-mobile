@@ -209,7 +209,6 @@ export default function Cart() {
         style={[fonts.title, { color: theme.text, padding: theme.spacing.md }]}
       >
         Your Cart{" "}
-        {groupedCartItems.length !== 0 && `(${groupedCartItems.length} items)`}
       </Text>
       <View className='flex-1'>
         {groupedCartItems.length === 0 ? (
