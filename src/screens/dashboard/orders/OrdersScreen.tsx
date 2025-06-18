@@ -106,7 +106,7 @@ const OrdersScreen = () => {
         style={{
           padding: theme.spacing.md,
           marginBottom: theme.spacing.md,
-          fontFamily: "PublicSans-regular",
+          fontFamily: "Inter",
           color: theme.text,
         }}
       >

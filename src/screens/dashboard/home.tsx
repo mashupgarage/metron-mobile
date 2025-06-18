@@ -232,7 +232,7 @@ export default function Home() {
                 >
                   <Text
                     style={{
-                      fontFamily: "Urbanist-Bold",
+                      fontFamily: "Inter",
                       color:
                         selectedPill === pill.id ? theme.white : theme.text,
                     }}
@@ -246,7 +246,7 @@ export default function Home() {
               <Box className='p-2 mt-4'>
                 <Text
                   style={{
-                    fontFamily: "Urbanist-Bold",
+                    fontFamily: "Inter",
                     color: theme.text,
                     lineHeight: 24,
                     fontSize: 24,

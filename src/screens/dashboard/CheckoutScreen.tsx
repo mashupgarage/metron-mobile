@@ -584,7 +584,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               Subtotal
@@ -593,7 +593,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               ₱{subTotal.toFixed(2)}
@@ -606,7 +606,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               Shipping Fee
@@ -615,7 +615,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               ₱{shippingTotal.toFixed(2)}
@@ -628,7 +628,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               Discount
@@ -637,7 +637,7 @@ export default function CheckoutScreen({ route }: any) {
               style={{
                 fontSize: 16,
                 color: theme.text,
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
               }}
             >
               ₱{discountTotal.toFixed(2)}

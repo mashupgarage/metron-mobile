@@ -1,5 +1,5 @@
-"use client";
-import { vars } from "nativewind";
+"use client"
+import { vars } from "nativewind"
 
 export const config = {
   light: vars({
@@ -307,8 +307,8 @@ export const config = {
     "--color-indicator-error": "232 70 69",
   }),
   fonts: {
-    body: "PublicSans-Regular",
-    heading: "Urbanist-Bold",
-    mono: "PublicSans-regular",
+    body: "Inter",
+    heading: "Inter",
+    mono: "Inter",
   },
-};
+}

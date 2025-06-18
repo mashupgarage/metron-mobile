@@ -345,7 +345,7 @@ const WantlistScreen = () => {
               <Text
                 numberOfLines={1}
                 style={{
-                  fontFamily: "Urbanist-Bold",
+                  fontFamily: "Inter",
                   fontSize: 14,
                   color: colors.text,
                   marginBottom: 2,
@@ -356,7 +356,7 @@ const WantlistScreen = () => {
               <Text
                 numberOfLines={1}
                 style={{
-                  fontFamily: "PublicSans-Regular",
+                  fontFamily: "Inter",
                   fontSize: 12,
                   color: colors.textSecondary,
                   marginBottom: 4,
@@ -390,7 +390,7 @@ const WantlistScreen = () => {
                     style={{
                       color: theme.white,
                       fontSize: 12,
-                      fontFamily: "Urbanist-SemiBold",
+                      fontFamily: "Inter",
                     }}
                   >
                     {isAvailable ? "Add to Cart" : "Out of Stock"}
@@ -438,7 +438,7 @@ const WantlistScreen = () => {
             <Text
               numberOfLines={1}
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: colors.text,
                 marginBottom: 4,
@@ -449,7 +449,7 @@ const WantlistScreen = () => {
             <Text
               numberOfLines={1}
               style={{
-                fontFamily: "PublicSans-Regular",
+                fontFamily: "Inter",
                 fontSize: 14,
                 color: colors.textSecondary,
                 marginBottom: 4,
@@ -467,7 +467,7 @@ const WantlistScreen = () => {
           >
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -494,7 +494,7 @@ const WantlistScreen = () => {
                 style={{
                   color: colors.buttonText,
                   fontSize: 14,
-                  fontFamily: "Urbanist-SemiBold",
+                  fontFamily: "Inter",
                 }}
               >
                 {isAvailable ? "Add to Cart" : "Out of Stock"}

@@ -177,14 +177,14 @@ export default function Cart() {
         />
         <View className='flex-1'>
           <Text
-            style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+            style={{ fontFamily: "Inter", color: theme.text }}
             className={`font-semibold`}
           >
             {item.product.title}
           </Text>
           <Text
             style={{
-              fontFamily: "PublicSans-regular",
+              fontFamily: "Inter",
               marginTop: 8,
               color: theme.text,
             }}
@@ -194,7 +194,7 @@ export default function Cart() {
           </Text>
           <Text
             style={{
-              fontFamily: "PublicSans-regular",
+              fontFamily: "Inter",
               marginTop: 4,
               color: theme.text,
             }}
@@ -222,7 +222,7 @@ export default function Cart() {
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <StatusBar style={isDark === true ? "light" : "dark"} />
       <Text
-        style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+        style={{ fontFamily: "Inter", color: theme.text }}
         className={`text-2xl font-bold m-4 text-left`}
       >
         Your Cart{" "}
@@ -231,8 +231,11 @@ export default function Cart() {
       <View className='flex-1'>
         {groupedCartItems.length === 0 ? (
           <Text
-            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
-            className='mt-12 text-lg  text-center'
+            style={{
+              fontFamily: "Inter",
+              color: theme.text,
+            }}
+            className='mt-12 text-center'
           >
             Your cart is empty.
           </Text>
@@ -260,9 +263,7 @@ export default function Cart() {
               disabled={selectedItems.size === 0}
               className='flex-1'
             >
-              <ButtonText
-                style={{ fontFamily: "PublicSans-regular", color: theme.white }}
-              >
+              <ButtonText style={{ fontFamily: "Inter", color: theme.white }}>
                 Checkout ({totalSelectedItems} Selected)
               </ButtonText>
             </Button>

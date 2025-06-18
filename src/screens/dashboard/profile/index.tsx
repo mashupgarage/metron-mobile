@@ -92,7 +92,7 @@ export default function Profile(props: { navigation: any }) {
         <TouchableOpacity onPress={handleEditProfile}>
           <Text
             style={{
-              fontFamily: "PublicSans-regular",
+              fontFamily: "Inter",
               color: theme.text,
               fontSize: 16,
             }}
@@ -110,13 +110,13 @@ export default function Profile(props: { navigation: any }) {
             className='w-24 h-24 rounded-full mb-3'
           />
           <Text
-            style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+            style={{ fontFamily: "Inter", color: theme.text }}
             className={`text-xl font-bold mb-1`}
           >
             {store.user?.full_name}
           </Text>
           <Text
-            style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+            style={{ fontFamily: "Inter", color: theme.text }}
             className={`text-base`}
           >
             {store.user?.email}
@@ -147,13 +147,13 @@ export default function Profile(props: { navigation: any }) {
           </View> */}
           <View className='items-center'>
             <Text
-              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`text-2xl font-bold`}
             >
               {collectionCount}
             </Text>
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`text-base`}
             >
               Series Collections
@@ -161,13 +161,13 @@ export default function Profile(props: { navigation: any }) {
           </View>
           <View className='items-center'>
             <Text
-              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`text-2xl font-bold`}
             >
               {wantlistCount}
             </Text>
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`text-base`}
             >
               Wantlist
@@ -192,7 +192,7 @@ export default function Profile(props: { navigation: any }) {
               color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`mt-2 text-base text-center`}
             >
               Reservation Box
@@ -211,7 +211,7 @@ export default function Profile(props: { navigation: any }) {
               color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`mt-2 text-base text-center`}
             >
               My Orders
@@ -231,7 +231,7 @@ export default function Profile(props: { navigation: any }) {
               color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`mt-2 text-base text-center`}
             >
               My Collection
@@ -250,7 +250,7 @@ export default function Profile(props: { navigation: any }) {
               color={theme.primary[500]}
             />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`mt-2 text-base text-center`}
             >
               Wantlist
@@ -274,7 +274,7 @@ export default function Profile(props: { navigation: any }) {
           <View className='flex-row items-center'>
             <Ionicons name='log-out-outline' size={22} color={theme.text} />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className={`ml-3 text-base`}
             >
               Logout

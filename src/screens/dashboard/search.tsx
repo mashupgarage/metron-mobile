@@ -86,7 +86,7 @@ export default function Search() {
           <>
             <ActivityIndicator size='small' color={theme.primary[500]} />
             <Text
-              style={{ fontFamily: "PublicSans-regular", color: theme.text }}
+              style={{ fontFamily: "Inter", color: theme.text }}
               className='mt-2'
             >
               Loading products...
@@ -104,7 +104,7 @@ export default function Search() {
       <VStack className='items-center justify-center p-4'>
         {searchQuery !== "" ? (
           <Text
-            style={{ fontFamily: "PublicSans-regular" }}
+            style={{ fontFamily: "Inter" }}
             className='text-center text-base'
           >
             No products found matching "{searchQuery}"
@@ -112,7 +112,7 @@ export default function Search() {
         ) : (
           <>
             <Text
-              style={{ fontFamily: "PublicSans-regular" }}
+              style={{ fontFamily: "Inter" }}
               className='text-center mb-4 text-xl font-medium'
             >
               Search for products
@@ -155,7 +155,7 @@ export default function Search() {
               ) : (
                 <ButtonText
                   style={{
-                    fontFamily: "PublicSans-regular",
+                    fontFamily: "Inter",
                     color: theme.white,
                   }}
                 >
@@ -166,10 +166,7 @@ export default function Search() {
           </HStack>
 
           {error ? (
-            <Text
-              style={{ fontFamily: "PublicSans-regular" }}
-              className='text-red-500 mb-2'
-            >
+            <Text style={{ fontFamily: "Inter" }} className='text-red-500 mb-2'>
               {error}
             </Text>
           ) : null}

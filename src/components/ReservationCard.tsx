@@ -53,7 +53,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           <Text
             numberOfLines={1}
             style={{
-              fontFamily: "Urbanist-Bold",
+              fontFamily: "Inter",
               color: theme.text,
             }}
           >
@@ -62,7 +62,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           <Text
             numberOfLines={1}
             style={{
-              fontFamily: "PublicSans-regular",
+              fontFamily: "Inter",
               color: theme.text,
             }}
             className='text-gray-600'

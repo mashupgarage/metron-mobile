@@ -326,7 +326,7 @@ export default function Product(props: {
           </View>
           <Text
             style={{
-              fontFamily: "Urbanist-Bold",
+              fontFamily: "Inter",
               fontSize: 24,
               lineHeight: 24,
               color: theme.text,
@@ -339,7 +339,7 @@ export default function Product(props: {
           <View className='px-4 mt-6 mb-2'>
             <Text
               style={{
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -348,7 +348,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -363,7 +363,7 @@ export default function Product(props: {
               <>
                 <Text
                   style={{
-                    fontFamily: "Urbanist-Bold",
+                    fontFamily: "Inter",
                     fontSize: 16,
                     color: theme.text,
                     marginTop: theme.spacing.md,
@@ -380,7 +380,7 @@ export default function Product(props: {
             )}
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -389,7 +389,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
                 fontSize: 16,
                 marginBottom: theme.spacing.md,
                 color: theme.text,
@@ -399,7 +399,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -408,7 +408,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
                 fontSize: 16,
                 marginBottom: theme.spacing.md,
                 color: theme.text,
@@ -419,7 +419,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -428,7 +428,7 @@ export default function Product(props: {
             </Text>
             <Text
               style={{
-                fontFamily: "PublicSans-regular",
+                fontFamily: "Inter",
                 fontSize: 16,
                 marginBottom: theme.spacing.md,
                 color: theme.text,
@@ -443,7 +443,7 @@ export default function Product(props: {
                 {/* Collection Status */}
                 <Text
                   style={{
-                    fontFamily: "Urbanist-Bold",
+                    fontFamily: "Inter",
                     fontSize: 16,
                     marginBottom: theme.spacing.sm,
                     color: theme.text,
@@ -463,7 +463,7 @@ export default function Product(props: {
                   {seriesLoading ? (
                     <Text
                       style={{
-                        fontFamily: "PublicSans-regular",
+                        fontFamily: "Inter",
                         fontSize: 16,
                         color: theme.text,
                       }}
@@ -474,7 +474,7 @@ export default function Product(props: {
                     <>
                       <Text
                         style={{
-                          fontFamily: "PublicSans-regular",
+                          fontFamily: "Inter",
                           fontSize: 16,
                           color: theme.text,
                         }}
@@ -487,7 +487,7 @@ export default function Product(props: {
                       </Text>
                       <Text
                         style={{
-                          fontFamily: "PublicSans-regular",
+                          fontFamily: "Inter",
                           fontSize: 16,
                           color: theme.text,
                         }}
@@ -508,7 +508,7 @@ export default function Product(props: {
                   ) : (
                     <Text
                       style={{
-                        fontFamily: "PublicSans-regular",
+                        fontFamily: "Inter",
                         fontSize: 16,
                         color: theme.text,
                       }}
@@ -538,7 +538,7 @@ export default function Product(props: {
                 </View>
                 <Text
                   style={{
-                    fontFamily: "Urbanist-Bold",
+                    fontFamily: "Inter",
                     fontSize: 16,
                     color: theme.text,
                     marginTop: theme.spacing.md,
@@ -645,7 +645,7 @@ export default function Product(props: {
               />
               <Text
                 style={{
-                  fontFamily: "Urbanist-Bold",
+                  fontFamily: "Inter",
                   fontSize: 16,
                   color: theme.text,
                 }}

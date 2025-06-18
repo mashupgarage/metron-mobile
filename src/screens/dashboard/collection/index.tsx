@@ -66,7 +66,7 @@ const CollectionScreen = () => {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            fontFamily: "Urbanist-Bold",
+            fontFamily: "Inter",
             color: theme.text,
           }}
         >
@@ -76,7 +76,7 @@ const CollectionScreen = () => {
           <Text
             style={{
               fontSize: 16,
-              fontFamily: "Urbanist-Bold",
+              fontFamily: "Inter",
               color: theme.text,
             }}
           >
@@ -182,7 +182,7 @@ const CollectionScreen = () => {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 color: theme.text,
                 marginBottom: theme.spacing.md,
                 marginLeft: theme.spacing.md,
@@ -203,7 +203,7 @@ const CollectionScreen = () => {
                 <Text
                   style={{
                     fontSize: 16,
-                    fontFamily: "Urbanist-Bold",
+                    fontFamily: "Inter",
                     color: theme.text,
                     marginLeft: theme.spacing.md,
                   }}
@@ -234,7 +234,7 @@ const CollectionScreen = () => {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 color: theme.text,
                 marginLeft: theme.spacing.md,
               }}

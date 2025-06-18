@@ -188,7 +188,7 @@ export default function ReservationBoxScreen() {
               <Text
                 numberOfLines={1}
                 style={{
-                  fontFamily: "PublicSans-Regular",
+                  fontFamily: "Inter",
                   color: colors.text,
                   fontSize: 13,
                 }}
@@ -199,7 +199,7 @@ export default function ReservationBoxScreen() {
                 <Text
                   numberOfLines={1}
                   style={{
-                    fontFamily: "PublicSans-Regular",
+                    fontFamily: "Inter",
                     color: colors.text,
                     fontSize: 12,
                   }}
@@ -248,7 +248,7 @@ export default function ReservationBoxScreen() {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            fontFamily: "Urbanist-Bold",
+            fontFamily: "Inter",
             color: colors.text,
           }}
         >
@@ -330,7 +330,7 @@ export default function ReservationBoxScreen() {
             >
               <Text
                 style={{
-                  fontFamily: "PublicSans-Regular",
+                  fontFamily: "Inter",
                   color: colors.text,
                 }}
               >
