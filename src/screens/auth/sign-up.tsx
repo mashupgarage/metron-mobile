@@ -1,5 +1,6 @@
 import SocialFields from "@/src/components/forms/social-fields";
 import { Text } from "@/src/components/ui/text";
+import { fonts } from "@/src/theme";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import Divider from "@/src/components/divider";
@@ -30,7 +31,7 @@ export default function SignUp(props: {
   return (
     <AuthLayout showBackButton={false} navigation={props.navigation}>
       <React.Fragment>
-        <Text className="mt-8 mb-8" size="3xl" bold style={{ color: theme.text }}>
+        <Text className="mt-8 mb-8" style={[fonts.hero, { color: theme.text }]}>
           Create your Account
         </Text>
         <SignUpForm
@@ -92,7 +93,7 @@ export default function SignUp(props: {
         <StatusBar style="auto" />
         <Divider withText={false} />
         <HStack className="justify-center items-center">
-          <Text style={{ color: theme.text }}>Have an account? </Text>
+          <Text style={[fonts.body, { color: theme.text }]}>Have an account? </Text>
           <Button
             variant="link"
             onPress={() => {
@@ -100,7 +101,7 @@ export default function SignUp(props: {
             }}
             size="md"
           >
-            <ButtonText className="text-blue-500">Sign in</ButtonText>
+            <ButtonText style={[fonts.body, { color: '#3B82F6' }]}>Sign in</ButtonText>
           </Button>
         </HStack>
       </React.Fragment>

@@ -10,6 +10,7 @@ import {
 import { Text } from "./ui/text"
 import { X } from "lucide-react-native"
 import { useBoundStore } from "../store"
+import { fonts } from "../theme"
 
 interface ReleaseDate {
   id: number
@@ -78,7 +79,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
         <SafeAreaView className='flex-1'>
           <View className='p-4 border-b flex-row justify-between items-center'>
             <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
+              style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
               className='text-xl font-bold'
             >
               Release History
@@ -97,7 +98,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
               }}
             >
               <Text
-                style={{ fontFamily: "Inter", color: theme.text }}
+                style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
                 className='text-base'
               >
                 LATEST RELEASE
@@ -118,10 +119,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                 }}
               >
                 <Text
-                  style={{
-                    fontFamily: "Inter",
-                    color: theme.text,
-                  }}
+                  style={[fonts.body, { color: theme.text }]}
                   className='text-base'
                 >
                   {item.date}
@@ -133,10 +131,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   className=' rounded px-2 py-0.5'
                 >
                   <Text
-                    style={{
-                      fontFamily: "Inter",
-                      color: "#fff",
-                    }}
+                    style={[fonts.body, { color: "#fff", fontWeight: "bold" }]}
                   >
                     {item.count}
                   </Text>

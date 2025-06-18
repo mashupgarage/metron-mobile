@@ -1,11 +1,11 @@
-import React, { FC } from "react";
-import { Box } from "../ui/box";
+import React, { FC } from "react"
+import { Box } from "../ui/box"
 import {
   FormControl,
   FormControlLabel,
   FormControlLabelText,
-} from "../ui/form-control";
-import { Input, InputField } from "../ui/input";
+} from "../ui/form-control"
+import { Input, InputField } from "../ui/input"
 import {
   Select,
   SelectBackdrop,
@@ -16,17 +16,19 @@ import {
   SelectItem,
   SelectPortal,
   SelectTrigger,
-} from "../ui/select";
-import { Button, ButtonText } from "../ui/button";
+} from "../ui/select"
+import { Button, ButtonText } from "../ui/button"
+import { fonts } from "@/src/theme"
+import { useBoundStore } from "@/src/store"
 
 interface OnboardingFormProps {
-  phone: string;
-  branch: string;
-  fulfillmentOption: string;
-  setPhoneValue: (phone: string) => void;
-  setFulfillmentOption: (option: string) => void;
-  setBranch: (branch: string) => void;
-  size?: "sm" | "md" | "lg";
+  phone: string
+  branch: string
+  fulfillmentOption: string
+  setPhoneValue: (phone: string) => void
+  setFulfillmentOption: (option: string) => void
+  setBranch: (branch: string) => void
+  size?: "sm" | "md" | "lg"
 }
 
 const OnboardingForm: FC<OnboardingFormProps> = ({
@@ -38,42 +40,45 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
   setFulfillmentOption,
   size = "md",
 }) => {
-  const options = ["store", "delivery"];
-  const branches = ["Robinsons Place Galeria"];
+  const theme = useBoundStore((state) => state.theme)
+  const options = ["store", "delivery"]
+  const branches = ["Robinsons Place Galeria"]
 
   return (
-    <Box className="mt-8">
-      <FormControl size="md">
+    <Box className='mt-8'>
+      <FormControl size='md'>
         <FormControlLabel>
-          <FormControlLabelText>Where can we reach you?</FormControlLabelText>
+          <FormControlLabelText style={[fonts.body, { color: theme.text }]}>
+            Where can we reach you?
+          </FormControlLabelText>
         </FormControlLabel>
-        <Input className="my-1" size={size}>
+        <Input className='my-1' size={size}>
           <InputField
-            type="text"
-            testID="onboarding-phone-field"
-            autoComplete="tel"
-            keyboardType="phone-pad"
-            autoCapitalize="none"
+            type='text'
+            testID='onboarding-phone-field'
+            autoComplete='tel'
+            keyboardType='phone-pad'
+            autoCapitalize='none'
             value={phone}
             onChangeText={(text) => {
-              setPhoneValue(text);
+              setPhoneValue(text)
             }}
           />
         </Input>
       </FormControl>
-      <FormControl className="mt-4" size="md">
+      <FormControl className='mt-4' size='md'>
         <FormControlLabel>
-          <FormControlLabelText>
+          <FormControlLabelText style={[fonts.body, { color: theme.text }]}>
             What is your preferred fulfillment?
           </FormControlLabelText>
         </FormControlLabel>
         <Select
-          className="mt-2"
-          testID="onboarding-option-field"
+          className='mt-2'
+          testID='onboarding-option-field'
           selectedValue={fulfillmentOption}
         >
-          <SelectTrigger variant="outline" size="lg">
-            <SelectInput placeholder="Select option" />
+          <SelectTrigger variant='outline' size='lg'>
+            <SelectInput placeholder='Select option' />
           </SelectTrigger>
           <SelectPortal>
             <SelectBackdrop />
@@ -87,7 +92,7 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
                   label={option.toLocaleUpperCase()}
                   value={option}
                   onPress={() => {
-                    setFulfillmentOption(option);
+                    setFulfillmentOption(option)
                   }}
                 >
                   {option}
@@ -97,19 +102,19 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
           </SelectPortal>
         </Select>
       </FormControl>
-      <FormControl className="mt-4" size="md">
+      <FormControl className='mt-4' size='md'>
         <FormControlLabel>
-          <FormControlLabelText>
+          <FormControlLabelText style={[fonts.body, { color: theme.text }]}>
             Which branch is nearest to you?
           </FormControlLabelText>
         </FormControlLabel>
         <Select
-          testID="onboarding-branch-field"
-          className="mt-2"
+          testID='onboarding-branch-field'
+          className='mt-2'
           selectedValue={branch}
         >
-          <SelectTrigger variant="outline" size="lg">
-            <SelectInput placeholder="Select option" />
+          <SelectTrigger variant='outline' size='lg'>
+            <SelectInput placeholder='Select option' />
           </SelectTrigger>
           <SelectPortal>
             <SelectBackdrop />
@@ -120,11 +125,11 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
               {branches.map((option) => (
                 <SelectItem
                   key={option}
-                  testID="onboarding-option"
+                  testID='onboarding-option'
                   label={option}
                   value={option}
                   onPress={() => {
-                    setBranch(option);
+                    setBranch(option)
                   }}
                 >
                   {option}
@@ -135,7 +140,7 @@ const OnboardingForm: FC<OnboardingFormProps> = ({
         </Select>
       </FormControl>
     </Box>
-  );
-};
+  )
+}
 
-export default OnboardingForm;
+export default OnboardingForm

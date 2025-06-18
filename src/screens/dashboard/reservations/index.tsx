@@ -32,6 +32,7 @@ import { Pressable } from "react-native"
 import { useBoundStore } from "@/src/store"
 import { useReservationManager } from "./useReservationManager"
 import { StatusBar } from "expo-status-bar"
+import { fonts } from "@/src/theme"
 
 export default function ReservationsScreen() {
   const store = useBoundStore()
@@ -143,9 +144,7 @@ export default function ReservationsScreen() {
                     className='flex-1 ml-2 py-1'
                     placeholder='Search comics...'
                     value={searchQuery}
-                    style={{
-                      color: theme.text,
-                    }}
+                    style={[fonts.body, { color: theme.text }]}
                     placeholderTextColor={theme.text}
                     onChangeText={handleSearchChange}
                     onSubmitEditing={() => {
@@ -167,17 +166,14 @@ export default function ReservationsScreen() {
                   className='ml-2 p-2'
                   onPress={() => setShowSearchBar(false)}
                 >
-                  <Text style={{ fontFamily: "Inter", color: theme.text }}>
+                  <Text style={[fonts.body, { color: theme.text }]}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <View className='flex-row justify-between items-center mb-4 mt-4'>
-                <Text
-                  style={{ fontFamily: "Inter", color: theme.text }}
-                  className={`text-2xl font-bold text-left`}
-                >
+                <Text style={[fonts.title, { color: theme.text }]}>
                   Releases
                 </Text>
                 <View className='flex-row items-center'>
@@ -215,7 +211,7 @@ export default function ReservationsScreen() {
                     {isMultiSelectMode ? (
                       <Text
                         className='mr-4 ml-4'
-                        style={{ fontFamily: "Inter", color: theme.text }}
+                        style={[fonts.body, { color: theme.text }]}
                       >
                         Cancel
                       </Text>
@@ -231,7 +227,7 @@ export default function ReservationsScreen() {
                     <Pressable onPress={showConfirmationDialog}>
                       <Text
                         className='font-bold'
-                        style={{ fontFamily: "Inter", color: theme.text }}
+                        style={[fonts.body, { color: theme.text }]}
                       >
                         Confirm ({selectedProducts.length})
                       </Text>
@@ -244,7 +240,7 @@ export default function ReservationsScreen() {
               </View>
             )}
             <Text
-              style={{ fontFamily: "Inter", color: theme.text }}
+              style={[fonts.caption, { color: theme.text }]}
               className='mb-2 text-sm'
             >
               {(() => {
@@ -264,14 +260,13 @@ export default function ReservationsScreen() {
               ) {
                 return (
                   <View className='bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200'>
-                    <Text
-                      style={{ fontFamily: "Inter" }}
-                      className='text-amber-800'
-                    >
+                    <Text style={[fonts.caption, { color: theme.warning }]}>
                       This is a past release. To browse the current release,{" "}
                       <Text
-                        style={{ fontFamily: "Inter" }}
-                        className='text-indigo-900'
+                        style={[
+                          fonts.caption,
+                          { color: theme.warning, fontWeight: "bold" },
+                        ]}
                         onPress={() => {
                           const latest = getLatestRelease(releaseDates)
                           if (latest) {
@@ -288,10 +283,13 @@ export default function ReservationsScreen() {
                 return (
                   <View className='bg-amber-50 rounded-md p-2.5 mb-2.5 border border-amber-200'>
                     <Text
-                      style={{
-                        fontFamily: "Inter",
-                        color: theme.warning,
-                      }}
+                      style={[
+                        fonts.caption,
+                        {
+                          fontWeight: "bold",
+                          color: theme.warning,
+                        },
+                      ]}
                     >
                       This release is now closed.
                     </Text>
@@ -311,7 +309,9 @@ export default function ReservationsScreen() {
               !isSearching &&
               (!Array.isArray(products) || products.length === 0) && (
                 <View className='items-center py-4'>
-                  <Text>No products found matching "{searchQuery}"</Text>
+                  <Text style={[fonts.caption, { color: theme.text }]}>
+                    No products found matching "{searchQuery}"
+                  </Text>
                 </View>
               )}
           </View>
@@ -354,18 +354,16 @@ export default function ReservationsScreen() {
                       resizeMethod='scale'
                       source={ComicOdysseyIcon}
                     />
-                    <Text className='mt-4 mb-2'>
+                    <Text
+                      style={[fonts.caption, { color: theme.text }]}
+                      className='mt-4 mb-2'
+                    >
                       {searchQuery.length > 0
                         ? `No results found for "${searchQuery}"`
                         : "The reservation list is already closed or was not found."}
                     </Text>
                     {searchQuery.length === 0 && (
-                      <Text
-                        style={{
-                          fontFamily: "Inter",
-                          color: theme.text,
-                        }}
-                      >
+                      <Text style={[fonts.caption, { color: theme.text }]}>
                         Please come back on Friday for the new releases!
                       </Text>
                     )}
@@ -383,10 +381,7 @@ export default function ReservationsScreen() {
                     />
                     <Text
                       className='mt-2'
-                      style={{
-                        fontFamily: "Inter",
-                        color: theme.text,
-                      }}
+                      style={[fonts.body, { color: theme.text }]}
                     >
                       Loading products...
                     </Text>
@@ -396,10 +391,7 @@ export default function ReservationsScreen() {
                 {Array.isArray(products) && products.length > 0 && (
                   <Text
                     className='text-sm text-gray-500 mt-2'
-                    style={{
-                      fontFamily: "Inter",
-                      color: theme.text,
-                    }}
+                    style={[fonts.body, { color: theme.text }]}
                   >
                     Showing {products.length} of {totalCount} products Showing{" "}
                     {products.length} of {totalCount} products
@@ -417,7 +409,7 @@ export default function ReservationsScreen() {
                   source={ComicOdysseyIcon}
                 />
                 <Text
-                  style={{ fontFamily: "Inter" }}
+                  style={[fonts.body, { color: theme.text }]}
                   className='mt-4 text-center mb-2'
                 >
                   {isSearching
@@ -433,7 +425,7 @@ export default function ReservationsScreen() {
             }}
             style={{
               columnGap: 12,
-              marginHorizontal: theme.spacing.md,
+              marginHorizontal: theme.spacing.sm,
             }}
             renderItem={({ item, i }) => {
               const product = item as ProductT
@@ -536,7 +528,13 @@ export default function ReservationsScreen() {
                         <View>
                           {product.cover_url && !imageErrors[product.id] ? (
                             // Show actual image if URL exists and no error
-                            <View style={{ position: "relative" }}>
+                            <View
+                              style={{
+                                position: "relative",
+                                width: thirdWidth * 0.9,
+                                height: 200,
+                              }}
+                            >
                               <Image
                                 source={{
                                   uri:
@@ -545,8 +543,8 @@ export default function ReservationsScreen() {
                                       product.cover_url || ""
                                     }`,
                                 }}
+                                size='full'
                                 alt={product.id.toString()}
-                                className='h-60 p-2 w-[130px] px-2 ml-2 mt-2'
                                 resizeMode='cover'
                                 onError={() => {
                                   console.log(
@@ -572,23 +570,17 @@ export default function ReservationsScreen() {
                           )}
                           <View className='mt-2 px-2'>
                             <Text
-                              style={{
-                                fontWeight: "bold",
-                                fontFamily: "Inter",
-                                maxWidth: thirdWidth * 0.9,
-                                color: theme.text,
-                              }}
+                              style={[
+                                fonts.label,
+                                { color: theme.text, fontWeight: "bold" },
+                              ]}
                               numberOfLines={1}
                               ellipsizeMode='tail'
-                              className='font-bold'
                             >
                               {product.title}
                             </Text>
                             <Text
-                              style={{
-                                fontFamily: "Inter",
-                                color: theme.text,
-                              }}
+                              style={[fonts.caption, { color: theme.text }]}
                               numberOfLines={1}
                               ellipsizeMode='tail'
                               className='text-gray-600'
@@ -602,8 +594,11 @@ export default function ReservationsScreen() {
                                 product.id
                               ) && (
                                 <Text
-                                  style={{ fontFamily: "Inter" }}
-                                  className='text-orange-500 font-bold text-xs'
+                                  style={[
+                                    fonts.caption,
+                                    { color: theme.orange },
+                                  ]}
+                                  className='px-2'
                                 >
                                   Already Reserved
                                 </Text>
@@ -615,8 +610,8 @@ export default function ReservationsScreen() {
                     </Pressable>
                   </View>
                   <TouchableOpacity
-                    className={`px-0 py-4 ${
-                      isWanted ? "opacity-50" : "opacity-100"
+                    className={`px-2 py-2 ${
+                      isWanted ? "opacity-80" : "opacity-100"
                     }`}
                     disabled={isWanted}
                     onPress={async () => {
@@ -631,10 +626,7 @@ export default function ReservationsScreen() {
                     }}
                   >
                     <Text
-                      style={{
-                        fontFamily: "Inter",
-                        color: theme.primary[400],
-                      }}
+                      style={[fonts.caption, { color: theme.primary[500] }]}
                     >
                       {isWanted ? "Wanted!" : "I want this"}
                     </Text>
@@ -660,7 +652,7 @@ export default function ReservationsScreen() {
               }}
               className='w-[90%] max-h-[80%] rounded-xl p-5 shadow-lg'
             >
-              <Text className='text-lg font-bold mb-2.5'>
+              <Text style={[fonts.body, { color: theme.text }]}>
                 Please Confirm the products you want to request for this
                 release.
               </Text>
@@ -698,10 +690,13 @@ export default function ReservationsScreen() {
                       )}
 
                       <View className='flex-1 ml-3'>
-                        <Text numberOfLines={1} className='font-bold'>
+                        <Text
+                          numberOfLines={1}
+                          style={[fonts.body, { color: theme.text }]}
+                        >
                           {product.title}
                         </Text>
-                        <Text className='text-teal-600'>
+                        <Text style={[fonts.body, { color: theme.text }]}>
                           {product.formatted_price}
                         </Text>
                       </View>
@@ -713,14 +708,13 @@ export default function ReservationsScreen() {
               <View className='flex-row justify-between mt-5'>
                 <TouchableOpacity
                   onPress={() => setShowConfirmationModal(false)}
-                  className='py-2.5 px-5 border border-indigo-900 rounded'
+                  className='py-2.5 px-5 rounded'
+                  style={{
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                  }}
                 >
-                  <Text
-                    style={{
-                      fontFamily: "Inter",
-                      color: theme.text,
-                    }}
-                  >
+                  <Text style={[fonts.body, { color: theme.text }]}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -733,12 +727,7 @@ export default function ReservationsScreen() {
                   }}
                   disabled={confirmationProducts.length === 0}
                 >
-                  <Text
-                    style={{
-                      fontFamily: "Inter",
-                      color: theme.text,
-                    }}
-                  >
+                  <Text style={[fonts.body, { color: theme.text }]}>
                     Confirm ({confirmationProducts.length})
                   </Text>
                 </TouchableOpacity>

@@ -37,6 +37,7 @@ import {
 import { CircleIcon } from "lucide-react-native"
 import NavigationHeader from "@/src/components/navigation-header"
 import { StatusBar } from "expo-status-bar"
+import { fonts } from "@/src/theme"
 // Type for the checkout form state
 
 interface CheckoutFormState {
@@ -182,71 +183,85 @@ export default function CheckoutScreen({ route }: any) {
     <SafeAreaView style={{ flex: 1 }}>
       <StatusBar style={store.isDark ? "light" : "dark"} />
       <NavigationHeader />
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <ScrollView contentContainerStyle={{ padding: theme.spacing.md }}>
         <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            marginBottom: 16,
-            fontFamily: "Inter",
-            color: theme.text,
-          }}
+          style={[
+            fonts.title,
+            { color: theme.text, paddingVertical: theme.spacing.md },
+          ]}
         >
           Order Confirmation
         </Text>
         {/* Delivery Option */}
-        <View style={{ marginBottom: 16 }}>
-          <Text
-            style={{ fontWeight: "bold", marginBottom: 8, color: theme.text }}
-          >
-            Delivery Option
-          </Text>
-          <Select>
-            <SelectTrigger variant='outline' size='lg'>
-              <SelectInput
-                value={deliveryOption}
-                // @ts-ignore
-                onChange={(e: { target: { value: string } }) => {
-                  console.log(e.target.value)
-                  if (e.target.value === "Store Pick-up") {
-                    setDeliveryOption("store")
-                  } else {
-                    setDeliveryOption("shipping")
-                  }
-                }}
-                placeholder='Select option'
-              />
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent className={"min-h-[240px] pt-4"}>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                {options.map((option) => (
-                  <SelectItem
-                    key={option}
-                    testID='onboarding-option'
-                    label={option}
-                    value={option}
-                    onPress={() => {
-                      setDeliveryOption(option as "store" | "shipping")
-                    }}
-                  >
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </SelectPortal>
-          </Select>
+        <View style={{ marginBottom: theme.spacing.md }}>
+          <FormControl isInvalid={!!formErrors.delivery_option} size='md'>
+            <FormControlLabel>
+              <FormControlLabelText
+                style={[
+                  fonts.label,
+                  {
+                    color: theme.text,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    marginBottom: theme.spacing.xs,
+                  },
+                ]}
+              >
+                Delivery Option
+              </FormControlLabelText>
+            </FormControlLabel>
+
+            <Select>
+              <SelectTrigger variant='outline' size='lg'>
+                <SelectInput
+                  value={deliveryOption}
+                  // @ts-ignore
+                  onChange={(e: { target: { value: string } }) => {
+                    console.log(e.target.value)
+                    if (e.target.value === "Store Pick-up") {
+                      setDeliveryOption("store")
+                    } else {
+                      setDeliveryOption("shipping")
+                    }
+                  }}
+                  placeholder='Select option'
+                />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent className={"min-h-[240px] pt-4"}>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  {options.map((option) => (
+                    <SelectItem
+                      key={option}
+                      testID='onboarding-option'
+                      label={option}
+                      value={option}
+                      onPress={() => {
+                        setDeliveryOption(option as "store" | "shipping")
+                      }}
+                    >
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+          </FormControl>
         </View>
         {/* Shipping / Branch Fields */}
         {deliveryOption === "shipping" ? (
           <View>
-            <View style={{ marginBottom: 8 }}>
+            <View style={{ marginBottom: theme.spacing.sm }}>
               <FormControl isInvalid={!!formErrors.shipping_address} size='md'>
                 <FormControlLabel>
-                  <FormControlLabelText>Shipping Address</FormControlLabelText>
+                  <FormControlLabelText
+                    style={[fonts.label, { color: theme.text }]}
+                  >
+                    Shipping Address
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input>
                   <InputField
@@ -272,7 +287,7 @@ export default function CheckoutScreen({ route }: any) {
                 </Input>
                 {!!formErrors.shipping_address && (
                   <FormControlError>
-                    <FormControlErrorText>
+                    <FormControlErrorText style={[fonts.body]}>
                       {formErrors.shipping_address}
                     </FormControlErrorText>
                   </FormControlError>
@@ -282,7 +297,11 @@ export default function CheckoutScreen({ route }: any) {
             <View style={{ marginBottom: 8 }}>
               <FormControl isInvalid={!!formErrors.shipping_region} size='md'>
                 <FormControlLabel>
-                  <FormControlLabelText>Region</FormControlLabelText>
+                  <FormControlLabelText
+                    style={[fonts.label, { color: theme.text, fontSize: 14 }]}
+                  >
+                    Region
+                  </FormControlLabelText>
                 </FormControlLabel>
                 <Input>
                   <InputField
@@ -308,7 +327,7 @@ export default function CheckoutScreen({ route }: any) {
                 </Input>
                 {!!formErrors.shipping_region && (
                   <FormControlError>
-                    <FormControlErrorText>
+                    <FormControlErrorText style={[fonts.body]}>
                       {formErrors.shipping_region}
                     </FormControlErrorText>
                   </FormControlError>
@@ -320,7 +339,11 @@ export default function CheckoutScreen({ route }: any) {
           <View style={{ marginBottom: 8 }}>
             <FormControl isInvalid={!!formErrors.branch} size='md'>
               <FormControlLabel>
-                <FormControlLabelText>Branch</FormControlLabelText>
+                <FormControlLabelText
+                  style={[fonts.label, { color: theme.text, fontSize: 14 }]}
+                >
+                  Branch
+                </FormControlLabelText>
               </FormControlLabel>
               <Input isDisabled={deliveryOption === "Store Pick-up"}>
                 <InputField
@@ -343,7 +366,7 @@ export default function CheckoutScreen({ route }: any) {
               </Input>
               {!!formErrors.branch && (
                 <FormControlError>
-                  <FormControlErrorText>
+                  <FormControlErrorText style={[fonts.body]}>
                     {formErrors.branch}
                   </FormControlErrorText>
                 </FormControlError>
@@ -354,7 +377,11 @@ export default function CheckoutScreen({ route }: any) {
         <View style={{ marginBottom: 8 }}>
           <FormControl isInvalid={!!formErrors.phone_number} size='md'>
             <FormControlLabel>
-              <FormControlLabelText>Phone Number</FormControlLabelText>
+              <FormControlLabelText
+                style={[fonts.label, { color: theme.text, fontSize: 14 }]}
+              >
+                Phone Number
+              </FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField
@@ -381,7 +408,7 @@ export default function CheckoutScreen({ route }: any) {
             </Input>
             {!!formErrors.phone_number && (
               <FormControlError>
-                <FormControlErrorText>
+                <FormControlErrorText style={[fonts.body]}>
                   {formErrors.phone_number}
                 </FormControlErrorText>
               </FormControlError>
@@ -391,7 +418,11 @@ export default function CheckoutScreen({ route }: any) {
         <View style={{ marginBottom: 16 }}>
           <FormControl isInvalid={!!formErrors.notes} size='md'>
             <FormControlLabel>
-              <FormControlLabelText>Notes</FormControlLabelText>
+              <FormControlLabelText
+                style={[fonts.label, { color: theme.text, fontSize: 14 }]}
+              >
+                Notes
+              </FormControlLabelText>
             </FormControlLabel>
             <Textarea size='md'>
               <TextareaInput
@@ -412,7 +443,9 @@ export default function CheckoutScreen({ route }: any) {
             </Textarea>
             {!!formErrors.notes && (
               <FormControlError>
-                <FormControlErrorText>{formErrors.notes}</FormControlErrorText>
+                <FormControlErrorText style={[fonts.body]}>
+                  {formErrors.notes}
+                </FormControlErrorText>
               </FormControlError>
             )}
           </FormControl>
@@ -420,12 +453,15 @@ export default function CheckoutScreen({ route }: any) {
         {/* Payment Method */}
         <View style={{ marginBottom: 16 }}>
           <Text
-            style={{
-              fontWeight: "bold",
-              marginBottom: 8,
-              fontSize: 16,
-              color: theme.text,
-            }}
+            style={[
+              fonts.label,
+              {
+                color: theme.text,
+                fontSize: 14,
+                fontWeight: 600,
+                marginBottom: theme.spacing.lg,
+              },
+            ]}
           >
             Payment Method
           </Text>
@@ -437,33 +473,43 @@ export default function CheckoutScreen({ route }: any) {
               )
             }
           >
-            <Radio value='bank_deposit' size='md'>
+            <Radio
+              value='bank_deposit'
+              size='lg'
+              style={{ marginBottom: theme.spacing.md }}
+            >
               <RadioIndicator>
                 <RadioIcon as={CircleIcon} />
               </RadioIndicator>
-              <RadioLabel>Bank Deposit</RadioLabel>
+              <RadioLabel style={[fonts.body, { color: theme.text }]}>
+                Bank Deposit
+              </RadioLabel>
             </Radio>
-            <Radio value='pay_at_store' size='md'>
+            <Radio
+              value='pay_at_store'
+              size='lg'
+              style={{ marginBottom: theme.spacing.md }}
+            >
               <RadioIndicator>
                 <RadioIcon as={CircleIcon} />
               </RadioIndicator>
-              <RadioLabel>Pay at Store</RadioLabel>
+              <RadioLabel style={[fonts.body, { color: theme.text }]}>
+                Pay at Store
+              </RadioLabel>
             </Radio>
           </RadioGroup>
         </View>
         {transactionSource === "bank_deposit" && (
           <View style={{ marginBottom: 16 }}>
             <Text
-              style={{
-                fontWeight: "bold",
-                marginBottom: 8,
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.body,
+                { color: theme.text, marginBottom: theme.spacing.md },
+              ]}
             >
               Instructions to pay via bank
             </Text>
-            <Text style={{ marginBottom: 8, color: theme.text }}>
+            <Text style={[fonts.body, { color: theme.text }]}>
               Deposit the total order amount to any of these bank accounts near
               you then upload a picture of the deposit slip, using the following
               details:
@@ -477,22 +523,33 @@ export default function CheckoutScreen({ route }: any) {
             >
               <View style={{ flex: 1 }}>
                 <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: theme.text,
-                    fontSize: 16,
-                    marginBottom: theme.spacing.md,
-                  }}
+                  style={[
+                    fonts.label,
+                    {
+                      color: theme.text,
+                      marginBottom: theme.spacing.md,
+                    },
+                  ]}
                 >
                   Bank: BPI
                 </Text>
-                <Text style={{ color: theme.text }}>
+                <Text
+                  style={[
+                    fonts.body,
+                    { color: theme.text, marginTop: theme.spacing.sm },
+                  ]}
+                >
                   Account Name: Comic Odyssey, Inc.
                 </Text>
-                <Text style={{ color: theme.text }}>
+                <Text
+                  style={[
+                    fonts.body,
+                    { color: theme.text, marginVertical: theme.spacing.sm },
+                  ]}
+                >
                   Account Number:{" "}
                   <Pressable
-                    className='mt-2'
+                    className='mt-1'
                     onPress={async () => {
                       await Clipboard.setStringAsync("2601-0259-41")
                       toast.show({
@@ -506,12 +563,12 @@ export default function CheckoutScreen({ route }: any) {
                     }}
                   >
                     <Text
-                      style={{
-                        fontWeight: "bold",
-                        textDecorationLine: "underline",
-                        color: theme.text,
-                        lineHeight: 18,
-                      }}
+                      style={[
+                        {
+                          color: theme.text,
+                          textDecorationLine: "underline",
+                        },
+                      ]}
                     >
                       2601-0259-41
                     </Text>
@@ -520,22 +577,39 @@ export default function CheckoutScreen({ route }: any) {
               </View>
               <View style={{ flex: 1 }}>
                 <Text
-                  style={{
-                    fontWeight: "bold",
-                    color: theme.text,
-                    fontSize: 16,
-                    marginBottom: theme.spacing.md,
-                  }}
+                  style={[
+                    fonts.label,
+                    {
+                      color: theme.text,
+                      marginVertical: theme.spacing.sm,
+                    },
+                  ]}
                 >
                   Bank: BDO
                 </Text>
-                <Text style={{ color: theme.text }}>
+                <Text
+                  style={[
+                    fonts.body,
+                    {
+                      color: theme.text,
+                      marginTop: theme.spacing.sm,
+                    },
+                  ]}
+                >
                   Account Name: Ma. Rowena Sansolis
                 </Text>
-                <Text style={{ color: theme.text }}>
+                <Text
+                  style={[
+                    fonts.body,
+                    {
+                      color: theme.text,
+                      marginVertical: theme.spacing.sm,
+                    },
+                  ]}
+                >
                   Account Number:{" "}
                   <Pressable
-                    className='mt-2'
+                    className='mt-1'
                     onPress={async () => {
                       await Clipboard.setStringAsync("0034-1802-0926")
                       toast.show({
@@ -549,12 +623,12 @@ export default function CheckoutScreen({ route }: any) {
                     }}
                   >
                     <Text
-                      style={{
-                        fontWeight: "bold",
-                        textDecorationLine: "underline",
-                        color: theme.text,
-                        lineHeight: 18,
-                      }}
+                      style={[
+                        {
+                          color: theme.text,
+                          textDecorationLine: "underline",
+                        },
+                      ]}
                     >
                       0034-1802-0926
                     </Text>
@@ -567,13 +641,10 @@ export default function CheckoutScreen({ route }: any) {
         {/* Order Summary */}
         <View style={{ marginBottom: 16 }}>
           <Text
-            style={{
-              fontWeight: "bold",
-              marginBottom: 12,
-              fontSize: 16,
-              color: theme.text,
-              fontFamily: "Inter",
-            }}
+            style={[
+              fonts.label,
+              { color: theme.text, marginBottom: theme.spacing.md },
+            ]}
           >
             Order Summary
           </Text>
@@ -581,20 +652,18 @@ export default function CheckoutScreen({ route }: any) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.caption,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               Subtotal
             </Text>
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.body,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               ₱{subTotal.toFixed(2)}
             </Text>
@@ -603,20 +672,18 @@ export default function CheckoutScreen({ route }: any) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.caption,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               Shipping Fee
             </Text>
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.body,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               ₱{shippingTotal.toFixed(2)}
             </Text>
@@ -625,20 +692,18 @@ export default function CheckoutScreen({ route }: any) {
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.caption,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               Discount
             </Text>
             <Text
-              style={{
-                fontSize: 16,
-                color: theme.text,
-                fontFamily: "Inter",
-              }}
+              style={[
+                fonts.body,
+                { color: theme.text, marginBottom: theme.spacing.sm },
+              ]}
             >
               ₱{discountTotal.toFixed(2)}
             </Text>
@@ -650,20 +715,22 @@ export default function CheckoutScreen({ route }: any) {
               marginVertical: 12,
             }}
           >
-            <Text
-              style={{ fontWeight: "bold", fontSize: 16, color: theme.text }}
-            >
-              Total
-            </Text>
-            <Text
-              style={{ fontWeight: "bold", fontSize: 16, color: theme.text }}
-            >
+            <Text style={[fonts.label, { color: theme.text }]}>Total</Text>
+            <Text style={[fonts.label, { color: theme.text }]}>
               ₱{totalPrice.toFixed(2)}
             </Text>
           </View>
         </View>
-        <Button size='xl' onPress={handleSubmit}>
-          <ButtonText>Confirm Order (₱{totalPrice.toFixed(2)})</ButtonText>
+        <Button
+          size='xl'
+          variant='solid'
+          action='primary'
+          style={{ backgroundColor: theme.primary[500] }}
+          onPress={handleSubmit}
+        >
+          <ButtonText style={[fonts.label, { color: theme.text }]}>
+            Confirm Order (₱{totalPrice.toFixed(2)})
+          </ButtonText>
         </Button>
       </ScrollView>
     </SafeAreaView>

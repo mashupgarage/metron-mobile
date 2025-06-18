@@ -29,6 +29,7 @@ import {
 import Constants from "expo-constants"
 
 import { LayoutGrid, LayoutList } from "lucide-react-native"
+import { fonts } from "@/src/theme"
 
 const PAGE_SIZE = 10 // Define standard page size
 
@@ -152,7 +153,9 @@ export default function Home() {
         {(isLoading || isFetchingMore) && (
           <>
             <ActivityIndicator size='small' color={theme.primary[500]} />
-            <Text className='mt-2'>Loading products...</Text>
+            <Text style={[fonts.body, { color: theme.text }]} className='mt-2'>
+              Loading products...
+            </Text>
           </>
         )}
       </Box>
@@ -231,11 +234,15 @@ export default function Home() {
                   }}
                 >
                   <Text
-                    style={{
-                      fontFamily: "Inter",
-                      color:
-                        selectedPill === pill.id ? theme.white : theme.text,
-                    }}
+                    style={[
+                      fonts.body,
+                      {
+                        color:
+                          selectedPill === pill.id ? theme.white : theme.text,
+                        fontWeight:
+                          selectedPill === pill.id ? "bold" : "normal",
+                      },
+                    ]}
                   >
                     {pill.name}
                   </Text>
@@ -245,13 +252,13 @@ export default function Home() {
             <HStack className='justify-between mr-2 ml-2'>
               <Box className='p-2 mt-4'>
                 <Text
-                  style={{
-                    fontFamily: "Inter",
-                    color: theme.text,
-                    lineHeight: 24,
-                    fontSize: 24,
-                    marginTop: 8,
-                  }}
+                  style={[
+                    fonts.title,
+                    {
+                      color: theme.text,
+                      marginTop: theme.spacing.xs,
+                    },
+                  ]}
                 >
                   {selectedPill !== undefined
                     ? `Featured ${

@@ -23,6 +23,7 @@ import { useToast } from "@gluestack-ui/themed"
 import { Toast, ToastTitle } from "@/src/components/ui/toast"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { NavigationProp } from "@react-navigation/native"
+import { fonts } from "@/src/theme"
 
 export default function Cart() {
   const store = useBoundStore()
@@ -176,30 +177,13 @@ export default function Cart() {
           alt={item.product.title}
         />
         <View className='flex-1'>
-          <Text
-            style={{ fontFamily: "Inter", color: theme.text }}
-            className={`font-semibold`}
-          >
+          <Text style={[fonts.label, { color: theme.text }]}>
             {item.product.title}
           </Text>
-          <Text
-            style={{
-              fontFamily: "Inter",
-              marginTop: 8,
-              color: theme.text,
-            }}
-            className={`font-semibold`}
-          >
+          <Text style={[fonts.body, { color: theme.text }]}>
             NM: {item.product_item_id}
           </Text>
-          <Text
-            style={{
-              fontFamily: "Inter",
-              marginTop: 4,
-              color: theme.text,
-            }}
-            className={`font-semibold`}
-          >
+          <Text style={[fonts.body, { color: theme.text }]}>
             Price:{" "}
             {item.product.formatted_price ||
               "₱" + Number(item.price).toFixed(2)}
@@ -222,8 +206,7 @@ export default function Cart() {
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <StatusBar style={isDark === true ? "light" : "dark"} />
       <Text
-        style={{ fontFamily: "Inter", color: theme.text }}
-        className={`text-2xl font-bold m-4 text-left`}
+        style={[fonts.title, { color: theme.text, padding: theme.spacing.md }]}
       >
         Your Cart{" "}
         {groupedCartItems.length !== 0 && `(${groupedCartItems.length} items)`}
@@ -231,10 +214,7 @@ export default function Cart() {
       <View className='flex-1'>
         {groupedCartItems.length === 0 ? (
           <Text
-            style={{
-              fontFamily: "Inter",
-              color: theme.text,
-            }}
+            style={[fonts.body, { color: theme.text }]}
             className='mt-12 text-center'
           >
             Your cart is empty.
@@ -263,14 +243,13 @@ export default function Cart() {
               disabled={selectedItems.size === 0}
               className='flex-1'
             >
-              <ButtonText style={{ fontFamily: "Inter", color: theme.white }}>
+              <ButtonText style={[fonts.body, { color: theme.white }]}>
                 Checkout ({totalSelectedItems} Selected)
               </ButtonText>
             </Button>
           </View>
         </View>
       )}
-      <StatusBar style='auto' />
     </SafeAreaView>
   )
 }

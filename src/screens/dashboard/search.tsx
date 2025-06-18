@@ -16,6 +16,7 @@ import ProductCard from "@/src/components/product"
 import { Pressable } from "react-native-gesture-handler"
 import { useBoundStore } from "@/src/store"
 import { StatusBar } from "expo-status-bar"
+import { fonts } from "@/src/theme"
 
 export default function Search() {
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
@@ -104,17 +105,14 @@ export default function Search() {
       <VStack className='items-center justify-center p-4'>
         {searchQuery !== "" ? (
           <Text
-            style={{ fontFamily: "Inter" }}
+            style={[fonts.body, { color: theme.text }]}
             className='text-center text-base'
           >
             No products found matching "{searchQuery}"
           </Text>
         ) : (
           <>
-            <Text
-              style={{ fontFamily: "Inter" }}
-              className='text-center mb-4 text-xl font-medium'
-            >
+            <Text style={[fonts.body, { color: theme.text }]}>
               Search for products
             </Text>
           </>
@@ -140,7 +138,7 @@ export default function Search() {
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={() => handleSearch(1)}
-                className='h-12'
+                className='h-16'
               />
             </Input>
             <Button
@@ -153,12 +151,7 @@ export default function Search() {
               {loading ? (
                 <ButtonSpinner />
               ) : (
-                <ButtonText
-                  style={{
-                    fontFamily: "Inter",
-                    color: theme.white,
-                  }}
-                >
+                <ButtonText style={[fonts.body, { color: theme.white }]}>
                   Search
                 </ButtonText>
               )}
@@ -166,7 +159,10 @@ export default function Search() {
           </HStack>
 
           {error ? (
-            <Text style={{ fontFamily: "Inter" }} className='text-red-500 mb-2'>
+            <Text
+              style={[fonts.body, { color: theme.text }]}
+              className='text-red-500 mb-2'
+            >
               {error}
             </Text>
           ) : null}

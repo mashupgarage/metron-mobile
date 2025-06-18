@@ -3,13 +3,13 @@ import { Button, ButtonText } from "../ui/button"
 import { useNavigation } from "@react-navigation/native"
 import { ArrowLeft, Dot, ShoppingBag } from "lucide-react-native"
 import { useBoundStore } from "@/src/store"
+import { fonts } from "@/src/theme"
 
 const NavigationHeader = ({
   showBackButton = true,
   showCartButton = false,
 }) => {
   const navigation = useNavigation()
-  const colorScheme = useColorScheme()
   const theme = useBoundStore((state) => state.theme)
   const cartCount = useBoundStore((state) => state.cartItems.length)
   return (
@@ -23,7 +23,7 @@ const NavigationHeader = ({
           variant='link'
         >
           <ArrowLeft color={theme.text} />
-          <ButtonText style={{ fontFamily: "Inter", color: theme.text }}>
+          <ButtonText style={[fonts.body, { color: theme.text }]}>
             Back
           </ButtonText>
         </Button>
@@ -47,7 +47,7 @@ const NavigationHeader = ({
               />
             )}
             <ShoppingBag color={theme.text} />
-            <ButtonText style={{ fontFamily: "Inter", color: theme.text }}>
+            <ButtonText style={[fonts.body, { color: theme.text }]}>
               My Cart
             </ButtonText>
           </Button>

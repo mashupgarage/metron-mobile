@@ -9,23 +9,33 @@ export const spacing = {
 export const fonts = {
   body: {
     fontSize: 16,
+    lineHeight: 18,
     fontFamily: "Inter",
-    fontWeight: "normal",
+    fontWeight: "normal" as "normal",
+  },
+  label: {
+    fontSize: 16,
+    lineHeight: 20,
+    fontFamily: "Inter",
+    fontWeight: "bold" as "bold",
   },
   hero: {
     fontSize: 32,
+    lineHeight: 36,
     fontFamily: "Inter",
-    fontWeight: "bold",
+    fontWeight: "bold" as "bold",
   },
   title: {
     fontSize: 24,
+    lineHeight: 28,
     fontFamily: "Inter",
-    fontWeight: "bold",
+    fontWeight: "bold" as "bold",
   },
   caption: {
     fontSize: 12,
+    lineHeight: 14,
     fontFamily: "Inter",
-    fontWeight: "normal",
+    fontWeight: "normal" as "normal",
   },
 }
 
@@ -62,6 +72,7 @@ export const colors = {
   success: "#10b981",
   error: "#ef4444",
   warning: "#f59e0b",
+  orange: "#f57e00",
   info: "#3b82f6",
 }
 
@@ -73,7 +84,7 @@ export const lightTheme = {
   background2: colors.gray[100],
   text: colors.gray[900],
   textSecondary: colors.gray[600],
-  border: colors.gray[200],
+  border: colors.gray[900],
   card: colors.white,
   notification: colors.primary[500],
   surface: colors.gray[100],

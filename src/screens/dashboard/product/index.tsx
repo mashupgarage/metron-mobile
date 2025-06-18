@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box } from "@/src/components/ui/box"
 import { Text } from "@/src/components/ui/text"
 import { Image } from "@/src/components/ui/image"
@@ -43,6 +43,7 @@ import {
 import ProductCard from "@/src/components/product"
 import { VStack } from "@/src/components/ui/vstack"
 import { useReservationManager } from "../reservations/useReservationManager"
+import { fonts } from "@/src/theme"
 
 export default function Product(props: {
   route: {
@@ -86,7 +87,7 @@ export default function Product(props: {
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Fetch product details to get normalized_product_items
     fetchProductDetails(product.id)
       .then((res) => {
@@ -325,114 +326,124 @@ export default function Product(props: {
             </VStack>
           </View>
           <Text
-            style={{
-              fontFamily: "Inter",
-              fontSize: 24,
-              lineHeight: 24,
-              color: theme.text,
-              marginTop: theme.spacing.md,
-            }}
+            style={[
+              fonts.title,
+              {
+                color: theme.text,
+                marginTop: theme.spacing.md,
+              },
+            ]}
             className='px-4 mt-6 mb-2'
           >
             {product?.title}
           </Text>
           <View className='px-4 mt-6 mb-2'>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.body,
+                {
+                  color: theme.text,
+                },
+              ]}
             >
               {product?.description ?? ""}
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.label,
+                {
+                  color: theme.text,
+                  marginBottom: theme.spacing.xs,
+                },
+              ]}
             >
               Publisher
             </Text>
-            <Text style={{ marginBottom: 8, color: theme.text }}>
-              {product?.publisher}
-            </Text>
+            <Text style={{ color: theme.text }}>{product?.publisher}</Text>
 
             {product?.creators && (
               <>
                 <Text
-                  style={{
-                    fontFamily: "Inter",
-                    fontSize: 16,
-                    color: theme.text,
-                    marginTop: theme.spacing.md,
-                  }}
+                  style={[
+                    fonts.label,
+                    {
+                      color: theme.text,
+                      marginBottom: theme.spacing.xs,
+                    },
+                  ]}
                 >
                   Creators
                 </Text>
                 <Text
-                  style={{ marginBottom: theme.spacing.md, color: theme.text }}
+                  style={{ color: theme.text, marginBottom: theme.spacing.md }}
                 >
                   {product?.creators}
                 </Text>
               </>
             )}
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.label,
+                {
+                  color: theme.text,
+                  marginBottom: theme.spacing.xs,
+                },
+              ]}
             >
               ISBN/UPC
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                marginBottom: theme.spacing.md,
-                color: theme.text,
-              }}
+              style={[
+                fonts.body,
+                {
+                  marginBottom: theme.spacing.md,
+                  color: theme.text,
+                },
+              ]}
             >
               {product?.isbn || product?.upc}
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.label,
+                {
+                  color: theme.text,
+                  marginBottom: theme.spacing.xs,
+                },
+              ]}
             >
               Price
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                marginBottom: theme.spacing.md,
-                color: theme.text,
-              }}
+              style={[
+                fonts.body,
+                {
+                  marginBottom: theme.spacing.md,
+                  color: theme.text,
+                },
+              ]}
             >
               {product?.formatted_price ??
                 "PHP " + Number(product?.price).toFixed(2)}
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
+              style={[
+                fonts.label,
+                {
+                  color: theme.text,
+                },
+              ]}
             >
               Available Quantity
             </Text>
             <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                marginBottom: theme.spacing.md,
-                color: theme.text,
-              }}
+              style={[
+                fonts.body,
+                {
+                  marginBottom: theme.spacing.md,
+                  color: theme.text,
+                },
+              ]}
             >
               {product?.quantity ?? "Out of Stock"}
             </Text>
@@ -442,42 +453,47 @@ export default function Product(props: {
               <VStack>
                 {/* Collection Status */}
                 <Text
-                  style={{
-                    fontFamily: "Inter",
-                    fontSize: 16,
-                    marginBottom: theme.spacing.sm,
-                    color: theme.text,
-                  }}
+                  style={[
+                    fonts.label,
+                    {
+                      color: theme.text,
+                    },
+                  ]}
                 >
                   Your Collection Status
                 </Text>
                 {/* Series Status (Collection Progress) */}
                 <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: theme.spacing.md,
-                  }}
+                  style={[
+                    {
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: theme.spacing.md,
+                    },
+                  ]}
                 >
                   {seriesLoading ? (
                     <Text
-                      style={{
-                        fontFamily: "Inter",
-                        fontSize: 16,
-                        color: theme.text,
-                      }}
+                      style={[
+                        fonts.body,
+                        {
+                          color: theme.text,
+                        },
+                      ]}
                     >
                       Loading...
                     </Text>
                   ) : seriesStatus ? (
                     <>
                       <Text
-                        style={{
-                          fontFamily: "Inter",
-                          fontSize: 16,
-                          color: theme.text,
-                        }}
+                        style={[
+                          fonts.body,
+                          {
+                            marginTop: theme.spacing.sm,
+                            color: theme.text,
+                          },
+                        ]}
                       >
                         {seriesStatus?.related_series?.collected ?? 0} of{" "}
                         {seriesStatus?.related_series?.total === 0
@@ -486,11 +502,13 @@ export default function Product(props: {
                         Series Collected
                       </Text>
                       <Text
-                        style={{
-                          fontFamily: "Inter",
-                          fontSize: 16,
-                          color: theme.text,
-                        }}
+                        style={[
+                          fonts.body,
+                          {
+                            marginTop: theme.spacing.sm,
+                            color: theme.text,
+                          },
+                        ]}
                       >
                         {(() => {
                           const collected = Number(
@@ -507,11 +525,10 @@ export default function Product(props: {
                     </>
                   ) : (
                     <Text
-                      style={{
-                        fontFamily: "Inter",
-                        fontSize: 16,
-                        color: theme.text,
-                      }}
+                      style={[
+                        fonts.body,
+                        { color: theme.text, marginTop: theme.spacing.md },
+                      ]}
                     >
                       No series data
                     </Text>
@@ -537,13 +554,14 @@ export default function Product(props: {
                   />
                 </View>
                 <Text
-                  style={{
-                    fontFamily: "Inter",
-                    fontSize: 16,
-                    color: theme.text,
-                    marginTop: theme.spacing.md,
-                    marginBottom: theme.spacing.md,
-                  }}
+                  style={[
+                    fonts.label,
+                    {
+                      color: theme.text,
+                      marginTop: theme.spacing.md,
+                      marginBottom: theme.spacing.md,
+                    },
+                  ]}
                 >
                   You may also like
                 </Text>
@@ -564,11 +582,9 @@ export default function Product(props: {
                   )}
                   ListEmptyComponent={() =>
                     recsLoading ? (
-                      <Text style={{ color: theme.text }}>Loading...</Text>
+                      <Text style={fonts.body}>Loading...</Text>
                     ) : (
-                      <Text style={{ color: theme.text }}>
-                        No recommendations
-                      </Text>
+                      <Text style={fonts.body}>No recommendations</Text>
                     )
                   }
                   style={{ marginBottom: theme.spacing.md }}
@@ -627,10 +643,9 @@ export default function Product(props: {
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                borderWidth: 1,
+                borderWidth: 1.5,
                 borderColor: theme.border,
-                borderRadius: 14,
-                backgroundColor: theme.background,
+                borderRadius: 24,
                 paddingVertical: theme.spacing.md,
                 marginRight: theme.spacing.md,
                 opacity: isWanted ? 0.6 : 1,
@@ -644,11 +659,12 @@ export default function Product(props: {
                 style={{ marginRight: theme.spacing.md }}
               />
               <Text
-                style={{
-                  fontFamily: "Inter",
-                  fontSize: 16,
-                  color: theme.text,
-                }}
+                style={[
+                  fonts.body,
+                  {
+                    color: theme.text,
+                  },
+                ]}
               >
                 {isWanted ? "Already added to want list" : "Add to want list"}
               </Text>
