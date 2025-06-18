@@ -60,27 +60,56 @@ const OrdersScreen = () => {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              paddingVertical: 8,
+              justifyContent: "center",
+              height: 48,
               borderBottomWidth: 1,
-              borderColor: theme.border,
+              borderColor: theme.background2,
             }}
           >
             <Text
               style={[
                 fonts.label,
                 {
-                  flex: 1.2,
+                  flex: 1,
                   color: theme.primary[500],
                   textDecorationLine: "underline",
+                  textAlignVertical: "center",
+                  textAlign: "left",
                 },
               ]}
+              numberOfLines={1}
+              ellipsizeMode='tail'
             >
               #{item.id}
             </Text>
-            <Text style={[fonts.body, { flex: 2, color: theme.text }]}>
+            <Text
+              style={[
+                fonts.body,
+                {
+                  flex: 2,
+                  color: theme.text,
+                  textAlignVertical: "center",
+                  textAlign: "left",
+                },
+              ]}
+              numberOfLines={1}
+              ellipsizeMode='tail'
+            >
               {item.formatted_status}
             </Text>
-            <Text style={[fonts.body, { flex: 1.5, color: statusColor }]}>
+            <Text
+              style={[
+                fonts.body,
+                {
+                  flex: 1,
+                  color: statusColor,
+                  textAlignVertical: "center",
+                  textAlign: "left",
+                },
+              ]}
+              numberOfLines={1}
+              ellipsizeMode='tail'
+            >
               {getPaymentStatus(item)}
             </Text>
           </View>
@@ -132,10 +161,12 @@ const OrdersScreen = () => {
             <View
               style={{
                 flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                height: 48,
                 borderBottomWidth: 1,
                 marginHorizontal: theme.spacing.md,
-                borderColor: theme.border,
-                paddingBottom: 8,
+                borderColor: theme.background2,
                 marginBottom: 8,
               }}
             >
@@ -143,10 +174,14 @@ const OrdersScreen = () => {
                 style={[
                   fonts.label,
                   {
-                    flex: 1.2,
+                    flex: 1,
                     color: theme.text,
+                    textAlignVertical: "center",
+                    textAlign: "left",
                   },
                 ]}
+                numberOfLines={1}
+                ellipsizeMode='tail'
               >
                 Order ID
               </Text>
@@ -154,10 +189,14 @@ const OrdersScreen = () => {
                 style={[
                   fonts.label,
                   {
-                    flex: 1.5,
+                    flex: 2,
                     color: theme.text,
+                    textAlignVertical: "center",
+                    textAlign: "left",
                   },
                 ]}
+                numberOfLines={1}
+                ellipsizeMode='tail'
               >
                 Order Status
               </Text>
@@ -165,12 +204,16 @@ const OrdersScreen = () => {
                 style={[
                   fonts.label,
                   {
-                    flex: 1.5,
+                    flex: 1,
                     color: theme.text,
+                    textAlignVertical: "center",
+                    textAlign: "left",
                   },
                 ]}
+                numberOfLines={1}
+                ellipsizeMode='tail'
               >
-                Payment Status
+                Status
               </Text>
             </View>
           }
