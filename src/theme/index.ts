@@ -6,6 +6,29 @@ export const spacing = {
   xl: 24,
 }
 
+export const fonts = {
+  body: {
+    fontSize: 16,
+    fontFamily: "Inter",
+    fontWeight: "normal",
+  },
+  hero: {
+    fontSize: 32,
+    fontFamily: "Inter",
+    fontWeight: "bold",
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: "Inter",
+    fontWeight: "bold",
+  },
+  caption: {
+    fontSize: 12,
+    fontFamily: "Inter",
+    fontWeight: "normal",
+  },
+}
+
 export const colors = {
   // Primary colors
   primary: {
@@ -45,6 +68,7 @@ export const colors = {
 export const lightTheme = {
   ...colors,
   spacing,
+  fonts,
   background: colors.white,
   background2: colors.gray[100],
   text: colors.gray[900],
