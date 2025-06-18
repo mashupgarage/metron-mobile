@@ -68,27 +68,60 @@ body,
 }
 
 :root {
-  --color-primary-0: 20, 55, 125;
-  --color-primary-50: 20, 55, 125;
-  --color-primary-100: 20, 55, 125;
-  --color-primary-200: 20, 55, 125;
-  --color-primary-300: 20, 55, 125;
-  --color-primary-400: 20, 55, 125;
-  --color-primary-500: 20, 55, 125;
-  --color-primary-600: 20, 55, 125;
-  --color-primary-700: 20, 55, 125;
-  --color-primary-800: 20, 55, 125;
-  --color-primary-900: 20, 55, 125;
+  /* Material 3 Primary (Hex to RGB) */
+  --color-primary-0: 240, 249, 255; /* #f0f9ff */
+  --color-primary-50: 224, 242, 254; /* #e0f2fe */
+  --color-primary-100: 186, 230, 253; /* #bae6fd */
+  --color-primary-200: 125, 211, 252; /* #7dd3fc */
+  --color-primary-300: 56, 189, 248; /* #38bdf8 */
+  --color-primary-400: 14, 165, 233; /* #0ea5e9 */
+  --color-primary-500: 2, 132, 199; /* #0284c7 */
+  --color-primary-600: 3, 105, 161; /* #0369a1 */
+  --color-primary-700: 7, 89, 133; /* #075985 */
+  --color-primary-800: 12, 74, 110; /* #0c4a6e */
+  --color-primary-900: 12, 74, 110; /* #0c4a6e */
 
-  --color-secondary-0: 20, 87, 125;
-  --color-secondary-50: 20, 87, 125;
-  --color-secondary-100: 20, 87, 125;
-  --color-secondary-200: 20, 87, 125;
-  --color-secondary-300: 20, 87, 125;
-  --color-secondary-400: 20, 87, 125;
-  --color-secondary-500: 20, 87, 125;
-  --color-secondary-600: 20, 87, 125;
-  --color-secondary-700: 20, 87, 125;
-  --color-secondary-800: 20, 87, 125;
-  --color-secondary-900: 20, 87, 125;
+  /* Material 3 Secondary (Hex to RGB) */
+  --color-secondary-0: 238, 238, 238; /* #eeeeee */
+  --color-secondary-50: 236, 234, 239; /* #eceaef */
+  --color-secondary-100: 204, 194, 220; /* #ccc2dc */
+  --color-secondary-200: 180, 175, 192; /* #b4afc0 */
+  --color-secondary-300: 98, 91, 113; /* #625b71 */
+  --color-secondary-400: 76, 68, 90; /* #4c445a */
+  --color-secondary-500: 51, 45, 65; /* #332d41 */
+  --color-secondary-600: 44, 38, 59; /* #2c263b */
+  --color-secondary-700: 34, 29, 41; /* #221d29 */
+  --color-secondary-800: 28, 23, 33; /* #1c1721 */
+  --color-secondary-900: 18, 14, 22; /* #120e16 */
+
+  /* Material 3 Outline (Hex to RGB) */
+  --color-outline-0: 238, 238, 238; /* #eeeeee */
+  --color-outline-50: 233, 233, 233; /* #e9e9e9 */
+  --color-outline-100: 211, 211, 211; /* #d3d3d3 */
+  --color-outline-200: 201, 201, 201; /* #c9c9c9 */
+  --color-outline-300: 183, 183, 183; /* #b7b7b7 */
+  --color-outline-400: 153, 153, 153; /* #999999 */
+  --color-outline-500: 121, 116, 126; /* #79747e */
+  --color-outline-600: 100, 95, 105; /* #645f69 */
+  --color-outline-700: 73, 69, 79; /* #49454f */
+  --color-outline-800: 57, 55, 62; /* #39373e */
+  --color-outline-900: 41, 39, 46; /* #29272e */
+
+  /* Material 3 Indicator (Hex to RGB) */
+  --color-indicator-primary: 103, 80, 164; /* #6750A4 */
+  --color-indicator-info: 59, 130, 246; /* #3b82f6 */
+  --color-indicator-error: 179, 38, 30; /* #B3261E */
+
+  /* Material 3 Background (Hex to RGB) */
+  --color-background-0: 255, 251, 254; /* #FFFBFE */
+  --color-background-50: 247, 245, 250; /* #f7f5fa */
+  --color-background-100: 231, 224, 236; /* #E7E0EC */
+  --color-background-200: 220, 215, 230; /* #dcd7e6 */
+  --color-background-300: 200, 196, 212; /* #c8c4d4 */
+  --color-background-400: 183, 178, 196; /* #b7b2c4 */
+  --color-background-500: 153, 147, 167; /* #9993a7 */
+  --color-background-600: 121, 116, 126; /* #79747e */
+  --color-background-700: 73, 69, 79; /* #49454f */
+  --color-background-800: 41, 39, 46; /* #29272e */
+  --color-background-900: 28, 27, 31; /* #1C1B1F */
 }

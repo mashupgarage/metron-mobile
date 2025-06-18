@@ -80,27 +80,28 @@ export const lightTheme = {
   ...colors,
   spacing,
   fonts,
-  background: colors.white,
-  background2: colors.gray[100],
-  text: colors.gray[900],
-  textSecondary: colors.gray[600],
-  border: colors.gray[900],
-  card: colors.white,
-  notification: colors.primary[500],
-  surface: colors.gray[100],
+  background: "#FFFBFE", // Material background
+  background2: "#E7E0EC", // Material surfaceVariant
+  text: "#1C1B1F", // Material onBackground
+  textSecondary: "#49454F", // Material onSurfaceVariant
+  border: "#79747E", // Material outline
+  card: "#FFFBFE", // Material surface
+  notification: "#6750A4", // Material primary
+  surface: "#FFFBFE", // Material surface
 }
 
 export const darkTheme = {
   ...colors,
   spacing,
-  background: "#1a1a1a",
-  background2: "#2a2a2a",
-  text: colors.gray[300],
-  textSecondary: colors.gray[600],
-  border: colors.gray[700],
-  card: colors.gray[800],
-  notification: colors.primary[500],
-  surface: colors.gray[800],
+  fonts,
+  background: "#1C1B1F", // Material background
+  background2: "#49454F", // Material surfaceVariant
+  text: "#E6E1E5", // Material onBackground
+  textSecondary: "#CAC4D0", // Material onSurfaceVariant
+  border: "#938F99", // Material outline
+  card: "#1C1B1F", // Material surface
+  notification: "#D0BCFF", // Material primary
+  surface: "#1C1B1F", // Material surface
 }
 
 export type ThemeType = typeof lightTheme

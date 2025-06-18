@@ -138,13 +138,20 @@ export default function ReservationsScreen() {
           <View className='ml-4 mr-4'>
             {showSearchBar ? (
               <View className='flex-row items-center mt-4 mb-4'>
-                <View className='flex-1 flex-row items-center border border-gray-300 rounded-lg px-2 py-1'>
-                  <Search size={18} color={theme.text} />
+                <View style={{ position: "relative", width: "80%" }}>
                   <TextInput
-                    className='flex-1 ml-2 py-1'
-                    placeholder='Search comics...'
+                    style={{
+                      backgroundColor: theme.surface,
+                      borderRadius: 8,
+                      padding: 10,
+                      fontSize: 16,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                      color: theme.text,
+                      paddingRight: 36,
+                    }}
+                    placeholder='Search releases...'
                     value={searchQuery}
-                    style={[fonts.body, { color: theme.text }]}
                     placeholderTextColor={theme.text}
                     onChangeText={handleSearchChange}
                     onSubmitEditing={() => {
@@ -156,15 +163,13 @@ export default function ReservationsScreen() {
                     returnKeyType='search'
                     autoFocus
                   />
-                  {searchQuery.length > 0 && (
-                    <TouchableOpacity onPress={clearSearch}>
-                      <X size={18} color={theme.text} />
-                    </TouchableOpacity>
-                  )}
                 </View>
                 <TouchableOpacity
                   className='ml-2 p-2'
-                  onPress={() => setShowSearchBar(false)}
+                  onPress={() => {
+                    setShowSearchBar(false)
+                    clearSearch()
+                  }}
                 >
                   <Text style={[fonts.body, { color: theme.text }]}>
                     Cancel

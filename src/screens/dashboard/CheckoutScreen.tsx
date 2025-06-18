@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
-import { View, Text, ScrollView, Pressable } from "react-native"
+import { View, Text, ScrollView, Pressable, TextInput } from "react-native"
 import * as Clipboard from "expo-clipboard"
 import { useNavigation } from "@react-navigation/native"
 import { useBoundStore } from "@/src/store"
@@ -348,6 +348,20 @@ export default function CheckoutScreen({ route }: any) {
               <Input isDisabled={deliveryOption === "Store Pick-up"}>
                 <InputField
                   type='text'
+                  style={[
+                    {
+                      color: theme.text,
+                      width: "100%",
+                      borderColor: theme.border,
+                      borderWidth: 1,
+                      borderRadius: 4,
+                      paddingTop: 6,
+                      marginBottom: theme.spacing.xs,
+                      height: 38.5,
+                      paddingLeft: theme.spacing.sm,
+                    },
+                    fonts.body,
+                  ]}
                   value={form.branch}
                   placeholder='Enter branch name'
                   onChangeText={(v) => {
@@ -383,29 +397,39 @@ export default function CheckoutScreen({ route }: any) {
                 Phone Number
               </FormControlLabelText>
             </FormControlLabel>
-            <Input>
-              <InputField
-                type='text'
-                value={form.phone_number}
-                placeholder='Enter phone number'
-                onChangeText={(v) => {
-                  handleChange("phone_number", v)
-                  // Basic phone validation: must be 10-15 digits, adjust as needed
-                  if (!/^\d{10,15}$/.test(v)) {
-                    setFormErrors((prev) => ({
-                      ...prev,
-                      phone_number: "Must be a valid phone number.",
-                    }))
-                  } else {
-                    setFormErrors((prev) => ({
-                      ...prev,
-                      phone_number: undefined,
-                    }))
-                  }
-                }}
-                autoCapitalize='none'
-              />
-            </Input>
+            <TextInput
+              value={form.phone_number}
+              onChangeText={(v) => {
+                handleChange("phone_number", v)
+                // Basic phone validation: must be 10-15 digits, adjust as needed
+                if (!/^\d{10,15}$/.test(v)) {
+                  setFormErrors((prev) => ({
+                    ...prev,
+                    phone_number: "Must be a valid phone number.",
+                  }))
+                } else {
+                  setFormErrors((prev) => ({
+                    ...prev,
+                    phone_number: undefined,
+                  }))
+                }
+              }}
+              style={[
+                fonts.body,
+                {
+                  color: theme.text,
+                  width: "100%",
+                  borderColor: theme.border,
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  marginBottom: theme.spacing.xs,
+                  height: 38.5,
+                  paddingLeft: theme.spacing.sm,
+                },
+              ]}
+              autoCapitalize='none'
+            />
             {!!formErrors.phone_number && (
               <FormControlError>
                 <FormControlErrorText style={[fonts.body]}>
@@ -424,23 +448,35 @@ export default function CheckoutScreen({ route }: any) {
                 Notes
               </FormControlLabelText>
             </FormControlLabel>
-            <Textarea size='md'>
-              <TextareaInput
-                value={form.notes}
-                numberOfLines={3}
-                onChangeText={(v) => {
-                  handleChange("notes", v)
-                  if (!v) {
-                    setFormErrors((prev) => ({
-                      ...prev,
-                      notes: "Notes are required.",
-                    }))
-                  } else {
-                    setFormErrors((prev) => ({ ...prev, notes: undefined }))
-                  }
-                }}
-              />
-            </Textarea>
+            <TextInput
+              value={form.notes}
+              multiline
+              style={[
+                fonts.body,
+                {
+                  color: theme.text,
+                  width: "100%",
+                  borderColor: theme.border,
+                  borderWidth: 1,
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  marginBottom: theme.spacing.xs,
+                  height: 100,
+                  paddingLeft: theme.spacing.sm,
+                },
+              ]}
+              onChangeText={(v) => {
+                handleChange("notes", v)
+                if (!v) {
+                  setFormErrors((prev) => ({
+                    ...prev,
+                    notes: "Notes are required.",
+                  }))
+                } else {
+                  setFormErrors((prev) => ({ ...prev, notes: undefined }))
+                }
+              }}
+            />
             {!!formErrors.notes && (
               <FormControlError>
                 <FormControlErrorText style={[fonts.body]}>
@@ -479,7 +515,11 @@ export default function CheckoutScreen({ route }: any) {
               style={{ marginBottom: theme.spacing.md }}
             >
               <RadioIndicator>
-                <RadioIcon as={CircleIcon} />
+                <RadioIcon
+                  color={theme.primary[300]}
+                  as={CircleIcon}
+                  fill={theme.primary[500]}
+                />
               </RadioIndicator>
               <RadioLabel style={[fonts.body, { color: theme.text }]}>
                 Bank Deposit
@@ -491,7 +531,11 @@ export default function CheckoutScreen({ route }: any) {
               style={{ marginBottom: theme.spacing.md }}
             >
               <RadioIndicator>
-                <RadioIcon as={CircleIcon} />
+                <RadioIcon
+                  color={theme.primary[300]}
+                  as={CircleIcon}
+                  fill={theme.primary[500]}
+                />
               </RadioIndicator>
               <RadioLabel style={[fonts.body, { color: theme.text }]}>
                 Pay at Store

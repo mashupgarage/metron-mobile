@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { View, ActivityIndicator } from "react-native"
+import { View, ActivityIndicator, TextInput } from "react-native"
 import { searchMarketplaceProducts } from "@/src/api/apiEndpoints"
 import { Input, InputField } from "@/src/components/ui/input"
 import { Button, ButtonText, ButtonSpinner } from "@/src/components/ui/button"
@@ -127,22 +127,33 @@ export default function Search() {
         <StatusBar style={store.isDark ? "light" : "dark"} />
         <VStack className='w-full px-4 mb-2'>
           <HStack className='w-full mb-6 mt-4'>
-            <Input
-              className='flex-1 mr-2 rounded-lg'
-              variant='outline'
-              size='md'
+            <View
+              style={{
+                position: "relative",
+                flex: 1,
+                marginRight: theme.spacing.sm,
+              }}
             >
-              <InputField
+              <TextInput
                 placeholder='Search products...'
                 returnKeyType='search'
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={() => handleSearch(1)}
-                className='h-16'
+                style={{
+                  backgroundColor: theme.background,
+                  borderRadius: 8,
+                  padding: 10,
+                  fontSize: 16,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                  color: theme.text,
+                  paddingRight: 36,
+                }}
               />
-            </Input>
+            </View>
             <Button
-              size='md'
+              size='xl'
               style={{ backgroundColor: theme.primary[500] }}
               onPress={() => handleSearch(1)}
               disabled={loading || searchQuery.trim() === ""}
