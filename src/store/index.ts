@@ -1,19 +1,24 @@
-import { create, StoreApi } from "zustand";
-import { persist, PersistOptions, StorageValue } from "zustand/middleware";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createGlobalSlice, GlobalSlice } from "./slices/GlobalSlice";
-import { createUserSlice, UserSlice } from "./slices/UserSlice";
-import { createProductSlice, ProductSlice } from "./slices/ProductsSlice";
-import { createOrderSlice, OrderSlice } from "./slices/OrderSlice";
+import { create, StoreApi } from "zustand"
+import { persist, PersistOptions, StorageValue } from "zustand/middleware"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { createGlobalSlice, GlobalSlice } from "./slices/GlobalSlice"
+import { createUserSlice, UserSlice } from "./slices/UserSlice"
+import { createProductSlice, ProductSlice } from "./slices/ProductsSlice"
+import { createOrderSlice, OrderSlice } from "./slices/OrderSlice"
 import {
   createCollectionSlice,
   CollectionSlice,
-} from "./slices/CollectionSlice";
+} from "./slices/CollectionSlice"
 import {
   createReleaseHistorySlice,
   ReleaseHistorySlice,
-} from "./slices/ReleaseHistorySlice";
-import { createThemeSlice, ThemeSlice } from "./slices/ThemeSlice";
+} from "./slices/ReleaseHistorySlice"
+import { createThemeSlice, ThemeSlice } from "./slices/ThemeSlice"
+import {
+  createReservationSlice,
+  ReservationSlice,
+} from "./slices/ReservationSlice"
+import { createWantListSlice, WantListSlice } from "./slices/WantListSlice"
 
 type BoundState = GlobalSlice &
   UserSlice &
@@ -21,7 +26,9 @@ type BoundState = GlobalSlice &
   ReleaseHistorySlice &
   OrderSlice &
   CollectionSlice &
-  ThemeSlice;
+  ReservationSlice &
+  WantListSlice &
+  ThemeSlice
 
 /**
  * this is the store that will handle the slices
@@ -37,21 +44,23 @@ export const useBoundStore = create<BoundState>()(
       ...createCollectionSlice(...a),
       ...createReleaseHistorySlice(...a),
       ...createThemeSlice(...a),
+      ...createReservationSlice(...a),
+      ...createWantListSlice(...a),
     }),
     {
       name: "app-bound-store",
       storage: {
         getItem: async (name: string) => {
-          const item = await AsyncStorage.getItem(name);
-          return item ? JSON.parse(item) : null;
+          const item = await AsyncStorage.getItem(name)
+          return item ? JSON.parse(item) : null
         },
         setItem: async (name: string, value: StorageValue<GlobalSlice>) => {
-          await AsyncStorage.setItem(name, JSON.stringify(value));
+          await AsyncStorage.setItem(name, JSON.stringify(value))
         },
         removeItem: async (name: string) => {
-          await AsyncStorage.removeItem(name);
+          await AsyncStorage.removeItem(name)
         },
       },
     }
   )
-);
+)

@@ -1,13 +1,18 @@
-import { create } from 'zustand';
+import { StateCreator } from "zustand"
 
-interface WantListState {
-  wantlistCount: number;
-  setWantlistCount: (count: number) => void;
-  incrementWantlistCount: () => void;
+export type WantListSlice = {
+  wantlistCount: number
+  setWantlistCount: (count: number) => void
+  incrementWantlistCount: () => void
+  wantlist: any[] | null
+  setWantlist: (data: any[]) => void
 }
 
-export const useWantListStore = create<WantListState>((set) => ({
+export const createWantListSlice: StateCreator<WantListSlice> = (set) => ({
   wantlistCount: 0,
   setWantlistCount: (count: number) => set({ wantlistCount: count }),
-  incrementWantlistCount: () => set((state) => ({ wantlistCount: state.wantlistCount + 1 })),
-}));
+  incrementWantlistCount: () =>
+    set((state) => ({ wantlistCount: state.wantlistCount + 1 })),
+  wantlist: null,
+  setWantlist: (data: any[]) => set({ wantlist: data }),
+})

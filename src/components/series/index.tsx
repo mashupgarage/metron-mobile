@@ -43,6 +43,7 @@ interface SeriesCardProps {
 }
 
 const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
+  if (!data || !data.series) return null
   const theme = useBoundStore((state) => state.theme)
   const deviceWidth = Dimensions.get("window").width
   const thirdWidth = deviceWidth / 3
@@ -88,19 +89,24 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
     <Box className={`mb-2`} style={{ width: thirdWidth * 0.9 }}>
       <View style={{ marginBottom: 0 }}>
         <View style={{ position: "relative" }}>
-          <Image
-            source={
-              imgError || !mainImage
-                ? require("@/src/assets/icon.png")
-                : { uri: mainImage }
-            }
-            alt={"banner"}
-            className={
-              imgError ? "pl-4 h-60 p-8 w-[130px]" : "h-60 p-2 w-[130px] "
-            }
-            style={{ opacity: grayed ? 0.7 : 1 }}
-            onError={() => setImgError(true)}
-          />
+          <View>
+            <Image
+              source={
+                imgError || !mainImage
+                  ? require("@/src/assets/icon.png")
+                  : { uri: mainImage }
+              }
+              alt={"banner"}
+              className={
+                imgError ? "pl-4 h-60 p-8 w-[130px]" : "h-60 p-1 w-[130px] "
+              }
+              resizeMode={imgError ? "contain" : "cover"}
+              style={{
+                opacity: grayed ? 0.7 : 1,
+              }}
+              onError={() => setImgError(true)}
+            />
+          </View>
           {/* Show full screen icon if owned */}
           {!imgError && mainImage && (
             <Pressable
@@ -257,15 +263,16 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             numberOfLines={1}
             style={[fonts.label, { color: theme.text, fontWeight: "bold" }]}
           >
-            {data.series.title}
+            {typeof data.series.title === "string" ? data.series.title : ""}
           </Text>
 
-          {data.owned_products && (
+          {typeof data.owned_products === "number" &&
+          typeof data.unowned_products === "number" ? (
             <Text style={[fonts.caption, { color: theme.text }]}>
-              {data.owned_products} out of{" "}
-              {data.owned_products + data.unowned_products}
+              {data.owned_products.toString()} out of{" "}
+              {(data.owned_products + data.unowned_products).toString()}
             </Text>
-          )}
+          ) : null}
         </View>
         <View className='flex-row justify-between items-center mt-1'>
           <View style={{ alignItems: "flex-end" }}></View>

@@ -30,17 +30,15 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
             }
             alt={"banner"}
             className={
-              imgError
-                ? `h-60 p-2 w-[${(deviceWidth / 3) * 0.9}px] rounded-md`
-                : `h-60 p-2 w-[${(deviceWidth / 3) * 0.9}px] rounded-md`
+              imgError ? "pl-4 h-60 p-8 w-[130px]" : "h-60 p-1 w-[130px] "
             }
-            resizeMode='contain'
+            resizeMode={imgError ? "contain" : "cover"}
             onError={() => setImgError(true)}
           />
           {/* Show full screen icon if owned */}
 
-          <View className='absolute top-0 left-0 right-0 bottom-0 h-full bg-black/50 justify-center items-center'>
-            <Text style={[fonts.caption, { color: theme.white }]}>
+          <View className='absolute top-1 left-1 right-1 bottom-1 bg-black/50 justify-center items-center'>
+            <Text style={[fonts.label, { color: theme.white }]}>
               {product.status === "for_approval"
                 ? "Pending Approval"
                 : product.status}
