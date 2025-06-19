@@ -124,7 +124,6 @@ const WantlistScreen = () => {
           search: debouncedQuery || undefined,
           paginated: true,
         })
-        console.log("res", res.data)
         const wantListData = res.data.want_lists || []
         setWantlistItems(wantListData)
         setPage(1)
@@ -225,7 +224,6 @@ const WantlistScreen = () => {
   // Helper function to safely extract product data
   const getProductData = (item: ExtendedWantListItemT) => {
     if (!item || !item.product) {
-      console.log("Missing product data for item:", item)
       return null
     }
     return item.product
@@ -242,7 +240,6 @@ const WantlistScreen = () => {
 
     // Check if item has product
     if (!wantlistItem.product) {
-      console.log("Missing product for item:", wantlistItem)
       return null
     }
 

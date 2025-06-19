@@ -12,7 +12,6 @@ const OrderDetails = () => {
   const theme = useBoundStore((state) => state.theme)
 
   const orderDetails = order
-  console.log(orderDetails)
   return (
     <SafeAreaView>
       <NavigationHeader />

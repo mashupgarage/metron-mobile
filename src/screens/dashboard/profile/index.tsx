@@ -10,12 +10,12 @@ import {
 } from "react-native"
 import React, { useEffect, useState } from "react"
 import { useWantListStore } from "@/src/store/slices/WantListSlice"
-import { createOrderSlice } from "@/src/store/slices/OrderSlice"
 import { Ionicons } from "@expo/vector-icons"
 import {
   getWantList,
   getUserCollection,
   getReservationList,
+  getOrders,
 } from "@/src/api/apiEndpoints"
 
 import { removeAuthToken } from "@/src/api/tokenManager"
@@ -53,10 +53,16 @@ export default function Profile(props: { navigation: any }) {
         reservationProducts
           .map((item: any) => item.product?.id)
           .filter((id) => id !== undefined)
-        store.setOrdersCount(res.data.metadata?.total_count || 0)
       })
       .catch((err) => {
         console.error("Failed to fetch reservation list:", err)
+      })
+    getOrders(store.user.id)
+      .then((res) => {
+        store.setOrdersCount(res.data.length)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch orders:", err)
       })
     getWantList()
       .then((res) => {
@@ -200,9 +206,11 @@ export default function Profile(props: { navigation: any }) {
                 }}
               >
                 {tab.label}{" "}
-                <Text style={{ color: theme.text, ...fonts.label }}>
-                  {tab.count}
-                </Text>
+                {tab.count > 0 && (
+                  <Text style={{ color: theme.text, ...fonts.label }}>
+                    {tab.count}
+                  </Text>
+                )}
               </Text>
             </TouchableOpacity>
           )}

@@ -99,7 +99,6 @@ export default function ReservationBoxScreen() {
     setLoading(true)
     getReservationList(store.user.id, 1, PAGE_SIZE, debouncedQuery)
       .then((res) => {
-        console.log("reservations", res.data)
         const reservationData = (res.data.reservations || []).filter(
           (item) => item.status !== "fill"
         )

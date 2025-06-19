@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { Text, ScrollView, TextInput, Dimensions } from "react-native"
+import { Text, ScrollView, TextInput, Dimensions, View } from "react-native"
+
+import { Image } from "@/src/components/ui/image"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { Box } from "@/src/components/ui/box"
 import { getUserCollection } from "@/src/api/apiEndpoints"
@@ -9,9 +10,10 @@ import SeriesCard from "@/src/components/series"
 import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Pressable } from "react-native"
-import NavigationHeader from "@/src/components/navigation-header"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { fonts } from "@/src/theme"
+// @ts-ignore
+import ComicOdysseyIcon from "@/src/assets/icon.png"
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
@@ -52,6 +54,28 @@ const CollectionScreen = () => {
         console.log("Failed to load collection", err)
       })
   }, [])
+
+  if (seriesCount === 0) {
+    return (
+      <View className='flex mt-56 mb-4 flex-col items-center'>
+        <View className='flex items-center'>
+          <Image
+            alt='Comic Odyssey Icon'
+            key='icon'
+            className='w-56 scale-[0.8]'
+            resizeMode='contain'
+            source={ComicOdysseyIcon}
+          />
+          <Text
+            style={[fonts.body, { color: theme.text }]}
+            className='mt-4 mb-2 text-center'
+          >
+            start collecting your favorite series!
+          </Text>
+        </View>
+      </View>
+    )
+  }
 
   return (
     <>

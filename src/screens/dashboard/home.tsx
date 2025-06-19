@@ -2,7 +2,13 @@ import { Box } from "@/src/components/ui/box"
 import { Image } from "@/src/components/ui/image"
 import { Text } from "@/src/components/ui/text"
 import { useBoundStore } from "@/src/store"
-import { View, ActivityIndicator, ScrollView, Dimensions } from "react-native"
+import {
+  View,
+  ActivityIndicator,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native"
 import MasonryList from "@react-native-seoul/masonry-list"
 
 import ProductCard from "@/src/components/product"
@@ -186,7 +192,7 @@ export default function Home() {
         onEndReachedThreshold={0.5}
         ListHeaderComponent={
           <Box>
-            <Box className='h-48'>
+            <Box className='h-36'>
               <Image
                 className='w-36 absolute h-48 z-10 left-1/2 -translate-x-1/2'
                 source={require("@/src/assets/icon.png")}
@@ -194,7 +200,7 @@ export default function Home() {
                 resizeMode='contain'
               />
               <Image
-                className='w-full h-48'
+                className='w-full h-36'
                 source={{ uri: carouselItems[0].img_url }}
                 alt={carouselItems[0].name}
               />
@@ -207,8 +213,18 @@ export default function Home() {
               className='mr-2 ml-2 mt-4'
             >
               {pills.map((pill) => (
-                <Button
+                <TouchableOpacity
                   key={pill.id}
+                  style={{
+                    paddingHorizontal: 16,
+                    paddingVertical: 7,
+                    borderRadius: 18,
+                    marginRight: 8,
+                    backgroundColor:
+                      selectedPill === pill.id
+                        ? theme.primary[500]
+                        : theme.background2,
+                  }}
                   onPress={() => {
                     // change results based on pill
                     console.log("pill pressed", pill)
@@ -219,34 +235,18 @@ export default function Home() {
                       total_pages: 1,
                     })
                   }}
-                  variant='outline'
-                  style={{
-                    borderWidth: 1,
-                    borderColor: theme.primary[500],
-                    backgroundColor:
-                      selectedPill === pill.id
-                        ? theme.primary[500]
-                        : "transparent",
-                    borderRadius: 9999,
-                    marginLeft: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                  }}
+                  activeOpacity={0.8}
                 >
                   <Text
-                    style={[
-                      fonts.body,
-                      {
-                        color:
-                          selectedPill === pill.id ? theme.white : theme.text,
-                        fontWeight:
-                          selectedPill === pill.id ? "bold" : "normal",
-                      },
-                    ]}
+                    style={{
+                      ...fonts.body,
+                      color: selectedPill === pill.id ? "#fff" : theme.text,
+                      fontWeight: selectedPill === pill.id ? "bold" : "500",
+                    }}
                   >
                     {pill.name}
                   </Text>
-                </Button>
+                </TouchableOpacity>
               ))}
             </ScrollView>
             <HStack className='justify-between mr-2 ml-2'>

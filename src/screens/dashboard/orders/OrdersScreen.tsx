@@ -9,6 +9,7 @@ import { fonts } from "@/src/theme"
 const OrdersScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const user = useBoundStore((state) => state.user)
+  const store = useBoundStore((state) => state)
   const [orders, setOrders] = useState<any[]>([])
 
   useEffect(() => {
@@ -16,7 +17,7 @@ const OrdersScreen = () => {
       try {
         const response = await getOrders(userId)
         setOrders(response.data)
-        console.log(response.data)
+        store.setOrdersCount(response.data.length)
       } catch (error) {
         console.error("Error fetching orders:", error)
       }
