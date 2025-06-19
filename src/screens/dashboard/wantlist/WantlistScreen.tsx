@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"
 import {
   View,
   Text,
@@ -11,83 +11,82 @@ import {
   FlatList,
   TextInput,
   Dimensions,
-} from "react-native";
-import MasonryList from "@react-native-seoul/masonry-list";
-import { useBoundStore } from "@/src/store";
-import { getWantList, addToCart, fetchCartItems } from "@/src/api/apiEndpoints";
-import { WantListItemT } from "@/src/utils/types/common";
-import { useNavigation } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
-import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast";
-import { LayoutGrid, LayoutList } from "lucide-react-native";
-import NavigationHeader from "@/src/components/navigation-header";
+} from "react-native"
+import MasonryList from "@react-native-seoul/masonry-list"
+import { useBoundStore } from "@/src/store"
+import { getWantList, addToCart, fetchCartItems } from "@/src/api/apiEndpoints"
+import { WantListItemT } from "@/src/utils/types/common"
+import { useNavigation } from "@react-navigation/native"
+import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast"
+import { LayoutGrid, LayoutList } from "lucide-react-native"
+import NavigationHeader from "@/src/components/navigation-header"
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 20
 
 // Helper function to construct image URL from cover_file_name
 const getCoverUrl = (
   coverFileName: string | undefined,
   productId?: number
 ): string => {
-  if (!coverFileName) return "";
+  if (!coverFileName) return ""
 
   // Try format with just the filename
-  return `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`;
-};
+  return `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`
+}
 
 // Extended product type that includes quantity
 interface ExtendedProduct {
-  id: number;
-  title: string;
-  cover_price?: string;
-  price?: string;
-  formatted_price?: string;
-  creators?: string;
-  cover_file_name?: string;
-  cover_content_type?: string;
-  cover_file_size?: number;
-  cover_updated_at?: string;
-  description?: string;
-  issue_number?: string;
-  quantity?: number;
-  cover_url?: string;
+  id: number
+  title: string
+  cover_price?: string
+  price?: string
+  formatted_price?: string
+  creators?: string
+  cover_file_name?: string
+  cover_content_type?: string
+  cover_file_size?: number
+  cover_updated_at?: string
+  description?: string
+  issue_number?: string
+  quantity?: number
+  cover_url?: string
 }
 
 // Extended WantListItem type
 interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
-  product?: ExtendedProduct;
+  product?: ExtendedProduct
 }
 
-import { useColorScheme } from "react-native";
-import { Box } from "@/src/components/ui/box";
+import { useColorScheme } from "react-native"
+import { Box } from "@/src/components/ui/box"
+import { fonts } from "@/src/theme"
 
 const WantlistScreen = () => {
-  const theme = useBoundStore((state) => state.theme);
-  const deviceWidth = Dimensions.get("window").width;
+  const theme = useBoundStore((state) => state.theme)
+  const deviceWidth = Dimensions.get("window").width
 
-  const [imgError, setImgError] = useState(false);
-  const [isGrid, setIsGrid] = useState(true);
-  const store = useBoundStore();
-  const navigation = useNavigation();
-  const toast = useToast();
+  const [imgError, setImgError] = useState(false)
+  const [isGrid, setIsGrid] = useState(false)
+  const store = useBoundStore()
+  const navigation = useNavigation()
+  const toast = useToast()
   const [wantlistItems, setWantlistItems] = useState<ExtendedWantListItemT[]>(
     []
-  );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  )
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
+  const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedQuery, setDebouncedQuery] = useState("")
 
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedQuery(searchQuery), 1500);
-    return () => clearTimeout(handler);
-  }, [searchQuery]);
+    const handler = setTimeout(() => setDebouncedQuery(searchQuery), 1500)
+    return () => clearTimeout(handler)
+  }, [searchQuery])
 
   // Centralized color palette for light/dark mode
   const colors = {
@@ -107,69 +106,68 @@ const WantlistScreen = () => {
     buttonText: theme.text,
     yellowBg: theme.warning,
     yellowText: theme.white,
-  };
+  }
 
   useEffect(() => {
     if (!store.user) {
       // @ts-ignore
-      navigation.replace("Auth", { screen: "SignIn" });
-      return;
+      navigation.replace("Auth", { screen: "SignIn" })
+      return
     }
 
     const fetchData = async () => {
       try {
-        setLoading(true);
+        setLoading(true)
         const res = await getWantList({
           page: 1,
           per: PAGE_SIZE,
           search: debouncedQuery || undefined,
           paginated: true,
-        });
-        console.log("res", res.data);
-        const wantListData = res.data.want_lists || [];
-        setWantlistItems(wantListData);
-        setPage(1);
-        setTotalPages(res.data.meta?.total_pages || 1);
-        setTotalCount(res.data.meta?.total_count || wantListData.length);
-        setError(null);
+        })
+        const wantListData = res.data.want_lists || []
+        setWantlistItems(wantListData)
+        setPage(1)
+        setTotalPages(res.data.meta?.total_pages || 1)
+        setTotalCount(res.data.meta?.total_count || wantListData.length)
+        setError(null)
       } catch (err) {
-        console.error("Failed to fetch want list:", err);
-        setError("Failed to load your want list. Please try again later.");
-        setWantlistItems([]);
+        console.error("Failed to fetch want list:", err)
+        setError("Failed to load your want list. Please try again later.")
+        setWantlistItems([])
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchData();
-  }, [store.user, navigation, debouncedQuery]);
+    fetchData()
+  }, [store.user, navigation, debouncedQuery])
 
   const loadMoreItems = async () => {
-    if (isFetchingMore || page >= totalPages) return;
-    setIsFetchingMore(true);
+    if (isFetchingMore || page >= totalPages) return
+    setIsFetchingMore(true)
     try {
-      const nextPage = page + 1;
+      const nextPage = page + 1
       const res = await getWantList({
         page: nextPage,
         per: PAGE_SIZE,
         search: debouncedQuery || undefined,
         paginated: true,
-      });
+      })
 
-      const newItems = res.data.want_lists || [];
+      const newItems = res.data.want_lists || []
       setWantlistItems((prev) => {
-        const existingIds = new Set(prev.map((item) => item.id));
-        const filtered = newItems.filter((item) => !existingIds.has(item.id));
-        return [...prev, ...filtered];
-      });
-      setPage(nextPage);
-      setTotalPages(res.data.meta?.total_pages || totalPages);
+        const existingIds = new Set(prev.map((item) => item.id))
+        const filtered = newItems.filter((item) => !existingIds.has(item.id))
+        return [...prev, ...filtered]
+      })
+      setPage(nextPage)
+      setTotalPages(res.data.meta?.total_pages || totalPages)
     } catch (err) {
-      console.error("Failed to fetch more want list items:", err);
+      console.error("Failed to fetch more want list items:", err)
     } finally {
-      setIsFetchingMore(false);
+      setIsFetchingMore(false)
     }
-  };
+  }
 
   if (error) {
     return (
@@ -186,8 +184,8 @@ const WantlistScreen = () => {
         </Text>
         <TouchableOpacity
           onPress={() => {
-            setLoading(true);
-            setError(null);
+            setLoading(true)
+            setError(null)
             getWantList({
               page: 1,
               per: PAGE_SIZE,
@@ -195,20 +193,18 @@ const WantlistScreen = () => {
               paginated: true,
             })
               .then((res) => {
-                const wantListData = res.data.want_lists || [];
-                setWantlistItems(wantListData);
-                setTotalPages(res.data.meta?.total_pages || 1);
-                setTotalCount(
-                  res.data.meta?.total_count || wantListData.length
-                );
+                const wantListData = res.data.want_lists || []
+                setWantlistItems(wantListData)
+                setTotalPages(res.data.meta?.total_pages || 1)
+                setTotalCount(res.data.meta?.total_count || wantListData.length)
               })
               .catch((err) => {
-                console.error("Retry failed:", err);
-                setError("Failed to load your want list. Please try again.");
+                console.error("Retry failed:", err)
+                setError("Failed to load your want list. Please try again.")
               })
               .finally(() => {
-                setLoading(false);
-              });
+                setLoading(false)
+              })
           }}
           style={{
             backgroundColor: theme.primary[500],
@@ -222,73 +218,67 @@ const WantlistScreen = () => {
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
-    );
+    )
   }
 
   // Helper function to safely extract product data
   const getProductData = (item: ExtendedWantListItemT) => {
     if (!item || !item.product) {
-      console.log("Missing product data for item:", item);
-      return null;
+      return null
     }
-    return item.product;
-  };
+    return item.product
+  }
 
   const renderGridItem = ({
     item,
     i,
   }: {
-    item: ExtendedWantListItemT;
-    i: number;
+    item: ExtendedWantListItemT
+    i: number
   }) => {
-    const wantlistItem = item;
+    const wantlistItem = item
 
     // Check if item has product
     if (!wantlistItem.product) {
-      console.log("Missing product for item:", wantlistItem);
-      return null;
+      return null
     }
 
     // Get cover URL
     const coverUrl = getCoverUrl(
       wantlistItem.product.cover_file_name,
       wantlistItem.product.id
-    );
-    const productId = wantlistItem.product.id;
+    )
+    const productId = wantlistItem.product.id
     const isAvailable = wantlistItem.product?.quantity
       ? wantlistItem.product.quantity > 0
-      : false;
+      : false
 
     const handleAddToCart = async () => {
       try {
         if (!store.user?.id) {
-          Alert.alert("Error", "You need to be logged in to add items to cart");
-          return;
+          Alert.alert("Error", "You need to be logged in to add items to cart")
+          return
         }
 
-        await addToCart(
-          store.user.id,
-          wantlistItem.product.id,
-          wantlistItem.id
-        );
-        const res = await fetchCartItems(store.user.id);
+        await addToCart(store.user.id, wantlistItem.product.id, wantlistItem.id)
+        const res = await fetchCartItems(store.user.id)
         if (res?.data) {
-          store.setCartItems(res.data);
+          store.setCartItems(res.data)
           toast.show({
             placement: "top",
             render: ({ id }) => (
-              <Toast nativeID={"toast-" + id} action="success">
+              <Toast nativeID={"toast-" + id} action='success'>
                 <ToastTitle>Item added to cart</ToastTitle>
               </Toast>
             ),
-          });
+          })
         }
       } catch (error) {
-        console.error("Error adding to cart:", error);
+        console.error("Error adding to cart:", error)
         toast.show({
           placement: "top",
           render: ({ id }) => (
-            <Toast nativeID={"toast-" + id} action="error">
+            <Toast nativeID={"toast-" + id} action='error'>
               <ToastTitle>
                 {error instanceof Error
                   ? error.message
@@ -296,9 +286,9 @@ const WantlistScreen = () => {
               </ToastTitle>
             </Toast>
           ),
-        });
+        })
       }
-    };
+    }
 
     const navigateToProduct = () => {
       if (wantlistItem.product) {
@@ -312,9 +302,9 @@ const WantlistScreen = () => {
                 ? `https://assets.comic-odyssey.com/products/covers/medium/${wantlistItem.product.cover_file_name}`
                 : ""),
           },
-        });
+        })
       }
-    };
+    }
 
     // Grid view item
     if (isGrid) {
@@ -323,16 +313,15 @@ const WantlistScreen = () => {
           key={`${wantlistItem.id}-${i}`}
           onPress={navigateToProduct}
           style={{
-            width: "100%",
-            aspectRatio: 2 / 3,
-            padding: 4,
+            width: (deviceWidth / 3) * 0.9,
+            padding: theme.spacing.xs,
+            marginBottom: theme.spacing.md,
           }}
         >
           <View
             style={{
               flex: 1,
-              backgroundColor: colors.surface,
-              borderRadius: 8,
+              borderRadius: 0,
               overflow: "hidden",
               shadowColor: colors.cardShadow,
               shadowOffset: { width: 0, height: 2 },
@@ -345,16 +334,16 @@ const WantlistScreen = () => {
               source={{ uri: coverUrl }}
               style={{
                 width: "100%",
-                height: 105,
+                height: 190,
                 backgroundColor: colors.placeholder,
               }}
-              resizeMode="cover"
+              resizeMode='cover'
             />
-            <View style={{ padding: 8 }}>
+            <View style={{ padding: theme.spacing.sm }}>
               <Text
                 numberOfLines={1}
                 style={{
-                  fontFamily: "Urbanist-Bold",
+                  fontFamily: "Inter",
                   fontSize: 14,
                   color: colors.text,
                   marginBottom: 2,
@@ -365,7 +354,7 @@ const WantlistScreen = () => {
               <Text
                 numberOfLines={1}
                 style={{
-                  fontFamily: "PublicSans-Regular",
+                  fontFamily: "Inter",
                   fontSize: 12,
                   color: colors.textSecondary,
                   marginBottom: 4,
@@ -399,7 +388,7 @@ const WantlistScreen = () => {
                     style={{
                       color: theme.white,
                       fontSize: 12,
-                      fontFamily: "Urbanist-SemiBold",
+                      fontFamily: "Inter",
                     }}
                   >
                     {isAvailable ? "Add to Cart" : "Out of Stock"}
@@ -409,7 +398,7 @@ const WantlistScreen = () => {
             </View>
           </View>
         </Pressable>
-      );
+      )
     }
 
     // List view item
@@ -423,7 +412,7 @@ const WantlistScreen = () => {
           marginVertical: 4,
           marginHorizontal: 8,
           backgroundColor: colors.surface,
-          borderRadius: 8,
+          borderRadius: 4,
           shadowColor: colors.cardShadow,
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.1,
@@ -436,18 +425,18 @@ const WantlistScreen = () => {
           style={{
             width: 60,
             height: 90,
-            borderRadius: 4,
+            borderRadius: 0,
             backgroundColor: colors.placeholder,
             marginRight: 12,
           }}
-          resizeMode="cover"
+          resizeMode='cover'
         />
         <View style={{ flex: 1, justifyContent: "space-between" }}>
           <View>
             <Text
               numberOfLines={1}
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: colors.text,
                 marginBottom: 4,
@@ -458,7 +447,7 @@ const WantlistScreen = () => {
             <Text
               numberOfLines={1}
               style={{
-                fontFamily: "PublicSans-Regular",
+                fontFamily: "Inter",
                 fontSize: 14,
                 color: colors.textSecondary,
                 marginBottom: 4,
@@ -476,7 +465,7 @@ const WantlistScreen = () => {
           >
             <Text
               style={{
-                fontFamily: "Urbanist-Bold",
+                fontFamily: "Inter",
                 fontSize: 16,
                 color: theme.text,
               }}
@@ -503,7 +492,7 @@ const WantlistScreen = () => {
                 style={{
                   color: colors.buttonText,
                   fontSize: 14,
-                  fontFamily: "Urbanist-SemiBold",
+                  fontFamily: "Inter",
                 }}
               >
                 {isAvailable ? "Add to Cart" : "Out of Stock"}
@@ -512,19 +501,11 @@ const WantlistScreen = () => {
           </View>
         </View>
       </Pressable>
-    );
-  };
+    )
+  }
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-        paddingTop: theme.spacing.xl,
-      }}
-    >
-      <NavigationHeader />
-
+    <>
       {/* Header with title and view toggle */}
       <View
         style={{
@@ -532,13 +513,18 @@ const WantlistScreen = () => {
           alignItems: "center",
           justifyContent: "space-between",
           paddingHorizontal: 16,
-          paddingVertical: 12,
         }}
       >
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: colors.text }}>
+        <Text
+          style={{
+            ...fonts.title,
+            color: theme.text,
+            marginBottom: theme.spacing.md,
+          }}
+        >
           Want List
         </Text>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{ padding: 8, borderRadius: 999 }}
           onPress={() => setIsGrid((prev) => !prev)}
         >
@@ -547,14 +533,14 @@ const WantlistScreen = () => {
           ) : (
             <LayoutGrid size={24} color={colors.icon} />
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Search Bar */}
       <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
         <View style={{ position: "relative" }}>
           <TextInput
-            placeholder="Search by title..."
+            placeholder='Search by title...'
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={{
@@ -582,7 +568,7 @@ const WantlistScreen = () => {
                 height: "100%",
                 width: 28,
               }}
-              accessibilityLabel="Clear search"
+              accessibilityLabel='Clear search'
             >
               <Text style={{ fontSize: 18, color: colors.textSecondary }}>
                 ✕
@@ -608,8 +594,9 @@ const WantlistScreen = () => {
               lineHeight: 20,
             }}
           >
-            This is your want list. You'll be notified when items become
-            available. Products are first come, first served.
+            This is your want list. You'll be able to add the products listed in
+            here to your cart when they become available. Products are first
+            come, first served.
           </Text>
         </View>
       </View>
@@ -621,8 +608,8 @@ const WantlistScreen = () => {
             data={wantlistItems}
             renderItem={({ item, i }) => {
               // Ensure item is of type ExtendedWantListItemT
-              const listItem = item as ExtendedWantListItemT;
-              return renderGridItem({ item: listItem, i });
+              const listItem = item as ExtendedWantListItemT
+              return renderGridItem({ item: listItem, i })
             }}
             numColumns={3}
             contentContainerStyle={{
@@ -634,7 +621,7 @@ const WantlistScreen = () => {
             ListFooterComponent={
               isFetchingMore && page < totalPages ? (
                 <ActivityIndicator
-                  size="small"
+                  size='small'
                   color={colors.primary[500]}
                   style={{ margin: 16 }}
                 />
@@ -646,8 +633,8 @@ const WantlistScreen = () => {
         <FlatList
           data={wantlistItems}
           renderItem={({ item, index }) => {
-            const product = getProductData(item);
-            return product ? renderGridItem({ item, i: index }) : null;
+            const product = getProductData(item)
+            return product ? renderGridItem({ item, i: index }) : null
           }}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 24 }}
@@ -657,7 +644,7 @@ const WantlistScreen = () => {
           ListFooterComponent={
             isFetchingMore && page < totalPages ? (
               <ActivityIndicator
-                size="small"
+                size='small'
                 color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
@@ -667,14 +654,14 @@ const WantlistScreen = () => {
       )}
 
       {/* Item count footer */}
-      <View style={{ alignItems: "center", marginVertical: 8 }}>
-        <Text style={{ fontSize: 12, color: colors.textSecondary }}>
+      <View style={{ alignItems: "center", marginVertical: 24 }}>
+        <Text style={[fonts.caption, { color: colors.textSecondary }]}>
           Showing {Math.min(wantlistItems.length, totalCount)} of {totalCount}{" "}
           items
         </Text>
       </View>
-    </SafeAreaView>
-  );
-};
+    </>
+  )
+}
 
-export default WantlistScreen;
+export default WantlistScreen

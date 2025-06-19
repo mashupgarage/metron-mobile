@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react"
 import {
   Animated,
   SafeAreaView,
@@ -6,24 +6,25 @@ import {
   TouchableOpacity,
   useColorScheme,
   View,
-} from "react-native";
-import { Text } from "./ui/text";
-import { X } from "lucide-react-native";
-import { useBoundStore } from "../store";
+} from "react-native"
+import { Text } from "./ui/text"
+import { X } from "lucide-react-native"
+import { useBoundStore } from "../store"
+import { fonts } from "../theme"
 
 interface ReleaseDate {
-  id: number;
-  date: string;
-  count: number;
+  id: number
+  date: string
+  count: number
 }
 
 interface ReleasesDrawerProps {
-  visible: boolean;
-  releaseDates: ReleaseDate[];
-  selectedReleaseId: number | null;
-  onClose: () => void;
-  onSelectDate: (id: number, date: string) => void;
-  onShowAllReleases: () => void;
+  visible: boolean
+  releaseDates: ReleaseDate[]
+  selectedReleaseId: number | null
+  onClose: () => void
+  onSelectDate: (id: number, date: string) => void
+  onShowAllReleases: () => void
 }
 
 const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
@@ -34,29 +35,29 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
   onSelectDate,
   onShowAllReleases,
 }) => {
-  const drawerAnimation = useRef(new Animated.Value(-300)).current;
-  const { theme } = useBoundStore();
+  const drawerAnimation = useRef(new Animated.Value(-300)).current
+  const { theme } = useBoundStore()
   useEffect(() => {
     if (visible) {
       Animated.timing(drawerAnimation, {
         toValue: 0,
         duration: 250,
         useNativeDriver: true,
-      }).start();
+      }).start()
     } else {
       Animated.timing(drawerAnimation, {
         toValue: -300,
         duration: 250,
         useNativeDriver: true,
-      }).start();
+      }).start()
     }
-  }, [visible]);
+  }, [visible])
 
   return (
     <>
       {visible && (
         <TouchableOpacity
-          className="absolute top-0 left-0 right-0 bottom-0 bg-black/50 z-[1]"
+          className='absolute top-0 left-0 right-0 bottom-0 bg-black/50 z-[1]'
           activeOpacity={1}
           onPress={onClose}
         />
@@ -75,11 +76,11 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
           },
         ]}
       >
-        <SafeAreaView className="flex-1">
-          <View className="p-4 border-b flex-row justify-between items-center">
+        <SafeAreaView className='flex-1'>
+          <View className='p-4 border-b flex-row justify-between items-center'>
             <Text
-              style={{ fontFamily: "Urbanist-Bold", color: theme.text }}
-              className="text-xl font-bold"
+              style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
+              className='text-xl font-bold'
             >
               Release History
             </Text>
@@ -88,17 +89,17 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
             </TouchableOpacity>
           </View>
 
-          <ScrollView className="flex-1">
+          <ScrollView className='flex-1'>
             <TouchableOpacity
-              className="flex-row justify-between items-center p-4"
+              className='flex-row justify-between items-center p-4'
               onPress={() => {
-                onShowAllReleases();
-                onClose();
+                onShowAllReleases()
+                onClose()
               }}
             >
               <Text
-                style={{ fontFamily: "PublicSans-regular", color: theme.text }}
-                className="text-base"
+                style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
+                className='text-base'
               >
                 LATEST RELEASE
               </Text>
@@ -114,12 +115,12 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   backgroundColor: theme.background,
                 }}
                 onPress={() => {
-                  onSelectDate(item.id, item.date);
+                  onSelectDate(item.id, item.date)
                 }}
               >
                 <Text
-                  style={{ fontFamily: "PublicSans-regular", color: theme.text }}
-                  className="text-base"
+                  style={[fonts.body, { color: theme.text }]}
+                  className='text-base'
                 >
                   {item.date}
                 </Text>
@@ -127,13 +128,10 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
                   style={{
                     backgroundColor: theme.primary[500],
                   }}
-                  className=" rounded px-2 py-0.5"
+                  className=' rounded px-2 py-0.5'
                 >
                   <Text
-                    style={{
-                      fontFamily: "PublicSans-regular",
-                      color: "#fff",
-                    }}
+                    style={[fonts.body, { color: "#fff", fontWeight: "bold" }]}
                   >
                     {item.count}
                   </Text>
@@ -144,7 +142,7 @@ const ReleasesDrawer: React.FC<ReleasesDrawerProps> = ({
         </SafeAreaView>
       </Animated.View>
     </>
-  );
-};
+  )
+}
 
-export default ReleasesDrawer;
+export default ReleasesDrawer

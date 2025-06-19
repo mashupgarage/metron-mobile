@@ -4,7 +4,40 @@ export const spacing = {
   md: 12,
   lg: 16,
   xl: 24,
-};
+}
+
+export const fonts = {
+  body: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: "Inter",
+    fontWeight: "normal" as "normal",
+  },
+  label: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: "Inter",
+    fontWeight: "bold" as "bold",
+  },
+  hero: {
+    fontSize: 32,
+    lineHeight: 36,
+    fontFamily: "Inter",
+    fontWeight: "bold" as "bold",
+  },
+  title: {
+    fontSize: 24,
+    lineHeight: 28,
+    fontFamily: "Inter",
+    fontWeight: "bold" as "bold",
+  },
+  caption: {
+    fontSize: 12,
+    lineHeight: 14,
+    fontFamily: "Inter",
+    fontWeight: "normal" as "normal",
+  },
+}
 
 export const colors = {
   // Primary colors
@@ -39,33 +72,36 @@ export const colors = {
   success: "#10b981",
   error: "#ef4444",
   warning: "#f59e0b",
+  orange: "#f57e00",
   info: "#3b82f6",
-};
+}
 
 export const lightTheme = {
   ...colors,
   spacing,
-  background: colors.white,
-  background2: colors.gray[100],
-  text: colors.gray[900],
-  textSecondary: colors.gray[600],
-  border: colors.gray[200],
-  card: colors.white,
-  notification: colors.primary[500],
-  surface: colors.gray[100],
-};
+  fonts,
+  background: "#FFFBFE", // Material background
+  background2: "#E7E0EC", // Material surfaceVariant
+  text: "#1C1B1F", // Material onBackground
+  textSecondary: "#49454F", // Material onSurfaceVariant
+  border: "#79747E", // Material outline
+  card: "#FFFBFE", // Material surface
+  notification: "#6750A4", // Material primary
+  surface: "#FFFBFE", // Material surface
+}
 
 export const darkTheme = {
   ...colors,
   spacing,
-  background: "#1a1a1a",
-  background2: colors.gray[800],
-  text: colors.gray[100],
-  textSecondary: colors.gray[600],
-  border: colors.gray[700],
-  card: colors.gray[800],
-  notification: colors.primary[500],
-  surface: colors.gray[800],
-};
+  fonts,
+  background: "#1C1B1F", // Material background
+  background2: "#49454F", // Material surfaceVariant
+  text: "#E6E1E5", // Material onBackground
+  textSecondary: "#CAC4D0", // Material onSurfaceVariant
+  border: "#938F99", // Material outline
+  card: "#1C1B1F", // Material surface
+  notification: "#D0BCFF", // Material primary
+  surface: "#1C1B1F", // Material surface
+}
 
-export type ThemeType = typeof lightTheme;
+export type ThemeType = typeof lightTheme

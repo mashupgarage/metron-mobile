@@ -19,17 +19,98 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // --- Material Design Dark Theme Overrides ---
-        // These will be used for dark mode via Tailwind/NativeWind
-        mdark: {
-          background: '#121212', // main background
-          surface: '#1E1E1E',   // cards, surfaces
-          primary: '#BB86FC',   // primary accent
-          primaryVariant: '#3700B3',
-          secondary: '#03DAC6',
-          error: '#CF6679',
-          text: '#FFFFFF', // high emphasis
-          textSecondary: '#B3B3B3', // medium emphasis
+        // --- Material Design Semantic Colors ---
+        // Light mode
+        primary: {
+          DEFAULT: '#6750A4',
+        },
+        onPrimary: {
+          DEFAULT: '#FFFFFF',
+        },
+        primaryContainer: {
+          DEFAULT: '#EADDFF',
+        },
+        onPrimaryContainer: {
+          DEFAULT: '#21005D',
+        },
+        secondary: {
+          DEFAULT: '#625B71',
+        },
+        onSecondary: {
+          DEFAULT: '#FFFFFF',
+        },
+        background: {
+          DEFAULT: '#FFFBFE',
+        },
+        onBackground: {
+          DEFAULT: '#1C1B1F',
+        },
+        surface: {
+          DEFAULT: '#FFFBFE',
+        },
+        onSurface: {
+          DEFAULT: '#1C1B1F',
+        },
+        surfaceVariant: {
+          DEFAULT: '#E7E0EC',
+        },
+        onSurfaceVariant: {
+          DEFAULT: '#49454F',
+        },
+        outline: {
+          DEFAULT: '#79747E',
+        },
+        error: {
+          DEFAULT: '#B3261E',
+        },
+        onError: {
+          DEFAULT: '#FFFFFF',
+        },
+        // Dark mode
+        'dark-primary': {
+          DEFAULT: '#D0BCFF',
+        },
+        'dark-onPrimary': {
+          DEFAULT: '#381E72',
+        },
+        'dark-primaryContainer': {
+          DEFAULT: '#4F378B',
+        },
+        'dark-onPrimaryContainer': {
+          DEFAULT: '#EADDFF',
+        },
+        'dark-secondary': {
+          DEFAULT: '#CCC2DC',
+        },
+        'dark-onSecondary': {
+          DEFAULT: '#332D41',
+        },
+        'dark-background': {
+          DEFAULT: '#1C1B1F',
+        },
+        'dark-onBackground': {
+          DEFAULT: '#E6E1E5',
+        },
+        'dark-surface': {
+          DEFAULT: '#1C1B1F',
+        },
+        'dark-onSurface': {
+          DEFAULT: '#E6E1E5',
+        },
+        'dark-surfaceVariant': {
+          DEFAULT: '#49454F',
+        },
+        'dark-onSurfaceVariant': {
+          DEFAULT: '#CAC4D0',
+        },
+        'dark-outline': {
+          DEFAULT: '#938F99',
+        },
+        'dark-error': {
+          DEFAULT: '#F2B8B5',
+        },
+        'dark-onError': {
+          DEFAULT: '#601410',
         },
         primary: {
           0: 'rgb(var(--color-primary-0)/<alpha-value>)',

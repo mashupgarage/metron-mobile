@@ -1,12 +1,11 @@
-import { Box } from "@/src/components/ui/box";
-import React from "react";
-import { useColorScheme } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBoundStore } from "@/src/store";
+import { Box } from "@/src/components/ui/box"
+import React from "react"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { useBoundStore } from "@/src/store"
 
 const DashboardLayout = ({ children }: { children: React.ReactElement }) => {
-  const safeArea = useSafeAreaInsets();
-  const theme = useBoundStore((state) => state.theme);
+  const safeArea = useSafeAreaInsets()
+  const theme = useBoundStore((state) => state.theme)
   return (
     <Box
       style={{
@@ -17,7 +16,7 @@ const DashboardLayout = ({ children }: { children: React.ReactElement }) => {
     >
       <React.Fragment>{children}</React.Fragment>
     </Box>
-  );
-};
+  )
+}
 
-export default DashboardLayout;
+export default DashboardLayout

@@ -1,29 +1,29 @@
-import { useColorScheme, View } from "react-native";
-import { Button, ButtonText } from "../ui/button";
-import { useNavigation } from "@react-navigation/native";
-import { ArrowLeft, Dot, ShoppingBag } from "lucide-react-native";
-import { useBoundStore } from "@/src/store";
+import { useColorScheme, View } from "react-native"
+import { Button, ButtonText } from "../ui/button"
+import { useNavigation } from "@react-navigation/native"
+import { ArrowLeft, Dot, ShoppingBag } from "lucide-react-native"
+import { useBoundStore } from "@/src/store"
+import { fonts } from "@/src/theme"
 
 const NavigationHeader = ({
   showBackButton = true,
   showCartButton = false,
 }) => {
-  const navigation = useNavigation();
-  const colorScheme = useColorScheme();
-  const theme = useBoundStore((state) => state.theme);
-  const cartCount = useBoundStore((state) => state.cartItems.length);
+  const navigation = useNavigation()
+  const theme = useBoundStore((state) => state.theme)
+  const cartCount = useBoundStore((state) => state.cartItems.length)
   return (
-    <View className="mb-4 flex">
+    <View className='mb-4 flex'>
       {showBackButton && (
         <Button
           onPress={() => {
-            navigation.goBack();
+            navigation.goBack()
           }}
-          className="absolute ml-4"
-          variant="link"
+          className='absolute ml-4'
+          variant='link'
         >
           <ArrowLeft color={theme.text} />
-          <ButtonText style={{ fontFamily: "PublicSans-regular", color: theme.text }}>
+          <ButtonText style={[fonts.body, { color: theme.text }]}>
             Back
           </ButtonText>
         </Button>
@@ -33,29 +33,27 @@ const NavigationHeader = ({
           <Button
             onPress={() => {
               // @ts-ignore
-              navigation.navigate("Home", { screen: "My Cart" });
+              navigation.navigate("Home", { screen: "My Cart" })
             }}
-            className="absolute right-4"
-            variant="link"
+            className='absolute right-4'
+            variant='link'
           >
             {cartCount > 0 && (
               <Dot
-                className="absolute"
+                className='absolute'
                 style={{ right: -50, top: -9, zIndex: 1 }}
-                color="red"
+                color='red'
                 size={44}
               />
             )}
-            <ShoppingBag
-              color={theme.text}
-            />
-            <ButtonText style={{ fontFamily: "PublicSans-regular", color: theme.text }}>
+            <ShoppingBag color={theme.text} />
+            <ButtonText style={[fonts.body, { color: theme.text }]}>
               My Cart
             </ButtonText>
           </Button>
         )}
       </View>
     </View>
-  );
-};
-export default NavigationHeader;
+  )
+}
+export default NavigationHeader

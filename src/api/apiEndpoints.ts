@@ -1,12 +1,7 @@
-import axios from "axios";
-import axiosClient from "./client";
-import constants from "expo-constants";
-import {
-  UserT,
-  ProductT,
-  SearchOptions,
-  SearchResponse,
-} from "../utils/types/common";
+import axios from "axios"
+import axiosClient from "./client"
+import constants from "expo-constants"
+import { UserT, SearchOptions, SearchResponse } from "../utils/types/common"
 
 // =========================
 // Product-related Endpoints
@@ -20,12 +15,12 @@ import {
  * searchProduct('batman').then(res => res.data)
  */
 export const searchProduct = (query: string) => {
-  return axiosClient.get(`/products/search`, { params: { q: query } });
-};
+  return axiosClient.get(`/products/search`, { params: { q: query } })
+}
 
 export const fetchProductDetails = (id: number) => {
-  return axiosClient.get(`/products/${id}`);
-};
+  return axiosClient.get(`/products/${id}`)
+}
 
 /**
  * Fetch available products in the system with pagination support.
@@ -41,7 +36,7 @@ export const fetchProducts = (
   page: number = 1,
   limit: number = 10
 ) => {
-  const params: Record<string, string | number> = { page, limit };
+  const params: Record<string, string | number> = { page, limit }
 
   if (category_id !== undefined) {
     return axiosClient.get(`/marketplace/catalog_products`, {
@@ -50,10 +45,10 @@ export const fetchProducts = (
         page,
         limit,
       },
-    });
+    })
   }
-  return axiosClient.get("/marketplace/catalog_products", { params });
-};
+  return axiosClient.get("/marketplace/catalog_products", { params })
+}
 
 /**
  * Search for products in the marketplace with pagination support.
@@ -72,14 +67,14 @@ export const searchMarketplaceProducts = (
     q: query,
     page,
     limit,
-  };
-
-  if (category_id !== undefined) {
-    params.c = category_id;
   }
 
-  return axiosClient.get(`/marketplace/catalog_products`, { params });
-};
+  if (category_id !== undefined) {
+    params.c = category_id
+  }
+
+  return axiosClient.get(`/marketplace/catalog_products`, { params })
+}
 
 // =========================
 // User-related Endpoints
@@ -102,23 +97,23 @@ export const authenticateUser = async (email: string, password: string) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-    });
+    })
 
     const response = await authClient.post("/api/v1/login", {
       email: email,
       password: password,
       remember_me: 0,
-    });
+    })
 
-    return response;
+    return response
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("Authentication error:", error);
-      throw new Error(error.response?.data?.error || "Authentication failed");
+      console.error("Authentication error:", error)
+      throw new Error(error.response?.data?.error || "Authentication failed")
     }
-    throw error;
+    throw error
   }
-};
+}
 
 /**
  * Register a new user.
@@ -136,19 +131,19 @@ export const registerUser = async (payload: any) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-    });
+    })
 
-    const response = await authClient.post("/api/v1/users", payload);
+    const response = await authClient.post("/api/v1/users", payload)
 
-    return response;
+    return response
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("Authentication error:", error);
-      throw new Error(error.response?.data?.error || "Authentication failed");
+      console.error("Authentication error:", error)
+      throw new Error(error.response?.data?.error || "Authentication failed")
     }
-    throw error;
+    throw error
   }
-};
+}
 
 /**
  * Fetch the current user's profile information.
@@ -157,8 +152,8 @@ export const registerUser = async (payload: any) => {
  * fetchUserProfile().then(res => res.data)
  */
 export const fetchUserProfile = (userId: UserT["id"]) => {
-  return axiosClient.get(`/users/${userId}`);
-};
+  return axiosClient.get(`/users/${userId}`)
+}
 
 /**
  * Update the current user's profile information.
@@ -169,8 +164,8 @@ export const fetchUserProfile = (userId: UserT["id"]) => {
  * updateUserProfile(123, { email: 'user@email.com' }).then(res => res.data)
  */
 export const updateUserProfile = (userId: UserT["id"], payload: any) => {
-  return axiosClient.put(`/users/${userId}`, payload);
-};
+  return axiosClient.put(`/users/${userId}`, payload)
+}
 
 /**
  * Fetch all cart items for a given user.
@@ -180,8 +175,8 @@ export const updateUserProfile = (userId: UserT["id"], payload: any) => {
  * fetchCartItems(123).then(res => res.data)
  */
 export const fetchCartItems = (userId: UserT["id"]) => {
-  return axiosClient.get(`/users/${userId}/cart_items`);
-};
+  return axiosClient.get(`/users/${userId}/cart_items`)
+}
 
 /**
  * Add a product to a user's cart.
@@ -200,16 +195,16 @@ export const addToCart = (
   return axiosClient.post(`/users/${userId}/cart_items`, {
     product_id: productId,
     product_item_id: product_item_id,
-  });
-};
+  })
+}
 
 export const removeFromCart = (userId: UserT["id"], cartItemId: number) => {
-  return axiosClient.delete(`/users/${userId}/cart_items/${cartItemId}`);
-};
+  return axiosClient.delete(`/users/${userId}/cart_items/${cartItemId}`)
+}
 
 export const getCartItems = (userId: UserT["id"]) => {
-  return axiosClient.get(`/users/${userId}/cart_items`);
-};
+  return axiosClient.get(`/users/${userId}/cart_items`)
+}
 
 // =========================
 // Release-related Endpoints
@@ -223,8 +218,8 @@ export const getCartItems = (userId: UserT["id"]) => {
  * fetchReleases().then(res => res.data)
  */
 export const fetchReleases = () => {
-  return axiosClient.get("/releases?type=all");
-};
+  return axiosClient.get("/releases?type=all")
+}
 
 /**
  * Fetch a single release by its ID.
@@ -234,8 +229,8 @@ export const fetchReleases = () => {
  * fetchReleaseById(1).then(res => res.data)
  */
 export const fetchReleaseById = (id: number) => {
-  return axiosClient.get(`/releases/${id}`);
-};
+  return axiosClient.get(`/releases/${id}`)
+}
 
 /**
  * Fetch all products associated with a specific release.
@@ -257,8 +252,8 @@ export const fetchProductsByReleaseId = (
       page,
       limit,
     },
-  });
-};
+  })
+}
 
 // =========================
 // Product-related Endpoints
@@ -274,14 +269,14 @@ export const fetchProductsByReleaseId = (
 export const addToWantList = async (productId: number) => {
   await axiosClient.post(`/want_lists`, {
     product_id: productId,
-  });
-};
+  })
+}
 
 interface GetWantListParams {
-  page?: number;
-  per?: number;
-  search?: string;
-  paginated?: boolean;
+  page?: number
+  per?: number
+  search?: string
+  paginated?: boolean
 }
 
 /**
@@ -305,9 +300,9 @@ interface GetWantListParams {
  */
 export const getWantList = async (params: GetWantListParams = {}) => {
   // Always include paginated=true for consistent API behavior
-  const queryParams = { ...params, paginated: true };
-  return axiosClient.get(`/want_lists`, { params: queryParams });
-};
+  const queryParams = { ...params, paginated: true }
+  return axiosClient.get(`/want_lists`, { params: queryParams })
+}
 
 /**
  * Fetch the reservation box (reservations) for a specific user, paginated.
@@ -327,14 +322,14 @@ export const getReservationList = async (
   const params: Record<string, any> = {
     page,
     limit,
-  };
+  }
   if (searchTerm) {
-    params["search[product]"] = searchTerm;
+    params["search[product]"] = searchTerm
   }
   return axiosClient.get(`/reservation_box/${userId}/reservations`, {
     params,
-  });
-};
+  })
+}
 
 /**
  * Check if a reservation entry exists for the current user and release.
@@ -344,8 +339,8 @@ export const getReservationList = async (
 export const checkReservationEntry = async (releaseId: number) => {
   return axiosClient.get(`/mobile_reservations/check`, {
     params: { release_id: releaseId },
-  });
-};
+  })
+}
 
 /**
  * Create a reservation entry for the user and release if not already present.
@@ -355,8 +350,8 @@ export const checkReservationEntry = async (releaseId: number) => {
 export const createReservationEntry = async (releaseId: number) => {
   return axiosClient.post(`/mobile_reservations/create`, {
     release_id: releaseId,
-  });
-};
+  })
+}
 
 /**
  * Add or update products in the reservation entry.
@@ -373,8 +368,8 @@ export const addProductsToReservation = async (
   return axiosClient.post(
     `/mobile_reservations/${reservationListId}/add_products`,
     { product_ids: productIds, quantities }
-  );
-};
+  )
+}
 
 /**
  * Submit the reservation entry.
@@ -385,8 +380,8 @@ export const submitReservation = async (reservationListId: number) => {
   return axiosClient.post(
     `/mobile_reservations/${reservationListId}/submit`,
     {}
-  );
-};
+  )
+}
 
 /**
  * Fetch products in a reservation entry.
@@ -394,33 +389,35 @@ export const submitReservation = async (reservationListId: number) => {
  * @returns Array of products in the reservation
  */
 export const fetchReservationProducts = async (reservationListId: number) => {
-  return axiosClient.get(`/mobile_reservations/${reservationListId}/products`);
-};
-
-// DEPRECATED: Old reservation endpoints below are no longer used for mobile reservations.
+  return axiosClient.get(`/mobile_reservations/${reservationListId}/products`)
+}
 
 /**
  * Fetch the authenticated user's collection (orders).
  * @param userId - The user ID whose collection to fetch.
  * @returns Axios promise resolving to the user's collection array.
  * @example
- * getMyCollection(123).then(res => res.data)
+ * getOrders(123).then(res => res.data)
  */
-export const getMyCollection = async (userId: number) => {
+export const getOrders = async (userId: number) => {
   return axiosClient.get(`/orders/collection`, {
     params: {
       user_id: userId,
     },
-  });
-};
+  })
+}
+
+export const getOrderDetails = async (orderId: number) => {
+  return axiosClient.get(`/orders/${orderId}`)
+}
 
 export const getUserCollection = async () => {
-  return axiosClient.get(`/user_collection`);
-};
+  return axiosClient.get(`/user_collection`)
+}
 
 export const getCollectionSeriesStatus = async (seriesId: number) => {
-  return axiosClient.get(`/user_collection/${seriesId}`);
-};
+  return axiosClient.get(`/user_collection/${seriesId}`)
+}
 
 /**
  * Search for products in reservations with optional filters.
@@ -432,32 +429,55 @@ export const searchReservationProducts = (
   productName: string,
   options: SearchOptions = {}
 ): Promise<{ data: SearchResponse }> => {
-  const searchParams = new URLSearchParams();
-  searchParams.append("search[product]", productName);
+  const searchParams = new URLSearchParams()
+  searchParams.append("search[product]", productName)
 
   Object.entries(options).forEach(([key, value]) => {
     if (value !== undefined) {
-      searchParams.append(`search[${key}]`, String(value));
+      searchParams.append(`search[${key}]`, String(value))
     }
-  });
+  })
 
   return axiosClient.get("/search/reservations", {
     params: searchParams,
-  });
-};
+  })
+}
 
 export const fetchAvailableBranches = async () => {
-  return axiosClient.get(`/locations`);
-};
+  return axiosClient.get(`/locations`)
+}
 
 export const fetchIsOwned = async (productId: number) => {
-  return axiosClient.get(`/products/${productId}/is_owned`);
-};
+  return axiosClient.get(`/products/${productId}/is_owned`)
+}
 
 export const fetchProductSeriesStatus = async (productId: number) => {
-  return axiosClient.get(`/products/${productId}/series_status`);
-};
+  return axiosClient.get(`/products/${productId}/series_status`)
+}
 
 export const fetchProductRecommendations = async (productId: number) => {
-  return axiosClient.get(`/products/${productId}/recommendations`);
-};
+  return axiosClient.get(`/products/${productId}/recommendations`)
+}
+
+// =========================
+// Cart Endpoints
+// =========================
+
+export const checkoutCartItems = async (
+  userId: number,
+  payload: {
+    order: {
+      notes: string
+      branch: number // branch id
+      phone_number: string
+      shipping_address: string
+      shipping_region: string
+      total_price: number
+      delivery_option: "store" | "shipping"
+      transaction_source: "paypal" | "bank_deposit" | "cod" | "pay_at_store"
+      status: "pending"
+    }
+  }
+) => {
+  return axiosClient.post(`users/${userId}/checkout`, payload)
+}
