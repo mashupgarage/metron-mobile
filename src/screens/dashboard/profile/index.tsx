@@ -10,6 +10,7 @@ import {
 } from "react-native"
 import React, { useEffect, useState } from "react"
 import { useWantListStore } from "@/src/store/slices/WantListSlice"
+import { createOrderSlice } from "@/src/store/slices/OrderSlice"
 import { Ionicons } from "@expo/vector-icons"
 import {
   getWantList,
@@ -46,13 +47,16 @@ export default function Profile(props: { navigation: any }) {
       return
     }
     setCheckingUser(false)
-    getReservationList(store.user.id, 1, 50)
+    getReservationList(store.user.id)
       .then((res) => {
-        console.log("reservations", res.data)
-        setReservationCount(res.data.metadata?.total_count)
+        const reservationProducts = res.data.reservations || []
+        reservationProducts
+          .map((item: any) => item.product?.id)
+          .filter((id) => id !== undefined)
+        store.setOrdersCount(res.data.metadata?.total_count || 0)
       })
-      .catch(() => {
-        console.log("Failed to fetch reservations")
+      .catch((err) => {
+        console.error("Failed to fetch reservation list:", err)
       })
     getWantList()
       .then((res) => {
@@ -137,6 +141,7 @@ export default function Profile(props: { navigation: any }) {
               store.setOnboardingDone(true)
               store.setCartItems([])
               store.setCartCount(0)
+              store.setOrdersCount(0)
               store.setCollectionCount(0)
               store.setUser(null)
             }}
@@ -162,7 +167,7 @@ export default function Profile(props: { navigation: any }) {
               count: reservationCount,
             },
             { key: "wantlist", label: `Wantlist`, count: wantlistCount },
-            { key: "orders", label: `Orders`, count: store.ordersCount ?? 0 },
+            { key: "orders", label: `Orders`, count: store.ordersCount },
           ]}
           horizontal
           showsHorizontalScrollIndicator={false}
