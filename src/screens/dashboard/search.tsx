@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { View, ActivityIndicator, TextInput } from "react-native"
 import { searchMarketplaceProducts } from "@/src/api/apiEndpoints"
-import { Input, InputField } from "@/src/components/ui/input"
 import { Button, ButtonText, ButtonSpinner } from "@/src/components/ui/button"
 import { Text } from "@/src/components/ui/text"
 import { ProductT } from "@/src/utils/types/common"
@@ -137,6 +136,7 @@ export default function Search() {
               <TextInput
                 placeholder='Search products...'
                 returnKeyType='search'
+                placeholderTextColor={theme.textSecondary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 onSubmitEditing={() => handleSearch(1)}
