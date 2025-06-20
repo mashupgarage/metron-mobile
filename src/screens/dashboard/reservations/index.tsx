@@ -14,7 +14,6 @@ import MasonryList from "@react-native-seoul/masonry-list"
 // @ts-ignore
 import ComicOdysseyIcon from "@/src/assets/icon.png"
 import React, { useEffect } from "react"
-import { useWantListStore } from "@/src/store/slices/WantListSlice"
 import { ProductT } from "@/src/utils/types/common"
 import { ClipboardCheck, Menu, Search, X, Check } from "lucide-react-native"
 import DashboardLayout from "../_layout"
@@ -98,7 +97,7 @@ export default function ReservationsScreen() {
   // Products already reserved in the current view
   // Products from the user's reservation list (across all releases)
 
-  const incrementWantlistCount = useWantListStore(
+  const incrementWantlistCount = useBoundStore(
     (state) => state.incrementWantlistCount
   )
 

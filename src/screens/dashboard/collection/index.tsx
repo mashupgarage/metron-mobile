@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react"
-import { Text, ScrollView, TextInput, Dimensions, View } from "react-native"
+import React, { useState, useEffect, useMemo } from "react"
+import { Text, ScrollView, TextInput, Dimensions } from "react-native"
 
-import { Image } from "@/src/components/ui/image"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { Box } from "@/src/components/ui/box"
 import { getUserCollection } from "@/src/api/apiEndpoints"
@@ -19,40 +18,60 @@ const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const deviceWidth = Dimensions.get("window").width
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(searchQuery)
-    }, 300)
-    return () => clearTimeout(handler)
-  }, [searchQuery])
   const theme = useBoundStore((state) => state.theme)
   const store = useBoundStore()
-  const [seriesCount, setSeriesCount] = useState(store.collectionCount ?? 0)
-  const [collectedSeries, setCollectedSeries] = useState<any[]>(
-    store.collection ?? []
-  )
-  const [series, setSeries] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
 
+  // Defensive: Ensure arrays and fallback values
+  const collection = Array.isArray(store.collection) ? store.collection : []
+  const seriesRaw = Array.isArray(store.series) ? store.series : []
+  const collectionCount = typeof store.collectionCount === 'number' ? store.collectionCount : collection.length
+
+  // Debounce search
   useEffect(() => {
-    setSeriesCount(store.collectionCount)
-    setLoading(false)
-    setCollectedSeries(store.collection || [])
-    setSeries(
-      store.series.sort((a: any, b: any) =>
-        b.series.title.localeCompare(a.series.title)
-      )
-    )
-  }, [store.collectionCount, store.collection, store.series])
+    const handler = setTimeout(() => setDebouncedQuery(searchQuery), 300)
+    return () => clearTimeout(handler)
+  }, [searchQuery])
+
+  // Memoize sorted and filtered series
+  const filteredSeries = useMemo(() => {
+    try {
+      return seriesRaw
+        .filter(item =>
+          item &&
+          item.series &&
+          typeof item.series.title === "string" &&
+          item.series.title.toLowerCase().includes(debouncedQuery.trim().toLowerCase())
+        )
+        .sort((a, b) => b.series.title.localeCompare(a.series.title))
+    } catch (e) {
+      // Defensive: fallback to empty array if error
+      console.error('Error filtering/sorting series:', e)
+      return []
+    }
+  }, [seriesRaw, debouncedQuery])
+
+  // Memoize collectedSeries for header section
+  const collectedSeries = useMemo(() => {
+    try {
+      return collection
+    } catch (e) {
+      console.error('Error in collectedSeries:', e)
+      return []
+    }
+  }, [collection])
+
+  // Loading state: if store data isn't ready, show skeletons
+  const loading = !Array.isArray(store.series) || store.series.length === 0
+
+  // --- MasonryList is already virtualized, but for huge data sets, consider implementing pagination/infinite scroll here ---
 
   return (
     <>
       <Box className='flex-row items-center justify-between px-4 mb-4'>
         <Text style={[fonts.title, { color: theme.text }]}>Collections</Text>
         <Box className='flex-row'>
-          <Text style={[fonts.body, { color: theme.text }]}>{seriesCount}</Text>
+          <Text style={[fonts.body, { color: theme.text }]}>{collectionCount}</Text>
         </Box>
       </Box>
 
@@ -103,48 +122,39 @@ const CollectionScreen = () => {
 
       {/* Collection Grid */}
       <MasonryList
-        data={
-          loading
-            ? Array.from({ length: 6 })
-            : [...series].filter(
-                (item) =>
-                  item &&
-                  item.series &&
-                  typeof item.series.title === "string" &&
-                  item.series.title
-                    .toLowerCase()
-                    .includes(debouncedQuery.trim().toLowerCase())
-              )
-        }
+        data={loading ? Array.from({ length: 6 }) : filteredSeries}
         scrollEnabled
         numColumns={deviceWidth > 325 ? 3 : 2}
         keyExtractor={(item, idx) =>
-          loading ? idx.toString() : item.series.id.toString()
+          loading ? idx.toString() : item.series?.id?.toString() || idx.toString()
         }
         style={{
           alignSelf: "flex-start",
           columnGap: 12,
           marginHorizontal: 12,
         }}
-        renderItem={({ item, i }) =>
+        renderItem={({ item, i }: { item: { series: any }; i: number }) =>
           loading ? (
             <Box key={i} className='items-center'>
               <SeriesCardSkeleton />
             </Box>
-          ) : (
+          ) : item && item.series ? (
             <Box key={i} className='items-center'>
               <Pressable
                 onPress={() =>
                   navigation.navigate("DetailedCollectionScreen", {
-                    // @ts-ignore
                     seriesId: item.series.id,
                   })
                 }
               >
-                <SeriesCard data={item as any} />
+                {/*
+                  For best performance, ensure SeriesCard supports lazy loading/caching for images.
+                  If you notice image-related memory issues, consider react-native-fast-image or similar.
+                */}
+                <SeriesCard data={item} />
               </Pressable>
             </Box>
-          )
+          ) : null
         }
         ListEmptyComponent={
           <Text
@@ -202,21 +212,23 @@ const CollectionScreen = () => {
                 </Text>
               ) : (
                 collectedSeries.map((s) => (
-                  <Pressable
-                    style={{
-                      width: (deviceWidth / 3) * 0.9,
-                      marginLeft: theme.spacing.sm,
-                      marginRight: theme.spacing.xs,
-                    }}
-                    key={s.series.id}
-                    onPress={() =>
-                      navigation.navigate("DetailedCollectionScreen", {
-                        seriesId: s.series.id,
-                      })
-                    }
-                  >
-                    <SeriesCard data={s} />
-                  </Pressable>
+                  s && s.series ? (
+                    <Pressable
+                      style={{
+                        width: (deviceWidth / 3) * 0.9,
+                        marginLeft: theme.spacing.sm,
+                        marginRight: theme.spacing.xs,
+                      }}
+                      key={s.series.id}
+                      onPress={() =>
+                        navigation.navigate("DetailedCollectionScreen", {
+                          seriesId: s.series.id,
+                        })
+                      }
+                    >
+                      <SeriesCard data={s} />
+                    </Pressable>
+                  ) : null
                 ))
               )}
             </ScrollView>
@@ -236,7 +248,7 @@ const CollectionScreen = () => {
         }
       />
     </>
-  )
-}
+  );
+};
 
-export default CollectionScreen
+export default CollectionScreen;

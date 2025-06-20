@@ -13,16 +13,17 @@ import { Ionicons } from "@expo/vector-icons"
 import {
   getWantList,
   getUserCollection,
-  getReservationList,
   getOrders,
+  getReservationList,
 } from "@/src/api/apiEndpoints"
 
 import { removeAuthToken } from "@/src/api/tokenManager"
-import CollectionScreen from "@/src/screens/dashboard/collection"
-import OrdersScreen from "../orders/OrdersScreen"
-import WantlistScreen from "../wantlist/WantlistScreen"
 import { fonts } from "@/src/theme"
 import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
+import WantlistScreen from "../wantlist/WantlistScreen"
+import OrdersScreen from "../orders/OrdersScreen"
+import { ErrorBoundary } from "@/src/components/ErrorBoundary"
+import CollectionScreen from "../collection"
 
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore()
@@ -44,6 +45,13 @@ export default function Profile(props: { navigation: any }) {
       return
     }
     setCheckingUser(false)
+    getReservationList(store.user.id)
+      .then((res) => {
+        setReservationCount(res.data.length)
+      })
+      .catch((err) => {
+        console.error("Failed to fetch reservations:", err)
+      })
     getOrders(store.user.id)
       .then((res) => {
         store.setOrdersCount(res.data.length)
@@ -98,7 +106,6 @@ export default function Profile(props: { navigation: any }) {
       className={"flex-1"}
     >
       <StatusBar style={store.isDark ? "light" : "dark"} />
-      {/* Topbar with avatar, email, settings, and logout */}
       <View
         style={{
           borderColor: theme.background2,
@@ -215,7 +222,11 @@ export default function Profile(props: { navigation: any }) {
 
       {/* Tab Content */}
       <View style={{ flex: 1, backgroundColor: theme.background }}>
-        {selectedTab === "collections" && <CollectionScreen />}
+        {selectedTab === "collections" && (
+          <ErrorBoundary>
+            <CollectionScreen />
+          </ErrorBoundary>
+        )}
         {selectedTab === "reservations" && <ReservationBoxScreen />}
         {selectedTab === "wantlist" && <WantlistScreen />}
         {selectedTab === "orders" && <OrdersScreen />}

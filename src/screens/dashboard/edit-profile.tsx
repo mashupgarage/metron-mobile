@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import {
   StatusBar,
   ScrollView,
@@ -14,7 +14,6 @@ import { Text } from "@/src/components/ui/text"
 import { Button, ButtonText } from "@/src/components/ui/button"
 import { Input, InputField } from "@/src/components/ui/input"
 import { VStack } from "@/src/components/ui/vstack"
-import { HStack } from "@/src/components/ui/hstack"
 import { ChevronDownIcon } from "@/src/components/ui/icon"
 import {
   FormControl,
