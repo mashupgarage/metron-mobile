@@ -9,7 +9,6 @@ import {
   FlatList,
 } from "react-native"
 import React, { useEffect, useState } from "react"
-import { useWantListStore } from "@/src/store/slices/WantListSlice"
 import { Ionicons } from "@expo/vector-icons"
 import {
   getWantList,
@@ -28,8 +27,6 @@ import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
 export default function Profile(props: { navigation: any }) {
   const store = useBoundStore()
   const theme = useBoundStore((state) => state.theme)
-  const wantlistCount = useWantListStore((state) => state.wantlistCount)
-  const setWantlistCount = useWantListStore((state) => state.setWantlistCount)
   const setCollectionCount = (count: number) => store.setCollectionCount(count)
   const collectionCount = store.collectionCount ?? 0
   const [reservationCount, setReservationCount] = useState(0)
@@ -47,16 +44,6 @@ export default function Profile(props: { navigation: any }) {
       return
     }
     setCheckingUser(false)
-    getReservationList(store.user.id)
-      .then((res) => {
-        const reservationProducts = res.data.reservations || []
-        reservationProducts
-          .map((item: any) => item.product?.id)
-          .filter((id) => id !== undefined)
-      })
-      .catch((err) => {
-        console.error("Failed to fetch reservation list:", err)
-      })
     getOrders(store.user.id)
       .then((res) => {
         store.setOrdersCount(res.data.length)
@@ -66,15 +53,21 @@ export default function Profile(props: { navigation: any }) {
       })
     getWantList()
       .then((res) => {
-        setWantlistCount(res.data.want_lists.length)
+        store.setWantlistCount(res.data.want_lists.length)
       })
       .catch(() => {
-        setWantlistCount(0)
+        store.setWantlistCount(0)
       })
 
     getUserCollection()
       .then((res) => {
+        store.setCollection(res.data.series_stats)
         setCollectionCount(res.data.series.length)
+        store.setSeries(
+          res.data.series.sort((a: any, b: any) =>
+            b.series.title.localeCompare(a.series.title)
+          ) || []
+        )
       })
       .catch(() => {
         setCollectionCount(0)
@@ -149,6 +142,9 @@ export default function Profile(props: { navigation: any }) {
               store.setCartCount(0)
               store.setOrdersCount(0)
               store.setCollectionCount(0)
+              store.setSeries([])
+              store.setCollection([])
+              store.setWantlistCount(0)
               store.setUser(null)
             }}
           >
@@ -172,7 +168,7 @@ export default function Profile(props: { navigation: any }) {
               label: `Reservations`,
               count: reservationCount,
             },
-            { key: "wantlist", label: `Wantlist`, count: wantlistCount },
+            { key: "wantlist", label: `Wantlist`, count: store.wantlistCount },
             { key: "orders", label: `Orders`, count: store.ordersCount },
           ]}
           horizontal

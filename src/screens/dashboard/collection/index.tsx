@@ -27,55 +27,25 @@ const CollectionScreen = () => {
   }, [searchQuery])
   const theme = useBoundStore((state) => state.theme)
   const store = useBoundStore()
-  const [seriesCount, setSeriesCount] = useState(0)
-  const [collectedSeries, setCollectedSeries] = useState<any[]>([])
+  const [seriesCount, setSeriesCount] = useState(store.collectionCount ?? 0)
+  const [collectedSeries, setCollectedSeries] = useState<any[]>(
+    store.collection ?? []
+  )
   const [series, setSeries] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
 
-  // Fetch collection from API
   useEffect(() => {
-    setLoading(true)
     setSeriesCount(store.collectionCount)
-    // fetch collected series
-    getUserCollection()
-      .then((res) => {
-        setLoading(false)
-        setCollectedSeries(res.data.series_stats || [])
-        setSeries(
-          res.data.series.sort((a: any, b: any) =>
-            b.series.title.localeCompare(a.series.title)
-          ) || []
-        )
-      })
-      .catch((err) => {
-        setLoading(false)
-        console.log("Failed to load collection", err)
-      })
-  }, [])
-
-  if (seriesCount === 0) {
-    return (
-      <View className='flex mt-56 mb-4 flex-col items-center'>
-        <View className='flex items-center'>
-          <Image
-            alt='Comic Odyssey Icon'
-            key='icon'
-            className='w-56 scale-[0.8]'
-            resizeMode='contain'
-            source={ComicOdysseyIcon}
-          />
-          <Text
-            style={[fonts.body, { color: theme.text }]}
-            className='mt-4 mb-2 text-center'
-          >
-            start collecting your favorite series!
-          </Text>
-        </View>
-      </View>
+    setLoading(false)
+    setCollectedSeries(store.collection || [])
+    setSeries(
+      store.series.sort((a: any, b: any) =>
+        b.series.title.localeCompare(a.series.title)
+      )
     )
-  }
+  }, [store.collectionCount, store.collection, store.series])
 
   return (
     <>

@@ -44,10 +44,6 @@ interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
     publisher?: string
   }
 }
-const getCoverUrl = (coverFileName?: string) =>
-  coverFileName
-    ? `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`
-    : ""
 
 export default function ReservationBoxScreen() {
   const [isGrid, setIsGrid] = useState(true)
@@ -216,8 +212,6 @@ export default function ReservationBoxScreen() {
       )
     }
   }
-
-  // No need to filter reservations on the frontend, as search is now server-side
 
   return (
     <>
