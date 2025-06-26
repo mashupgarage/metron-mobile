@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { View, Text, ScrollView, Pressable, TextInput } from "react-native"
 import * as Clipboard from "expo-clipboard"
@@ -101,7 +101,7 @@ const CheckoutScreen = ({ route }: any) => {
   })
 
   // Sync form with delivery/payment option and price changes
-  React.useEffect(() => {
+  useEffect(() => {
     setForm((prev) => ({
       ...prev,
       delivery_option: deliveryOption as "shipping" | "store",

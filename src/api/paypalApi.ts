@@ -15,6 +15,7 @@ export async function createPayPalOrder({
       transaction_source: "paypal",
     },
   })
+  console.log("response", response)
   // The backend should return { next_url: "https://www.sandbox.paypal.com/checkoutnow?..." }
   return {
     approvalUrl: response.data.next_url,
