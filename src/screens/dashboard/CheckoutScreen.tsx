@@ -6,9 +6,12 @@ import { useNavigation } from "@react-navigation/native"
 import { useBoundStore } from "@/src/store"
 import { Button, ButtonText } from "@/src/components/ui/button"
 import { Input, InputField } from "@/src/components/ui/input"
-import { Textarea, TextareaInput } from "@/src/components/ui/textarea"
 import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast"
 import { checkoutCartItems } from "@/src/api/apiEndpoints"
+import { createPayPalOrder, capturePayPalOrder } from "@/src/api/paypalApi"
+import PayPalWebView from "./PayPalWebView"
+import { Modal } from "react-native"
+
 import {
   FormControl,
   FormControlError,
@@ -55,7 +58,7 @@ interface CheckoutFormState {
   status: "pending"
 }
 
-export default function CheckoutScreen({ route }: any) {
+const CheckoutScreen = ({ route }: any) => {
   // Form errors state for validation messages
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof CheckoutFormState, string>>
@@ -121,7 +124,43 @@ export default function CheckoutScreen({ route }: any) {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
+  // PayPal modal and state hooks (for PayPal integration)
+  const [paypalLoading, setPaypalLoading] = useState(false)
+  const [paypalApprovalUrl, setPaypalApprovalUrl] = useState<string | null>(
+    null
+  )
+  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null)
+  const [showPayPalModal, setShowPayPalModal] = useState(false)
+
   const handleSubmit = async () => {
+    if (transactionSource === "paypal") {
+      console.log("paypal")
+      setPaypalLoading(true)
+      try {
+        // Pass userId and full order object to backend
+        const { approvalUrl, orderId } = await createPayPalOrder({
+          userId: user.id,
+          order: form,
+        })
+        setPaypalApprovalUrl(approvalUrl)
+        setPaypalOrderId(orderId)
+        setShowPayPalModal(true)
+      } catch (err) {
+        console.log(err)
+        toast.show({
+          placement: "top",
+          render: ({ id }: any) => (
+            <Toast nativeID={"toast-" + id} action='error'>
+              <ToastTitle>PayPal initialization failed.</ToastTitle>
+            </Toast>
+          ),
+        })
+      } finally {
+        setPaypalLoading(false)
+      }
+      return
+    }
+
     if (!user) {
       toast.show({
         placement: "top",
@@ -501,12 +540,28 @@ export default function CheckoutScreen({ route }: any) {
           </Text>
           <RadioGroup
             value={transactionSource}
-            onChange={(val) =>
+            onChange={(val: string) =>
               setTransactionSource(
                 val as "paypal" | "bank_deposit" | "cod" | "pay_at_store"
               )
             }
           >
+            <Radio
+              value='paypal'
+              size='lg'
+              style={{ marginBottom: theme.spacing.md }}
+            >
+              <RadioIndicator>
+                <RadioIcon
+                  color={theme.primary[300]}
+                  as={CircleIcon}
+                  fill={theme.primary[500]}
+                />
+              </RadioIndicator>
+              <RadioLabel style={[fonts.body, { color: theme.text }]}>
+                PayPal
+              </RadioLabel>
+            </Radio>
             <Radio
               value='bank_deposit'
               size='lg'
@@ -770,11 +825,112 @@ export default function CheckoutScreen({ route }: any) {
           style={{ backgroundColor: theme.primary[500] }}
           onPress={handleSubmit}
         >
-          <ButtonText style={[fonts.label, { color: theme.text }]}>
+          <ButtonText style={[fonts.label, { color: theme.white }]}>
             Confirm Order (₱{totalPrice.toFixed(2)})
           </ButtonText>
         </Button>
       </ScrollView>
+      {/* PayPal Modal Integration */}
+      <Modal
+        visible={showPayPalModal}
+        animationType='slide'
+        onRequestClose={() => setShowPayPalModal(false)}
+        transparent={false}
+      >
+        <View style={{ flex: 1, paddingTop: 40 }}>
+          {/* Cancel Button */}
+          <View
+            style={{
+              padding: 16,
+              alignItems: "flex-end",
+              zIndex: 2,
+            }}
+          >
+            <Button
+              variant='outline'
+              size='md'
+              onPress={() => {
+                setShowPayPalModal(false)
+                toast.show({
+                  placement: "top",
+                  render: ({ id }: any) => (
+                    <Toast nativeID={"toast-" + id} action='warning'>
+                      <ToastTitle>PayPal payment cancelled.</ToastTitle>
+                    </Toast>
+                  ),
+                })
+              }}
+              style={{ minWidth: 80 }}
+            >
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+          </View>
+          {/* PayPal WebView */}
+          <View style={{ flex: 1 }}>
+            {paypalApprovalUrl
+              ? // Log approval URL for debugging
+                ((() => {
+                  console.log("PayPal Approval URL:", paypalApprovalUrl)
+                  return null
+                })(),
+                (
+                  <PayPalWebView
+                    approvalUrl={paypalApprovalUrl}
+                    onSuccess={async (details) => {
+                      setShowPayPalModal(false)
+                      try {
+                        await capturePayPalOrder({ orderId: paypalOrderId! })
+                        // Place order in backend
+                        await checkoutCartItems(user.id, {
+                          order: {
+                            ...form,
+                            transaction_source: "paypal",
+                          } as any,
+                        })
+                        toast.show({
+                          placement: "top",
+                          render: ({ id }: any) => (
+                            <Toast nativeID={"toast-" + id} action='success'>
+                              <ToastTitle>
+                                PayPal payment successful! Order placed.
+                              </ToastTitle>
+                            </Toast>
+                          ),
+                        })
+                        store.setCartItems([])
+                        navigation.navigate("Home" as never)
+                      } catch (err) {
+                        toast.show({
+                          placement: "top",
+                          render: ({ id }: any) => (
+                            <Toast nativeID={"toast-" + id} action='error'>
+                              <ToastTitle>
+                                PayPal payment failed. Please try again.
+                              </ToastTitle>
+                            </Toast>
+                          ),
+                        })
+                      }
+                    }}
+                    onCancel={() => {
+                      setShowPayPalModal(false)
+                      toast.show({
+                        placement: "top",
+                        render: ({ id }: any) => (
+                          <Toast nativeID={"toast-" + id} action='warning'>
+                            <ToastTitle>PayPal payment cancelled.</ToastTitle>
+                          </Toast>
+                        ),
+                      })
+                    }}
+                  />
+                ))
+              : null}
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   )
 }
+
+export default CheckoutScreen

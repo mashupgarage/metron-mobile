@@ -114,28 +114,9 @@ export default function Cart() {
   }
 
   const handleCheckout = () => {
-    const itemsToCheckout = groupedCartItems
-      .filter((item) => selectedItems.has(item.id))
-      .map((item) => ({
-        id: item.id,
-        quantity: item.cartQuantity,
-      }))
-
-    if (itemsToCheckout.length === 0) {
-      toast.show({
-        placement: "top",
-        render: ({ id }: any) => (
-          <Toast nativeID={"toast-" + id} action='error'>
-            <ToastTitle>Please select items to checkout.</ToastTitle>
-          </Toast>
-        ),
-      })
-      return
-    }
-
     if (store.user) {
       navigation.navigate("CheckoutScreen", {
-        itemsToCheckout,
+        itemsToCheckout: store.cartItems,
       })
     } else {
       navigation.navigate("Auth" as never)
@@ -164,13 +145,6 @@ export default function Cart() {
         onChange={() => toggleItemSelection(item.id)}
         className='mr-2 p-2'
       >
-        <CheckboxIndicator>
-          <CheckboxIconComponent
-            style={{ color: theme.primary[500] }}
-            as={CheckIcon}
-          />
-        </CheckboxIndicator>
-
         <Image
           source={{ uri: item.product.cover_url_large }}
           className='w-24 h-24 mr-2'
@@ -233,17 +207,15 @@ export default function Cart() {
           style={{ backgroundColor: theme.background }}
           className={`absolute left-0 right-0 bottom-0 pb-4 pt-2 items-center`}
         >
-          <View className='flex-row mx-1'>
+          <View className='flex-row mx-1 mb-8'>
             <Button
               size='xl'
               onPress={handleCheckout}
               style={{ backgroundColor: theme.primary[900] }}
-              isDisabled={selectedItems.size === 0}
-              disabled={selectedItems.size === 0}
               className='flex-1'
             >
               <ButtonText style={[fonts.body, { color: theme.white }]}>
-                Checkout ({totalSelectedItems} Selected)
+                Checkout
               </ButtonText>
             </Button>
           </View>
