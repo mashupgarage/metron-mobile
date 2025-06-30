@@ -319,7 +319,7 @@ export const getReservationList = async (
   limit: number = 20,
   searchTerm?: string
 ) => {
-  const params: Record<string, any> = {
+  const params: Record<string, string | number> = {
     page,
     limit,
   }
@@ -468,7 +468,7 @@ export const checkoutCartItems = async (
   payload: {
     order: {
       notes: string
-      branch: number // branch id
+      branch: number | string // branch id
       phone_number: string
       shipping_address: string
       shipping_region: string

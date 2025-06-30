@@ -8,7 +8,7 @@ import { Button, ButtonText } from "@/src/components/ui/button"
 import { Input, InputField } from "@/src/components/ui/input"
 import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast"
 import { checkoutCartItems } from "@/src/api/apiEndpoints"
-import { createPayPalOrder, capturePayPalOrder } from "@/src/api/paypalApi"
+import { createPayPalOrder } from "@/src/api/paypalApi"
 import PayPalWebView from "./PayPalWebView"
 import { Modal } from "react-native"
 
@@ -58,7 +58,7 @@ interface CheckoutFormState {
   status: "pending"
 }
 
-const CheckoutScreen = ({ route }: any) => {
+const CheckoutScreen = ({ route }) => {
   // Form errors state for validation messages
   const [formErrors, setFormErrors] = useState<
     Partial<Record<keyof CheckoutFormState, string>>
@@ -72,8 +72,7 @@ const CheckoutScreen = ({ route }: any) => {
 
   // Calculate prices
   const subTotal = useMemo(
-    () =>
-      cartItems.reduce((sum: number, item: any) => sum + Number(item.price), 0),
+    () => cartItems.reduce((sum: number, item) => sum + Number(item.price), 0),
     [cartItems]
   )
   const [deliveryOption, setDeliveryOption] = useState<string>("Store Pick-up")
@@ -149,7 +148,7 @@ const CheckoutScreen = ({ route }: any) => {
         console.log(err)
         toast.show({
           placement: "top",
-          render: ({ id }: any) => (
+          render: ({ id }) => (
             <Toast nativeID={"toast-" + id} action='error'>
               <ToastTitle>PayPal initialization failed.</ToastTitle>
             </Toast>
@@ -164,7 +163,7 @@ const CheckoutScreen = ({ route }: any) => {
     if (!user) {
       toast.show({
         placement: "top",
-        render: ({ id }: any) => (
+        render: ({ id }) => (
           <Toast nativeID={"toast-" + id} action='error'>
             <ToastTitle>Please log in to proceed with checkout.</ToastTitle>
           </Toast>
@@ -192,11 +191,11 @@ const CheckoutScreen = ({ route }: any) => {
     try {
       console.log({ ...form, delivery_option: "store" })
       await checkoutCartItems(user.id, {
-        order: { ...form, delivery_option: "store" } as any,
+        order: { ...form, delivery_option: "store" },
       })
       toast.show({
         placement: "top",
-        render: ({ id }: any) => (
+        render: ({ id }) => (
           <Toast nativeID={"toast-" + id} action='success'>
             <ToastTitle>Order placed successfully!</ToastTitle>
           </Toast>
@@ -204,11 +203,11 @@ const CheckoutScreen = ({ route }: any) => {
       })
       store.setCartItems([]) // Clear cart
       navigation.navigate("Home" as never)
-    } catch (err: any) {
+    } catch (err) {
       console.log(err)
       toast.show({
         placement: "top",
-        render: ({ id }: any) => (
+        render: ({ id }) => (
           <Toast nativeID={"toast-" + id} action='error'>
             <ToastTitle>Checkout failed. Please try again.</ToastTitle>
           </Toast>
@@ -651,7 +650,7 @@ const CheckoutScreen = ({ route }: any) => {
                       await Clipboard.setStringAsync("2601-0259-41")
                       toast.show({
                         placement: "top",
-                        render: ({ id }: any) => (
+                        render: ({ id }) => (
                           <Toast nativeID={"toast-" + id} action='success'>
                             <ToastTitle>Account number copied!</ToastTitle>
                           </Toast>
@@ -711,7 +710,7 @@ const CheckoutScreen = ({ route }: any) => {
                       await Clipboard.setStringAsync("0034-1802-0926")
                       toast.show({
                         placement: "top",
-                        render: ({ id }: any) => (
+                        render: ({ id }) => (
                           <Toast nativeID={"toast-" + id} action='success'>
                             <ToastTitle>Account number copied!</ToastTitle>
                           </Toast>
@@ -853,7 +852,7 @@ const CheckoutScreen = ({ route }: any) => {
                 setShowPayPalModal(false)
                 toast.show({
                   placement: "top",
-                  render: ({ id }: any) => (
+                  render: ({ id }) => (
                     <Toast nativeID={"toast-" + id} action='warning'>
                       <ToastTitle>PayPal payment cancelled.</ToastTitle>
                     </Toast>
@@ -877,19 +876,19 @@ const CheckoutScreen = ({ route }: any) => {
                   <PayPalWebView
                     approvalUrl={paypalApprovalUrl}
                     onSuccess={async (details) => {
+                      console.log("PayPal details:", details)
                       setShowPayPalModal(false)
                       try {
-                        await capturePayPalOrder({ orderId: paypalOrderId! })
                         // Place order in backend
                         await checkoutCartItems(user.id, {
                           order: {
                             ...form,
                             transaction_source: "paypal",
-                          } as any,
+                          },
                         })
                         toast.show({
                           placement: "top",
-                          render: ({ id }: any) => (
+                          render: ({ id }) => (
                             <Toast nativeID={"toast-" + id} action='success'>
                               <ToastTitle>
                                 PayPal payment successful! Order placed.
@@ -900,9 +899,10 @@ const CheckoutScreen = ({ route }: any) => {
                         store.setCartItems([])
                         navigation.navigate("Home" as never)
                       } catch (err) {
+                        console.log(err)
                         toast.show({
                           placement: "top",
-                          render: ({ id }: any) => (
+                          render: ({ id }) => (
                             <Toast nativeID={"toast-" + id} action='error'>
                               <ToastTitle>
                                 PayPal payment failed. Please try again.
@@ -916,7 +916,7 @@ const CheckoutScreen = ({ route }: any) => {
                       setShowPayPalModal(false)
                       toast.show({
                         placement: "top",
-                        render: ({ id }: any) => (
+                        render: ({ id }) => (
                           <Toast nativeID={"toast-" + id} action='warning'>
                             <ToastTitle>PayPal payment cancelled.</ToastTitle>
                           </Toast>
