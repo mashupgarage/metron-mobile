@@ -3,7 +3,6 @@ import { Text, ScrollView, TextInput, Dimensions } from "react-native"
 
 import MasonryList from "@react-native-seoul/masonry-list"
 import { Box } from "@/src/components/ui/box"
-import { getUserCollection } from "@/src/api/apiEndpoints"
 import { useBoundStore } from "@/src/store"
 import SeriesCard from "@/src/components/series"
 import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton"
@@ -11,21 +10,26 @@ import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Pressable } from "react-native"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { fonts } from "@/src/theme"
-// @ts-ignore
-import ComicOdysseyIcon from "@/src/assets/icon.png"
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
+  const [minSkeletonElapsed, setMinSkeletonElapsed] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
   const deviceWidth = Dimensions.get("window").width
   const theme = useBoundStore((state) => state.theme)
   const store = useBoundStore()
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
 
   // Defensive: Ensure arrays and fallback values
-  const collection = Array.isArray(store.collection) ? store.collection : []
-  const seriesRaw = Array.isArray(store.series) ? store.series : []
-  const collectionCount = typeof store.collectionCount === 'number' ? store.collectionCount : collection.length
+  const collection = useMemo(
+    () => (Array.isArray(store.collection) ? store.collection : []),
+    [store.collection]
+  )
+  const seriesRaw = useMemo(
+    () => (Array.isArray(store.series) ? store.series : []),
+    [store.series]
+  )
 
   // Debounce search
   useEffect(() => {
@@ -37,16 +41,19 @@ const CollectionScreen = () => {
   const filteredSeries = useMemo(() => {
     try {
       return seriesRaw
-        .filter(item =>
-          item &&
-          item.series &&
-          typeof item.series.title === "string" &&
-          item.series.title.toLowerCase().includes(debouncedQuery.trim().toLowerCase())
+        .filter(
+          (item) =>
+            item &&
+            item.series &&
+            typeof item.series.title === "string" &&
+            item.series.title
+              .toLowerCase()
+              .includes(debouncedQuery.trim().toLowerCase())
         )
         .sort((a, b) => b.series.title.localeCompare(a.series.title))
     } catch (e) {
       // Defensive: fallback to empty array if error
-      console.error('Error filtering/sorting series:', e)
+      console.error("Error filtering/sorting series:", e)
       return []
     }
   }, [seriesRaw, debouncedQuery])
@@ -56,13 +63,25 @@ const CollectionScreen = () => {
     try {
       return collection
     } catch (e) {
-      console.error('Error in collectedSeries:', e)
+      console.error("Error in collectedSeries:", e)
       return []
     }
   }, [collection])
 
-  // Loading state: if store data isn't ready, show skeletons
-  const loading = !Array.isArray(store.series) || store.series.length === 0
+  // Show skeleton until BOTH: (a) 3s elapsed, (b) data is ready
+  useEffect(() => {
+    const timer = setTimeout(() => setMinSkeletonElapsed(true), 3000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Consider data ready as soon as seriesRaw is an array (regardless of length)
+    if (Array.isArray(seriesRaw)) {
+      setDataReady(true)
+    }
+  }, [seriesRaw])
+
+  const loading = !(minSkeletonElapsed && dataReady)
 
   // --- MasonryList is already virtualized, but for huge data sets, consider implementing pagination/infinite scroll here ---
 
@@ -71,7 +90,9 @@ const CollectionScreen = () => {
       <Box className='flex-row items-center justify-between px-4 mb-4'>
         <Text style={[fonts.title, { color: theme.text }]}>Collections</Text>
         <Box className='flex-row'>
-          <Text style={[fonts.body, { color: theme.text }]}>{collectionCount}</Text>
+          <Text style={[fonts.body, { color: theme.text }]}>
+            {seriesRaw.length}
+          </Text>
         </Box>
       </Box>
 
@@ -126,14 +147,22 @@ const CollectionScreen = () => {
         scrollEnabled
         numColumns={deviceWidth > 325 ? 3 : 2}
         keyExtractor={(item, idx) =>
-          loading ? idx.toString() : item.series?.id?.toString() || idx.toString()
+          loading
+            ? idx.toString()
+            : item.series?.id?.toString() || idx.toString()
         }
         style={{
           alignSelf: "flex-start",
           columnGap: 12,
           marginHorizontal: 12,
         }}
-        renderItem={({ item, i }: { item: { series: any }; i: number }) =>
+        renderItem={({
+          item,
+          i,
+        }: {
+          item: { series: { id: number; title: string } }
+          i: number
+        }) =>
           loading ? (
             <Box key={i} className='items-center'>
               <SeriesCardSkeleton />
@@ -151,6 +180,7 @@ const CollectionScreen = () => {
                   For best performance, ensure SeriesCard supports lazy loading/caching for images.
                   If you notice image-related memory issues, consider react-native-fast-image or similar.
                 */}
+                {/* @ts-expect-error "Type 'Series' is not assignable to type 'SeriesCardProps'." */}
                 <SeriesCard data={item} />
               </Pressable>
             </Box>
@@ -211,7 +241,7 @@ const CollectionScreen = () => {
                   No collected series yet.
                 </Text>
               ) : (
-                collectedSeries.map((s) => (
+                collectedSeries.map((s) =>
                   s && s.series ? (
                     <Pressable
                       style={{
@@ -229,7 +259,7 @@ const CollectionScreen = () => {
                       <SeriesCard data={s} />
                     </Pressable>
                   ) : null
-                ))
+                )
               )}
             </ScrollView>
             <Text
@@ -248,7 +278,7 @@ const CollectionScreen = () => {
         }
       />
     </>
-  );
-};
+  )
+}
 
-export default CollectionScreen;
+export default CollectionScreen

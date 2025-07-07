@@ -6,21 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { CartItemT } from "@/src/utils/types/common"
 import { Box } from "@/src/components/ui/box"
 import { Image } from "@/src/components/ui/image"
-import { Trash2, CheckIcon } from "lucide-react-native"
+import { Trash2 } from "lucide-react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useEffect, useState } from "react"
-import {
-  Checkbox,
-  CheckboxIndicator,
-  CheckboxIcon as CheckboxIconComponent,
-} from "@/src/components/ui/checkbox"
-import {
-  fetchCartItems,
-  addToCart,
-  removeFromCart,
-} from "@/src/api/apiEndpoints"
-import { useToast } from "@gluestack-ui/themed"
-import { Toast, ToastTitle } from "@/src/components/ui/toast"
+import { Checkbox } from "@/src/components/ui/checkbox"
+import { fetchCartItems, removeFromCart } from "@/src/api/apiEndpoints"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { NavigationProp } from "@react-navigation/native"
 import { fonts } from "@/src/theme"
@@ -30,7 +20,6 @@ export default function Cart() {
   const isDark = useBoundStore((state) => state.isDark)
   const theme = useBoundStore((state) => state.theme)
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
-  const toast = useToast()
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -86,56 +75,10 @@ export default function Cart() {
     }
   }
 
-  const [addingProductId, setAddingProductId] = useState<number | null>(null)
-
-  const handleIncrease = async (item: CartItemT) => {
-    if (!store.user) {
-      alert("You must be logged in to add items to the cart.")
-      navigation.navigate("Auth" as never)
-      return
-    }
-    if (!item.product_item_id) {
-      alert("Missing product item ID. Please try again.")
-      return
-    }
-    setAddingProductId(item.id)
-    try {
-      const res = await addToCart(store.user.id, item.id, item.product_item_id)
-      // Assuming API returns the updated cart items array
-      if (res?.data) {
-        store.setCartItems(res.data)
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      alert("Failed to add item to cart. Please try again.")
-    } finally {
-      setAddingProductId(null)
-    }
-  }
-
   const handleCheckout = () => {
-    const itemsToCheckout = groupedCartItems
-      .filter((item) => selectedItems.has(item.id))
-      .map((item) => ({
-        id: item.id,
-        quantity: item.cartQuantity,
-      }))
-
-    if (itemsToCheckout.length === 0) {
-      toast.show({
-        placement: "top",
-        render: ({ id }: any) => (
-          <Toast nativeID={"toast-" + id} action='error'>
-            <ToastTitle>Please select items to checkout.</ToastTitle>
-          </Toast>
-        ),
-      })
-      return
-    }
-
     if (store.user) {
       navigation.navigate("CheckoutScreen", {
-        itemsToCheckout,
+        itemsToCheckout: store.cartItems,
       })
     } else {
       navigation.navigate("Auth" as never)
@@ -164,13 +107,6 @@ export default function Cart() {
         onChange={() => toggleItemSelection(item.id)}
         className='mr-2 p-2'
       >
-        <CheckboxIndicator>
-          <CheckboxIconComponent
-            style={{ color: theme.primary[500] }}
-            as={CheckIcon}
-          />
-        </CheckboxIndicator>
-
         <Image
           source={{ uri: item.product.cover_url_large }}
           className='w-24 h-24 mr-2'
@@ -201,7 +137,6 @@ export default function Cart() {
     </Box>
   )
 
-  const totalSelectedItems = selectedItems.size
   return (
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <StatusBar style={isDark === true ? "light" : "dark"} />
@@ -233,17 +168,15 @@ export default function Cart() {
           style={{ backgroundColor: theme.background }}
           className={`absolute left-0 right-0 bottom-0 pb-4 pt-2 items-center`}
         >
-          <View className='flex-row mx-1'>
+          <View className='flex-row mx-1 mb-8'>
             <Button
               size='xl'
               onPress={handleCheckout}
-              style={{ backgroundColor: theme.primary[900] }}
-              isDisabled={selectedItems.size === 0}
-              disabled={selectedItems.size === 0}
+              style={{ backgroundColor: theme.primary[500] }}
               className='flex-1'
             >
               <ButtonText style={[fonts.body, { color: theme.white }]}>
-                Checkout ({totalSelectedItems} Selected)
+                Checkout
               </ButtonText>
             </Button>
           </View>

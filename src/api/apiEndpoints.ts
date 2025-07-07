@@ -319,7 +319,7 @@ export const getReservationList = async (
   limit: number = 20,
   searchTerm?: string
 ) => {
-  const params: Record<string, any> = {
+  const params: Record<string, string | number> = {
     page,
     limit,
   }
@@ -411,8 +411,16 @@ export const getOrderDetails = async (orderId: number) => {
   return axiosClient.get(`/orders/${orderId}`)
 }
 
-export const getUserCollection = async () => {
-  return axiosClient.get(`/user_collection`)
+export const getUserCollection = async (payload?: {
+  page?: number
+  per_page?: number
+}) => {
+  const params: Record<string, string | number> = {}
+  if (payload?.page !== undefined) params.page = payload.page
+  if (payload?.per_page !== undefined) params.per_page = payload.per_page
+  const res = await axiosClient.get(`/user_collection`, { params })
+  console.log(res)
+  return res
 }
 
 export const getCollectionSeriesStatus = async (seriesId: number) => {
@@ -468,7 +476,7 @@ export const checkoutCartItems = async (
   payload: {
     order: {
       notes: string
-      branch: number // branch id
+      branch: number | string // branch id
       phone_number: string
       shipping_address: string
       shipping_region: string

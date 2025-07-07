@@ -25,7 +25,7 @@ import OrdersScreen from "../orders/OrdersScreen"
 import { ErrorBoundary } from "@/src/components/ErrorBoundary"
 import CollectionScreen from "../collection"
 
-export default function Profile(props: { navigation: any }) {
+export default function Profile(props: { navigation }) {
   const store = useBoundStore()
   const theme = useBoundStore((state) => state.theme)
   const setCollectionCount = (count: number) => store.setCollectionCount(count)
@@ -66,13 +66,12 @@ export default function Profile(props: { navigation: any }) {
       .catch(() => {
         store.setWantlistCount(0)
       })
-
     getUserCollection()
       .then((res) => {
         store.setCollection(res.data.series_stats)
         setCollectionCount(res.data.series.length)
         store.setSeries(
-          res.data.series.sort((a: any, b: any) =>
+          res.data.series.sort((a, b) =>
             b.series.title.localeCompare(a.series.title)
           ) || []
         )
@@ -80,7 +79,7 @@ export default function Profile(props: { navigation: any }) {
       .catch(() => {
         setCollectionCount(0)
       })
-  }, [store.user, props.navigation])
+  }, [store.user, selectedTab])
 
   if (checkingUser) {
     return (
@@ -122,6 +121,7 @@ export default function Profile(props: { navigation: any }) {
           <Image
             source={{ uri: "https://picsum.photos/100" }}
             style={{ width: 36, height: 36, borderRadius: 18, marginRight: 12 }}
+            alt='Profile'
           />
           <Text
             style={{
@@ -210,7 +210,11 @@ export default function Profile(props: { navigation: any }) {
               >
                 {tab.label}{" "}
                 {tab.count > 0 && (
-                  <Text style={{ color: theme.text, ...fonts.label }}>
+                  <Text
+                    style={{
+                      color: selectedTab === tab.key ? "#fff" : theme.text,
+                    }}
+                  >
                     {tab.count}
                   </Text>
                 )}
