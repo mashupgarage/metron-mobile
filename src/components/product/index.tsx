@@ -12,12 +12,12 @@ interface ProductCardProps {
   isInCart?: boolean
 }
 
-const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
-  const { product } = data
+const ProductCard: FC<ProductCardProps> = ({ product }) => {
   const [imgError, setImgError] = useState(false)
   const theme = useBoundStore((state) => state.theme)
 
   const mainImage = product.cover_url || undefined
+  const highResImage = product.cover_url_large || undefined
   const thirdWidth = Dimensions.get("window").width / 3
 
   return (
@@ -33,7 +33,7 @@ const ProductCard: FC<ProductCardProps> = (data, isInCart = false) => {
           source={
             imgError || !mainImage
               ? require("@/src/assets/icon.png")
-              : { uri: mainImage }
+              : { uri: highResImage }
           }
           alt={product.id.toString()}
           className={

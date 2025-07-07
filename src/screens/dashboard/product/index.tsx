@@ -9,7 +9,6 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
-  useColorScheme,
   ScrollView,
   Pressable,
   Dimensions,
@@ -42,50 +41,41 @@ import {
 } from "./productHooks"
 import ProductCard from "@/src/components/product"
 import { VStack } from "@/src/components/ui/vstack"
-import { useReservationManager } from "../reservations/useReservationManager"
 import { fonts } from "@/src/theme"
 
 export default function Product(props: {
   route: {
     params: {
       product: ProductT
-      fromReservations?: boolean
-      reservationId?: number
-      reservationList?: any[]
       fromCollection?: boolean
     }
   }
 }) {
   const theme = useBoundStore((state) => state.theme)
-  const colorScheme = useColorScheme()
   const { route } = props
   const { params } = route
-  const { product, reservationList, fromCollection } = params
+  const { product, fromCollection } = params
   const { data: seriesStatus, loading: seriesLoading } = useProductSeriesStatus(
     product.id
   )
   const { data: recommendations, loading: recsLoading } =
     useProductRecommendations(product.id)
 
-  const [productItems, setProductItems] = useState<any[]>([])
-  const [selectedProductItemId, setSelectedProductItemId] = useState<
-    number | null
-  >(null)
-  const [quantity, setQuantity] = useState(1)
+  const [productItems, setProductItems] = useState<ProductT[]>([])
+  const [quantity] = useState(1)
 
   // Only count available NM items for cart logic
-  const availableNMItems = productItems.filter(
-    (item) => item.available && item.condition === "NM"
-  )
-  const maxQuantity = availableNMItems.length
+
+  const maxQuantity = productItems.length
+  console.log("maxQuantity", maxQuantity)
   const isQuantityValid = quantity >= 1 && quantity <= maxQuantity
 
   const store = useBoundStore()
   const navigation = useNavigation()
   const toast = useToast()
-  const [isWanted, setIsWanted] = React.useState(false)
+  const [isWanted, setIsWanted] = useState(false)
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false)
-  const [downloading, setDownloading] = useState(false)
+  const [, setDownloading] = useState(false)
 
   useEffect(() => {
     // Fetch product details to get normalized_product_items
@@ -93,29 +83,23 @@ export default function Product(props: {
       .then((res) => {
         const details = res.data
         // Flatten all product items from normalized_product_items
-        let items: any[] = []
+        let items: unknown[] = []
         if (details.normalized_product_items) {
-          Object.values(details.normalized_product_items).forEach(
-            (arr: any) => {
-              items = items.concat(arr)
-            }
-          )
+          Object.values(details.normalized_product_items).forEach((arr) => {
+            items = items.concat(arr)
+          })
         }
-        setProductItems(items)
-        // Pick the first available item as default
-        const firstAvailable = items.find((item) => item.available)
-        setSelectedProductItemId(firstAvailable ? firstAvailable.id : null)
+        setProductItems(items as ProductT[])
       })
       .catch(() => {
         setProductItems([])
-        setSelectedProductItemId(null)
       })
   }, [product.id])
 
   React.useEffect(() => {
     getWantList()
       .then((res) => {
-        const ids = res.data.want_lists.map((item: any) => item.product_id)
+        const ids = res.data.want_lists.map((item) => item.product_id)
         setIsWanted(ids.includes(product.id))
       })
       .catch(() => setIsWanted(false))
@@ -161,7 +145,7 @@ export default function Product(props: {
     try {
       // Add the first N NM product items to the cart
       for (let i = 0; i < quantity; i++) {
-        await addToCart(store.user.id, product.id, availableNMItems[i].id)
+        await addToCart(store.user.id, product.id, productItems[i].id)
       }
       // Fetch the updated cart from backend
       const res = await fetchCartItems(store.user.id)
@@ -179,7 +163,7 @@ export default function Product(props: {
           )
         },
       })
-    } catch (error) {
+    } catch {
       toast.show({
         placement: "top",
         render: ({ id }) => (
@@ -296,7 +280,7 @@ export default function Product(props: {
                           </Toast>
                         ),
                       })
-                    } catch (err) {
+                    } catch {
                       toast.show({
                         placement: "top",
                         render: ({ id }) => (
@@ -622,7 +606,7 @@ export default function Product(props: {
                         )
                       },
                     })
-                  } catch (err) {
+                  } catch {
                     toast.show({
                       placement: "top",
                       render: ({ id }) => {
@@ -678,7 +662,6 @@ export default function Product(props: {
               }}
               className='rounded-full h-16 w-16'
               onPress={async () => handleAddToCart()}
-              disabled={maxQuantity === 0 || !isQuantityValid}
             >
               <ShoppingCart color={theme.white} size={24} />
             </Button>

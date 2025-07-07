@@ -541,11 +541,11 @@ const CheckoutScreen = ({ route }) => {
             value={transactionSource}
             onChange={(val: string) =>
               setTransactionSource(
-                val as "paypal" | "bank_deposit" | "cod" | "pay_at_store"
+                val as "bank_deposit" | "cod" | "pay_at_store"
               )
             }
           >
-            <Radio
+            {/* <Radio
               value='paypal'
               size='lg'
               style={{ marginBottom: theme.spacing.md }}
@@ -560,7 +560,7 @@ const CheckoutScreen = ({ route }) => {
               <RadioLabel style={[fonts.body, { color: theme.text }]}>
                 PayPal
               </RadioLabel>
-            </Radio>
+            </Radio> */}
             <Radio
               value='bank_deposit'
               size='lg'

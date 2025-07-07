@@ -6,21 +6,11 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { CartItemT } from "@/src/utils/types/common"
 import { Box } from "@/src/components/ui/box"
 import { Image } from "@/src/components/ui/image"
-import { Trash2, CheckIcon } from "lucide-react-native"
+import { Trash2 } from "lucide-react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useEffect, useState } from "react"
-import {
-  Checkbox,
-  CheckboxIndicator,
-  CheckboxIcon as CheckboxIconComponent,
-} from "@/src/components/ui/checkbox"
-import {
-  fetchCartItems,
-  addToCart,
-  removeFromCart,
-} from "@/src/api/apiEndpoints"
-import { useToast } from "@gluestack-ui/themed"
-import { Toast, ToastTitle } from "@/src/components/ui/toast"
+import { Checkbox } from "@/src/components/ui/checkbox"
+import { fetchCartItems, removeFromCart } from "@/src/api/apiEndpoints"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { NavigationProp } from "@react-navigation/native"
 import { fonts } from "@/src/theme"
@@ -30,7 +20,6 @@ export default function Cart() {
   const isDark = useBoundStore((state) => state.isDark)
   const theme = useBoundStore((state) => state.theme)
   const navigation = useNavigation<NavigationProp<DashboardStackParams>>()
-  const toast = useToast()
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -83,33 +72,6 @@ export default function Cart() {
     } catch (error) {
       console.error("Error removing from cart:", error)
       alert("Failed to remove item from cart. Please try again.")
-    }
-  }
-
-  const [addingProductId, setAddingProductId] = useState<number | null>(null)
-
-  const handleIncrease = async (item: CartItemT) => {
-    if (!store.user) {
-      alert("You must be logged in to add items to the cart.")
-      navigation.navigate("Auth" as never)
-      return
-    }
-    if (!item.product_item_id) {
-      alert("Missing product item ID. Please try again.")
-      return
-    }
-    setAddingProductId(item.id)
-    try {
-      const res = await addToCart(store.user.id, item.id, item.product_item_id)
-      // Assuming API returns the updated cart items array
-      if (res?.data) {
-        store.setCartItems(res.data)
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error)
-      alert("Failed to add item to cart. Please try again.")
-    } finally {
-      setAddingProductId(null)
     }
   }
 
@@ -175,7 +137,6 @@ export default function Cart() {
     </Box>
   )
 
-  const totalSelectedItems = selectedItems.size
   return (
     <SafeAreaView className={`flex-1 bg-[${theme.background}]`}>
       <StatusBar style={isDark === true ? "light" : "dark"} />
@@ -211,7 +172,7 @@ export default function Cart() {
             <Button
               size='xl'
               onPress={handleCheckout}
-              style={{ backgroundColor: theme.primary[900] }}
+              style={{ backgroundColor: theme.primary[500] }}
               className='flex-1'
             >
               <ButtonText style={[fonts.body, { color: theme.white }]}>
