@@ -109,7 +109,8 @@ export default function Cart() {
       >
         <Image
           source={{ uri: item.product.cover_url_large }}
-          className='w-24 h-24 mr-2'
+          className='aspect-[3/4] w-1/4 rounded-sm'
+          resizeMode='contain'
           alt={item.product.title}
         />
         <View className='flex-1'>

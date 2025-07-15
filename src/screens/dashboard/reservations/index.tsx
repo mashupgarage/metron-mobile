@@ -11,11 +11,11 @@ import {
   Dimensions,
 } from "react-native"
 import MasonryList from "@react-native-seoul/masonry-list"
-// @ts-ignore
+// @ts-expect-error ts(6133)
 import ComicOdysseyIcon from "@/src/assets/icon.png"
 import React, { useEffect } from "react"
 import { ProductT } from "@/src/utils/types/common"
-import { ClipboardCheck, Menu, Search, X, Check } from "lucide-react-native"
+import { ClipboardCheck, Menu, Search, Check } from "lucide-react-native"
 import DashboardLayout from "../_layout"
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast"
 import { getReservationList } from "@/src/api/apiEndpoints"
@@ -244,8 +244,8 @@ export default function ReservationsScreen() {
               </View>
             )}
             <Text
-              style={[fonts.caption, { color: theme.text }]}
-              className='mb-2 text-sm'
+              style={[{ color: theme.text, fontWeight: "bold", fontSize: 14 }]}
+              className='mb-4'
             >
               {(() => {
                 const selectedRelease = releaseDates.find(
@@ -314,7 +314,7 @@ export default function ReservationsScreen() {
               (!Array.isArray(products) || products.length === 0) && (
                 <View className='items-center py-4'>
                   <Text style={[fonts.caption, { color: theme.text }]}>
-                    No products found matching "{searchQuery}"
+                    No products found matching &rdquo;{searchQuery}&ldquo;
                   </Text>
                 </View>
               )}
@@ -423,7 +423,7 @@ export default function ReservationsScreen() {
               </View>
             }
             numColumns={deviceWidth > 325 ? 3 : 2}
-            keyExtractor={(item: any) => {
+            keyExtractor={(item) => {
               // Use _uniqueKey from search results if available, otherwise use product id
               return item._uniqueKey || `${item.id}_${Date.now()}`
             }}
@@ -431,7 +431,7 @@ export default function ReservationsScreen() {
               columnGap: 12,
               marginHorizontal: theme.spacing.sm,
             }}
-            renderItem={({ item, i }) => {
+            renderItem={({ item }) => {
               const product = item as ProductT
               const isWanted = wantedProductIds.includes(product.id)
               const isSelected = selectedProducts.includes(product.id)
@@ -490,7 +490,7 @@ export default function ReservationsScreen() {
                         } else {
                           getReservationList(store.user?.id).then((res) => {
                             const reservationList = res.data.reservations
-                            // @ts-ignore
+                            // @ts-expect-error navigation.navigate is not typed
                             navigation.navigate("Product", {
                               product: product,
                               fromReservations: true,

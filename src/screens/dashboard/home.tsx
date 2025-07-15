@@ -448,7 +448,19 @@ export default function Home() {
                     >
                       {item.title}
                     </Text>
-                    <Text style={{ color: theme.text }} className='text-md'>
+                    <Text
+                      style={{
+                        color: theme.text,
+                        maxWidth: Dimensions.get("window").width - thirdWidth,
+                      }}
+                      className='text-sm'
+                    >
+                      {item.creators}
+                    </Text>
+                    <Text
+                      style={{ color: theme.text, marginVertical: 4 }}
+                      className='text-sm'
+                    >
                       {item.publisher}
                     </Text>
                   </Box>

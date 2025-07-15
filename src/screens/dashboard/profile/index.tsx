@@ -21,7 +21,6 @@ import { removeAuthToken } from "@/src/api/tokenManager"
 import { fonts } from "@/src/theme"
 import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
 import WantlistScreen from "../wantlist/WantlistScreen"
-import OrdersScreen from "../orders/OrdersScreen"
 import { ErrorBoundary } from "@/src/components/ErrorBoundary"
 import CollectionScreen from "../collection"
 
@@ -118,20 +117,15 @@ export default function Profile(props: { navigation }) {
         }}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image
-            source={{ uri: "https://picsum.photos/100" }}
-            style={{ width: 36, height: 36, borderRadius: 18, marginRight: 12 }}
-            alt='Profile'
-          />
           <Text
             style={{
               fontFamily: "Inter",
               color: theme.text,
               fontSize: 15,
-              fontWeight: "500",
+              fontWeight: "600",
             }}
           >
-            {store.user?.email}
+            {store.user?.full_name}
           </Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -176,7 +170,6 @@ export default function Profile(props: { navigation }) {
               count: reservationCount,
             },
             { key: "wantlist", label: `Wantlist`, count: store.wantlistCount },
-            { key: "orders", label: `Orders`, count: store.ordersCount },
           ]}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -233,7 +226,6 @@ export default function Profile(props: { navigation }) {
         )}
         {selectedTab === "reservations" && <ReservationBoxScreen />}
         {selectedTab === "wantlist" && <WantlistScreen />}
-        {selectedTab === "orders" && <OrdersScreen />}
       </View>
     </SafeAreaView>
   )
