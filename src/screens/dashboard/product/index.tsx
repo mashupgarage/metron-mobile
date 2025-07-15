@@ -321,116 +321,24 @@ export default function Product(props: {
           >
             {product?.title}
           </Text>
-          <View className='px-4 mt-6 mb-2'>
+          {product?.creators && (
+            <Text className='px-4 mb-2' style={{ color: theme.text }}>
+              {product?.creators}
+            </Text>
+          )}
+          <Text className='px-4 mb-2' style={{ color: theme.text }}>
+            {product?.publisher}
+          </Text>
+          <View className='px-4 mt-4 mb-2'>
             <Text
-              style={[
-                fonts.body,
-                {
-                  color: theme.text,
-                },
-              ]}
+              className='mt-2'
+              style={{
+                color: theme.text,
+              }}
             >
               {product?.description ?? ""}
             </Text>
-            <Text
-              style={[
-                fonts.label,
-                {
-                  color: theme.text,
-                  marginBottom: theme.spacing.xs,
-                },
-              ]}
-            >
-              Publisher
-            </Text>
-            <Text style={{ color: theme.text }}>{product?.publisher}</Text>
 
-            {product?.creators && (
-              <>
-                <Text
-                  style={[
-                    fonts.label,
-                    {
-                      color: theme.text,
-                      marginBottom: theme.spacing.xs,
-                    },
-                  ]}
-                >
-                  Creators
-                </Text>
-                <Text
-                  style={{ color: theme.text, marginBottom: theme.spacing.md }}
-                >
-                  {product?.creators}
-                </Text>
-              </>
-            )}
-            <Text
-              style={[
-                fonts.label,
-                {
-                  color: theme.text,
-                  marginBottom: theme.spacing.xs,
-                },
-              ]}
-            >
-              ISBN/UPC
-            </Text>
-            <Text
-              style={[
-                fonts.body,
-                {
-                  marginBottom: theme.spacing.md,
-                  color: theme.text,
-                },
-              ]}
-            >
-              {product?.isbn || product?.upc}
-            </Text>
-            <Text
-              style={[
-                fonts.label,
-                {
-                  color: theme.text,
-                  marginBottom: theme.spacing.xs,
-                },
-              ]}
-            >
-              Price
-            </Text>
-            <Text
-              style={[
-                fonts.body,
-                {
-                  marginBottom: theme.spacing.md,
-                  color: theme.text,
-                },
-              ]}
-            >
-              {product?.formatted_price ??
-                "PHP " + Number(product?.price).toFixed(2)}
-            </Text>
-            <Text
-              style={[
-                fonts.label,
-                {
-                  color: theme.text,
-                },
-              ]}
-            >
-              Available Quantity
-            </Text>
-            <Text
-              style={[
-                fonts.body,
-                {
-                  marginBottom: theme.spacing.md,
-                  color: theme.text,
-                },
-              ]}
-            >
-              {product?.quantity ?? "Out of Stock"}
-            </Text>
             {/* if from collection we hide the stats */}
             {/* Hide collection status, series progress, and recommendations if fromDetailedDisplay */}
             {!fromCollection && (
@@ -576,97 +484,100 @@ export default function Product(props: {
               </VStack>
             )}
           </View>
-          {/* Bottom Bar */}
-          <View
+        </ScrollView>
+        {/* Bottom Bar */}
+        <View
+          style={{
+            flexDirection: "row",
+            padding: theme.spacing.md,
+            backgroundColor: theme.background,
+
+            borderColor: theme.border,
+            alignItems: "center",
+            gap: theme.spacing.md,
+          }}
+        >
+          {/* Want List Button */}
+          <Pressable
+            onPress={async () => {
+              if (store.user !== null) {
+                try {
+                  await addToWantList(product.id)
+                  setIsWanted(true)
+                  toast.show({
+                    placement: "top",
+                    render: ({ id }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} action='success'>
+                          <ToastTitle>Product added to want list!</ToastTitle>
+                        </Toast>
+                      )
+                    },
+                  })
+                } catch {
+                  toast.show({
+                    placement: "top",
+                    render: ({ id }) => {
+                      const toastId = "toast-" + id
+                      return (
+                        <Toast nativeID={toastId} action='error'>
+                          <ToastTitle>Failed to add to want list.</ToastTitle>
+                        </Toast>
+                      )
+                    },
+                  })
+                }
+              }
+            }}
+            disabled={isWanted}
             style={{
               flexDirection: "row",
-              padding: theme.spacing.md,
-              backgroundColor: theme.background,
-              borderTopWidth: 1,
-              borderColor: theme.border,
               alignItems: "center",
-              gap: theme.spacing.md,
+              justifyContent: "center",
+              borderWidth: 1.5,
+              paddingHorizontal: theme.spacing.md,
+              borderColor: theme.primary[500],
+              borderRadius: 24,
+              backgroundColor: isWanted ? "transparent" : theme.background,
+              paddingVertical: theme.spacing.md,
+              opacity: isWanted ? 0.6 : 1,
             }}
           >
-            {/* Want List Button */}
-            <Pressable
-              onPress={async () => {
-                if (store.user !== null) {
-                  try {
-                    await addToWantList(product.id)
-                    setIsWanted(true)
-                    toast.show({
-                      placement: "top",
-                      render: ({ id }) => {
-                        const toastId = "toast-" + id
-                        return (
-                          <Toast nativeID={toastId} action='success'>
-                            <ToastTitle>Product added to want list!</ToastTitle>
-                          </Toast>
-                        )
-                      },
-                    })
-                  } catch {
-                    toast.show({
-                      placement: "top",
-                      render: ({ id }) => {
-                        const toastId = "toast-" + id
-                        return (
-                          <Toast nativeID={toastId} action='error'>
-                            <ToastTitle>Failed to add to want list.</ToastTitle>
-                          </Toast>
-                        )
-                      },
-                    })
-                  }
-                }
-              }}
-              disabled={isWanted}
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                borderWidth: 1.5,
-                borderColor: theme.border,
-                borderRadius: 24,
-                paddingVertical: theme.spacing.md,
-                marginRight: theme.spacing.md,
-                opacity: isWanted ? 0.6 : 1,
-              }}
-            >
-              {/* Heart icon from lucide-react-native */}
-              <Heart
-                fill={"transparent"}
-                color={theme.text}
-                size={24}
-                style={{ marginRight: theme.spacing.md }}
-              />
-              <Text
-                style={[
-                  fonts.body,
-                  {
-                    color: theme.text,
-                  },
-                ]}
-              >
-                {isWanted ? "Already added to want list" : "Add to want list"}
-              </Text>
-            </Pressable>
+            {/* Heart icon from lucide-react-native */}
+            <Heart
+              stroke={isWanted ? theme.error : theme.primary[500]}
+              fill={isWanted ? theme.error : "transparent"}
+              color={theme.text}
+              size={24}
+            />
+          </Pressable>
 
-            {/* Add to Cart Button */}
-            <Button
-              action='primary'
-              style={{
-                backgroundColor: theme.primary[500],
-              }}
-              className='rounded-full h-16 w-16'
-              onPress={async () => handleAddToCart()}
+          {/* Add to Cart Button */}
+          <Button
+            action='primary'
+            style={{
+              backgroundColor: theme.primary[500],
+              width: "80%",
+            }}
+            className='rounded-full h-16 flex-row items-center gap-2'
+            onPress={async () => handleAddToCart()}
+          >
+            <ShoppingCart color={theme.white} size={24} />
+            <Text
+              style={[
+                {
+                  color: theme.white,
+                  fontSize: theme.fonts.label.fontSize,
+                  fontWeight: "bold",
+                },
+              ]}
             >
-              <ShoppingCart color={theme.white} size={24} />
-            </Button>
-          </View>
-        </ScrollView>
+              {product?.formatted_price ??
+                "PHP " + Number(product?.price).toFixed(2)}
+            </Text>
+          </Button>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )

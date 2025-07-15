@@ -312,7 +312,7 @@ export default function Home() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Box className='p-4 pb-0'>
+            <Box className='p-4 mt-2 pb-0'>
               <HStack className='w-full'>
                 <View
                   style={{

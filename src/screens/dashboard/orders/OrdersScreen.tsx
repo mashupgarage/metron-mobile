@@ -10,7 +10,7 @@ const OrdersScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const user = useBoundStore((state) => state.user)
   const store = useBoundStore((state) => state)
-  const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<[]>([])
 
   useEffect(() => {
     const fetchOrders = async (userId: number) => {
@@ -22,7 +22,7 @@ const OrdersScreen = () => {
         console.error("Error fetching orders:", error)
       }
     }
-    fetchOrders(user.id)
+    fetchOrders(user?.id)
   }, [])
 
   const statusColors: Record<string, string> = {
@@ -32,8 +32,12 @@ const OrdersScreen = () => {
     default: theme.text,
   }
 
-  const renderItem = ({ item }: { item: Order }) => {
-    function getPaymentStatus(order) {
+  const renderItem = ({
+    item,
+  }: {
+    item: { id: number; status: string; formatted_status: string }
+  }) => {
+    function getPaymentStatus(order: { status: string }) {
       // Example mapping, adjust as needed
       if (order.status === "fulfilled") return "Paid"
       if (order.status === "approved") return "Pay Online or Bank Deposit"
@@ -149,72 +153,88 @@ const OrdersScreen = () => {
             backgroundColor: theme.background,
           }}
         >
-          <MasonryList
-            data={orders}
-            scrollEnabled={true}
-            ListHeaderComponent={
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: 48,
-                  borderBottomWidth: 1,
-                  marginHorizontal: theme.spacing.md,
-                  borderColor: theme.background2,
-                  marginBottom: 8,
-                }}
-              >
-                <Text
-                  style={[
-                    fonts.label,
-                    {
-                      flex: 1,
-                      color: theme.text,
-                      textAlignVertical: "center",
-                      textAlign: "left",
-                    },
-                  ]}
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
+          {user?.id ? (
+            <MasonryList
+              data={orders}
+              scrollEnabled={true}
+              ListHeaderComponent={
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 48,
+                    borderBottomWidth: 1,
+                    marginHorizontal: theme.spacing.md,
+                    borderColor: theme.background2,
+                    marginBottom: 8,
+                  }}
                 >
-                  Order ID
-                </Text>
-                <Text
-                  style={[
-                    fonts.label,
-                    {
-                      flex: 2,
-                      color: theme.text,
-                      textAlignVertical: "center",
-                      textAlign: "left",
-                    },
-                  ]}
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
-                >
-                  Order Status
-                </Text>
-                <Text
-                  style={[
-                    fonts.label,
-                    {
-                      flex: 1,
-                      color: theme.text,
-                      textAlignVertical: "center",
-                      textAlign: "left",
-                    },
-                  ]}
-                  numberOfLines={1}
-                  ellipsizeMode='tail'
-                >
-                  Status
-                </Text>
-              </View>
-            }
-            numColumns={1}
-            renderItem={renderItem}
-          />
+                  <Text
+                    style={[
+                      fonts.label,
+                      {
+                        flex: 1,
+                        color: theme.text,
+                        textAlignVertical: "center",
+                        textAlign: "left",
+                      },
+                    ]}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                  >
+                    Order ID
+                  </Text>
+                  <Text
+                    style={[
+                      fonts.label,
+                      {
+                        flex: 2,
+                        color: theme.text,
+                        textAlignVertical: "center",
+                        textAlign: "left",
+                      },
+                    ]}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                  >
+                    Order Status
+                  </Text>
+                  <Text
+                    style={[
+                      fonts.label,
+                      {
+                        flex: 1,
+                        color: theme.text,
+                        textAlignVertical: "center",
+                        textAlign: "left",
+                      },
+                    ]}
+                    numberOfLines={1}
+                    ellipsizeMode='tail'
+                  >
+                    Status
+                  </Text>
+                </View>
+              }
+              ListFooterComponent={<Box className='mt-12 h-48' />}
+              numColumns={1}
+              renderItem={renderItem as never}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                position: "relative",
+                marginVertical: 240,
+                alignItems: "center",
+              }}
+            >
+              <Text style={[fonts.caption, { textAlign: "center" }]}>
+                You need to be logged in to view your orders
+              </Text>
+            </View>
+          )}
         </Box>
       </Box>
     </SafeAreaView>

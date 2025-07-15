@@ -61,7 +61,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           )}
           <Text
             numberOfLines={1}
-            style={[fonts.body, { color: theme.text }]}
+            style={[fonts.caption, { color: theme.text }]}
             className='text-gray-600 text-sm'
           >
             {product.creators}
