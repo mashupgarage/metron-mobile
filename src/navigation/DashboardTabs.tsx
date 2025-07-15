@@ -1,34 +1,34 @@
 import {
   BottomTabNavigationOptions,
   createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
-import SearchScreen from "../screens/dashboard/search";
-import CartScreen from "../screens/dashboard/cart";
-import ProfileSceen from "../screens/dashboard/profile";
-import ReservationsScreen from "../screens/dashboard/reservations";
+} from "@react-navigation/bottom-tabs"
+import CartScreen from "../screens/dashboard/cart"
+import ProfileSceen from "../screens/dashboard/profile"
+import ReservationsScreen from "../screens/dashboard/reservations"
 
 import {
   BookOpen,
   House,
-  Search,
+  Package,
   ShoppingBag,
   User2,
-} from "lucide-react-native";
-import { useBoundStore } from "../store";
-import HomeDrawer from "./HomeDrawer";
-import { useColorScheme, View } from "react-native";
+} from "lucide-react-native"
+import { useBoundStore } from "../store"
+import { View } from "react-native"
+import OrdersScreen from "../screens/dashboard/orders/OrdersScreen"
+import Home from "../screens/dashboard/home"
 
-const DashboardTab = createBottomTabNavigator();
+const DashboardTab = createBottomTabNavigator()
 
 const DashboardTabs = () => {
-  const cartItems = useBoundStore((state) => state.cartItems);
-  const theme = useBoundStore((state) => state.theme);
-  const uniqueItemCount = new Set(cartItems.map((item) => item.id)).size;
+  const cartItems = useBoundStore((state) => state.cartItems)
+  const theme = useBoundStore((state) => state.theme)
+  const uniqueItemCount = new Set(cartItems.map((item) => item.id)).size
 
   const screenConfig = ({
     route,
   }: {
-    route: { name: string };
+    route: { name: string }
   }): BottomTabNavigationOptions => ({
     headerShown: false,
     tabBarStyle: {
@@ -44,16 +44,16 @@ const DashboardTabs = () => {
     tabBarBadgeStyle: {
       backgroundColor: theme.error,
     },
-  });
+  })
 
   const iconDisplay = (route: string, color: string, size: number) => {
     switch (route) {
       case "Marketplace":
-        return <House color={color} size={size} />;
-      case "Search":
-        return <Search color={color} size={size} />;
+        return <House color={color} size={size} />
+      case "Orders":
+        return <Package color={color} size={size} />
       case "My Cart":
-        return <ShoppingBag color={color} size={size} />;
+        return <ShoppingBag color={color} size={size} />
       case "Reservations":
         // Bigger icon with circular background
         return (
@@ -75,13 +75,13 @@ const DashboardTabs = () => {
           >
             <BookOpen color={color} size={36} />
           </View>
-        );
+        )
       case "Profile":
-        return <User2 color={color} size={size} />;
+        return <User2 color={color} size={size} />
     }
 
-    return null;
-  };
+    return null
+  }
 
   return (
     <DashboardTab.Navigator id={undefined}>
@@ -89,15 +89,15 @@ const DashboardTabs = () => {
         options={{
           ...screenConfig({ route: { name: "Marketplace" } }),
         }}
-        name="Home"
-        component={HomeDrawer}
+        name='Home'
+        component={Home}
       />
       <DashboardTab.Screen
         options={{
-          ...screenConfig({ route: { name: "Search" } }),
+          ...screenConfig({ route: { name: "Orders" } }),
         }}
-        name="Search"
-        component={SearchScreen}
+        name='Orders'
+        component={OrdersScreen}
       />
       <DashboardTab.Screen
         options={{
@@ -105,25 +105,25 @@ const DashboardTabs = () => {
           tabBarIcon: ({ color }) => iconDisplay("Reservations", color, 24),
           tabBarLabel: () => null,
         }}
-        name="Reservations"
+        name='Reservations'
         component={ReservationsScreen}
       />
       <DashboardTab.Screen
         options={{
           ...screenConfig({ route: { name: "My Cart" } }),
         }}
-        name="My Cart"
+        name='My Cart'
         component={CartScreen}
       />
       <DashboardTab.Screen
         options={{
           ...screenConfig({ route: { name: "Profile" } }),
         }}
-        name="Profile"
+        name='Profile'
         component={ProfileSceen}
       />
     </DashboardTab.Navigator>
-  );
-};
+  )
+}
 
-export default DashboardTabs;
+export default DashboardTabs

@@ -1,4 +1,4 @@
-import { Linking, Pressable, Text, View } from "react-native"
+import { Linking, Pressable, SafeAreaView, Text, View } from "react-native"
 import { useBoundStore } from "@/src/store"
 import { useEffect, useState } from "react"
 import MasonryList from "@react-native-seoul/masonry-list"
@@ -10,7 +10,7 @@ const OrdersScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const user = useBoundStore((state) => state.user)
   const store = useBoundStore((state) => state)
-  const [orders, setOrders] = useState<any[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
 
   useEffect(() => {
     const fetchOrders = async (userId: number) => {
@@ -32,7 +32,7 @@ const OrdersScreen = () => {
     default: theme.text,
   }
 
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: Order }) => {
     function getPaymentStatus(order) {
       // Example mapping, adjust as needed
       if (order.status === "fulfilled") return "Paid"
@@ -113,106 +113,111 @@ const OrdersScreen = () => {
   }
 
   return (
-    <>
-      <Text
-        style={[
-          fonts.title,
-          {
-            color: theme.text,
-            marginHorizontal: theme.spacing.md,
-          },
-        ]}
-      >
-        My Orders
-      </Text>
-      <Text
-        style={[
-          fonts.body,
-          {
-            color: theme.text,
-            marginVertical: theme.spacing.md,
-            marginHorizontal: theme.spacing.md,
-          },
-        ]}
-      >
-        This is a list of all your orders, track orders, pay, and manage your
-        orders here.
-      </Text>
+    <SafeAreaView>
       <Box
         className='h-screen w-full pb-24'
-        style={{
-          marginTop: theme.spacing.md,
-          backgroundColor: theme.background,
-        }}
+        style={{ backgroundColor: theme.background }}
       >
-        <MasonryList
-          data={orders}
-          scrollEnabled={true}
-          ListHeaderComponent={
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                height: 48,
-                borderBottomWidth: 1,
-                marginHorizontal: theme.spacing.md,
-                borderColor: theme.background2,
-                marginBottom: 8,
-              }}
-            >
-              <Text
-                style={[
-                  fonts.label,
-                  {
-                    flex: 1,
-                    color: theme.text,
-                    textAlignVertical: "center",
-                    textAlign: "left",
-                  },
-                ]}
-                numberOfLines={1}
-                ellipsizeMode='tail'
+        <Text
+          style={[
+            fonts.title,
+            {
+              color: theme.text,
+              marginHorizontal: theme.spacing.md,
+            },
+          ]}
+        >
+          My Orders
+        </Text>
+        <Text
+          style={[
+            fonts.body,
+            {
+              color: theme.text,
+              marginVertical: theme.spacing.md,
+              marginHorizontal: theme.spacing.md,
+            },
+          ]}
+        >
+          This is a list of all your orders, you can track and manage your
+          orders here.
+        </Text>
+        <Box
+          className='h-screen w-full pb-24'
+          style={{
+            marginTop: theme.spacing.md,
+            backgroundColor: theme.background,
+          }}
+        >
+          <MasonryList
+            data={orders}
+            scrollEnabled={true}
+            ListHeaderComponent={
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: 48,
+                  borderBottomWidth: 1,
+                  marginHorizontal: theme.spacing.md,
+                  borderColor: theme.background2,
+                  marginBottom: 8,
+                }}
               >
-                Order ID
-              </Text>
-              <Text
-                style={[
-                  fonts.label,
-                  {
-                    flex: 2,
-                    color: theme.text,
-                    textAlignVertical: "center",
-                    textAlign: "left",
-                  },
-                ]}
-                numberOfLines={1}
-                ellipsizeMode='tail'
-              >
-                Order Status
-              </Text>
-              <Text
-                style={[
-                  fonts.label,
-                  {
-                    flex: 1,
-                    color: theme.text,
-                    textAlignVertical: "center",
-                    textAlign: "left",
-                  },
-                ]}
-                numberOfLines={1}
-                ellipsizeMode='tail'
-              >
-                Status
-              </Text>
-            </View>
-          }
-          numColumns={1}
-          renderItem={renderItem}
-        />
+                <Text
+                  style={[
+                    fonts.label,
+                    {
+                      flex: 1,
+                      color: theme.text,
+                      textAlignVertical: "center",
+                      textAlign: "left",
+                    },
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  Order ID
+                </Text>
+                <Text
+                  style={[
+                    fonts.label,
+                    {
+                      flex: 2,
+                      color: theme.text,
+                      textAlignVertical: "center",
+                      textAlign: "left",
+                    },
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  Order Status
+                </Text>
+                <Text
+                  style={[
+                    fonts.label,
+                    {
+                      flex: 1,
+                      color: theme.text,
+                      textAlignVertical: "center",
+                      textAlign: "left",
+                    },
+                  ]}
+                  numberOfLines={1}
+                  ellipsizeMode='tail'
+                >
+                  Status
+                </Text>
+              </View>
+            }
+            numColumns={1}
+            renderItem={renderItem}
+          />
+        </Box>
       </Box>
-    </>
+    </SafeAreaView>
   )
 }
 

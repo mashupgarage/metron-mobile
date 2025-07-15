@@ -38,7 +38,6 @@ export function DashboardStack() {
       <Stack.Screen
         name='Product'
         options={screenOption}
-        // @ts-ignore
         component={ProductScreen}
       />
       <Stack.Screen

@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   TouchableOpacity,
+  TextInput,
 } from "react-native"
 import MasonryList from "@react-native-seoul/masonry-list"
 
@@ -17,20 +18,19 @@ import { Pressable } from "react-native-gesture-handler"
 import {
   NavigationProp,
   useNavigation,
-  DrawerActions,
   useRoute,
   RouteProp,
   ParamListBase,
 } from "@react-navigation/native"
 import { HStack } from "@/src/components/ui/hstack"
-import { Button } from "@/src/components/ui/button"
-import { Menu } from "lucide-react-native"
+import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button"
 import { mockedCarouselItems } from "@/src/utils/mock"
 import { useCallback, useEffect, useState } from "react"
 import {
   fetchCartItems,
   fetchProducts,
   fetchUserProfile,
+  searchMarketplaceProducts,
 } from "@/src/api/apiEndpoints"
 import Constants from "expo-constants"
 
@@ -47,12 +47,16 @@ export default function Home() {
   const [selectedPill, setSelectedPill] = useState<number | undefined>(
     undefined
   )
+  const [searchQuery, setSearchQuery] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [carouselItems, setCarouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems)
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [isGrid, setIsGrid] = useState(true)
+  const [isSearchMode, setIsSearchMode] = useState(false)
   const thirdWidth = Dimensions.get("window").width / 3
 
   console.log(
@@ -115,7 +119,6 @@ export default function Home() {
 
   // Function to load more products
   const loadMoreProducts = useCallback(async () => {
-    // Don't fetch if already fetching, no more pages, or initial loading
     if (
       isFetchingMore ||
       currentPage >= totalPages ||
@@ -123,30 +126,38 @@ export default function Home() {
     ) {
       return
     }
-
     setIsFetchingMore(true)
     const nextPage = currentPage + 1
-
     try {
-      const res = await fetchProducts(undefined, nextPage, PAGE_SIZE)
-      const newProducts = res.data.products || []
-
-      // Update store with new products
-      store.appendProducts({
-        products: newProducts,
-        total_count: res.data.total_count,
-        total_pages: res.data.total_pages,
-        page: nextPage,
-      })
-
-      // Update local state
-      setCurrentPage(nextPage)
+      if (isSearchMode && searchQuery.trim() !== "") {
+        // Fetch more search results
+        await handleSearch(nextPage)
+      } else {
+        // Fetch more products
+        const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
+        const newProducts = res.data.products || []
+        store.appendProducts({
+          products: newProducts,
+          total_count: res.data.total_count,
+          total_pages: res.data.total_pages,
+          page: nextPage,
+        })
+        setCurrentPage(nextPage)
+      }
     } catch (err) {
       console.error("Failed to fetch more products:", err)
     } finally {
       setIsFetchingMore(false)
     }
-  }, [currentPage, totalPages, isFetchingMore, store.products_list?.loading])
+  }, [
+    currentPage,
+    totalPages,
+    isFetchingMore,
+    store.products_list?.loading,
+    isSearchMode,
+    searchQuery,
+    selectedPill,
+  ])
 
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
   const products = store.products_list?.products || []
@@ -166,6 +177,58 @@ export default function Home() {
         )}
       </Box>
     )
+  }
+
+  const handleSearch = async (page = 1) => {
+    if (searchQuery.trim() === "") return
+    setIsSearchMode(true)
+    if (page === 1) {
+      setLoading(true)
+      setCurrentPage(1)
+    } else {
+      setIsFetchingMore(true)
+    }
+    setError("")
+    try {
+      const response = await searchMarketplaceProducts(searchQuery, page)
+      const productsArray = response.data.products || response.data.data || []
+      const totalCount =
+        response.data.total_count || response.data.meta?.total || 0
+      const totalPagesValue =
+        response.data.total_pages || response.data.meta?.last_page || 1
+      const currentPageValue =
+        response.data.current_page || response.data.meta?.current_page || page
+      if (page === 1) {
+        store.setProducts({
+          products: productsArray,
+          total_count: totalCount,
+          total_pages: totalPagesValue,
+        })
+      } else {
+        store.appendProducts({
+          products: productsArray,
+          total_count: totalCount,
+          total_pages: totalPagesValue,
+          page: currentPageValue,
+        })
+      }
+      setTotalPages(totalPagesValue)
+      setCurrentPage(currentPageValue)
+    } catch {
+      setError("Failed to fetch search results. Please try again.")
+    } finally {
+      setLoading(false)
+      setIsFetchingMore(false)
+    }
+  }
+
+  // Clear search and restore default product list
+  const handleClearSearch = () => {
+    setSearchQuery("")
+    setIsSearchMode(false)
+    setCurrentPage(1)
+    setError("")
+    loadInitialProducts(selectedPill)
   }
 
   const pills = [
@@ -249,6 +312,72 @@ export default function Home() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
+            <Box className='p-4 pb-0'>
+              <HStack className='w-full'>
+                <View
+                  style={{
+                    position: "relative",
+                    flex: 1,
+                    marginRight: theme.spacing.sm,
+                  }}
+                >
+                  <TextInput
+                    placeholder='Search products...'
+                    returnKeyType='search'
+                    placeholderTextColor={theme.textSecondary}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    onSubmitEditing={() => handleSearch(1)}
+                    style={{
+                      backgroundColor: theme.background,
+                      borderRadius: 8,
+                      padding: 10,
+                      fontSize: 16,
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                      color: theme.text,
+                      paddingRight:
+                        isSearchMode && searchQuery.trim() !== "" ? 60 : 36,
+                    }}
+                  />
+                  {isSearchMode && searchQuery.trim() !== "" && (
+                    <TouchableOpacity
+                      style={{
+                        position: "absolute",
+                        right: 10,
+                        top: 12,
+                        zIndex: 10,
+                      }}
+                      onPress={handleClearSearch}
+                    >
+                      <Text
+                        style={{
+                          color: theme.primary[500],
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Clear
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <Button
+                  size='xl'
+                  style={{ backgroundColor: theme.primary[500] }}
+                  onPress={() => handleSearch(1)}
+                  disabled={loading || searchQuery.trim() === ""}
+                  className='rounded-lg px-4'
+                >
+                  {loading ? (
+                    <ButtonSpinner />
+                  ) : (
+                    <ButtonText style={[fonts.body, { color: theme.white }]}>
+                      Search
+                    </ButtonText>
+                  )}
+                </Button>
+              </HStack>
+            </Box>
             <HStack className='justify-between mr-2 ml-2'>
               <Box className='p-2 mt-4'>
                 <Text
@@ -256,7 +385,6 @@ export default function Home() {
                     fonts.title,
                     {
                       color: theme.text,
-                      marginTop: theme.spacing.xs,
                     },
                   ]}
                 >
@@ -276,14 +404,6 @@ export default function Home() {
                     <LayoutGrid size={24} color={theme.text} />
                   )}
                 </Pressable>
-                <Button
-                  onPress={() => {
-                    navigation.dispatch(DrawerActions.toggleDrawer())
-                  }}
-                  variant='link'
-                >
-                  <Menu size={24} color={theme.text} />
-                </Button>
               </HStack>
             </HStack>
           </Box>
