@@ -38,12 +38,10 @@ interface SeriesCardProps {
     product_items_count?: number
     in_want_list?: boolean
   }
-  detailedDisplay?: boolean
   grayed?: boolean
 }
 
-const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
-  if (!data || !data.series) return null
+const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
   const theme = useBoundStore((state) => state.theme)
   const deviceWidth = Dimensions.get("window").width
   const thirdWidth = deviceWidth / 3
@@ -53,6 +51,8 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
+  if (!data || !data.series) return null
+
   const mainImage =
     data.last_product?.image_url || data.cover_url_large || undefined
   const handleAddToWantList = async () => {
@@ -60,21 +60,21 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
       await addToWantList(data.series.id)
       toast.show({
         placement: "top",
-        render: ({ id }) => (
+        render: () => (
           <Text className='text-green-600'>Added to Want List!</Text>
         ),
       })
-    } catch (error) {
+    } catch {
       toast.show({
         placement: "top",
-        render: ({ id }) => (
+        render: () => (
           <Text className='text-red-600'>Failed to add to Want List.</Text>
         ),
       })
     }
   }
 
-  const handleAddToCart = async (item: any) => {
+  const handleAddToCart = async (item) => {
     try {
       navigation.navigate("Product", {
         product: item,
@@ -102,7 +102,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
               }
               resizeMode={imgError ? "contain" : "cover"}
               style={{
-                opacity: grayed ? 0.7 : 1,
+                opacity: grayed ? 0.9 : 1,
               }}
               onError={() => setImgError(true)}
             />
@@ -116,7 +116,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                 top: 10,
                 right: 10,
                 backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: 0,
+                borderRadius: 24,
                 padding: 6,
                 zIndex: 10,
               }}
@@ -131,7 +131,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
             imageIndex={0}
             visible={isImageViewerVisible}
             onRequestClose={() => setIsImageViewerVisible(false)}
-            FooterComponent={({ imageIndex }) => (
+            FooterComponent={() => (
               <View
                 style={{
                   width: "100%",
@@ -152,7 +152,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                       if (status !== "granted") {
                         toast.show({
                           placement: "top",
-                          render: ({ id }) => (
+                          render: () => (
                             <Text style={{ color: "red" }}>
                               Permission denied: Cannot save image.
                             </Text>
@@ -180,16 +180,16 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                       )
                       toast.show({
                         placement: "top",
-                        render: ({ id }) => (
+                        render: () => (
                           <Text style={{ color: "green" }}>
                             Image saved to gallery.
                           </Text>
                         ),
                       })
-                    } catch (err) {
+                    } catch {
                       toast.show({
                         placement: "top",
-                        render: ({ id }) => (
+                        render: () => (
                           <Text style={{ color: "red" }}>
                             Failed to save image.
                           </Text>
@@ -222,14 +222,14 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
           />
           {grayed && (
             <View className='absolute top-2 left-2 right-2 bottom-2 h-56 bg-black/50 justify-center items-center'>
-              <Text style={[fonts.label, { color: theme.text }]}>
+              <Text style={[fonts.caption, { color: theme.white }]}>
                 Not Collected
               </Text>
               <View className='flex-row gap-2 mt-2'>
                 <Pressable
                   className='p-3 rounded-full'
                   style={{
-                    backgroundColor: "rgba(255,255,255,0.4)",
+                    backgroundColor: "rgba(255,255,255,0.1)",
                     opacity: data.in_want_list ? 1 : 0.7,
                   }}
                   onPress={handleAddToWantList}
@@ -237,7 +237,7 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, detailedDisplay, grayed }) => {
                 >
                   <StarIcon
                     fill={
-                      !data.in_want_list ? "#ffd700" : "rgba(255,255,255,0.02)"
+                      !data.in_want_list ? "#ffd700" : "rgba(255,255,255,0.1)"
                     }
                     color={data.in_want_list ? "#ffd700" : "#fff"}
                     size={24}

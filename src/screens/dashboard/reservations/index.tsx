@@ -15,7 +15,15 @@ import MasonryList from "@react-native-seoul/masonry-list"
 import ComicOdysseyIcon from "@/src/assets/icon.png"
 import React, { useEffect } from "react"
 import { ProductT } from "@/src/utils/types/common"
-import { ClipboardCheck, Menu, Search, Check } from "lucide-react-native"
+import {
+  ClipboardCheck,
+  Menu,
+  Search,
+  Check,
+  HeartOff,
+  Heart,
+  HeartIcon,
+} from "lucide-react-native"
 import DashboardLayout from "../_layout"
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast"
 import { getReservationList } from "@/src/api/apiEndpoints"
@@ -437,15 +445,7 @@ export default function ReservationsScreen() {
               const isSelected = selectedProducts.includes(product.id)
               return (
                 <>
-                  <View
-                    style={
-                      isMultiSelectMode && isSelected
-                        ? {
-                            backgroundColor: theme.primary[800],
-                          }
-                        : {}
-                    }
-                  >
+                  <View>
                     <Pressable
                       onPress={() => {
                         if (isMultiSelectMode) {
@@ -539,6 +539,100 @@ export default function ReservationsScreen() {
                                 height: 200,
                               }}
                             >
+                              {/* Overlay only if reserved */}
+                              {userReservationProductIds.includes(
+                                product.id
+                              ) && (
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    backgroundColor: "rgba(0,0,0,0.5)",
+                                    zIndex: 1,
+                                    borderRadius: 8,
+                                  }}
+                                />
+                              )}
+                              {/* selected as reserved */}
+                              {isMultiSelectMode && isSelected && (
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    top: 4,
+                                    left: 4,
+                                    zIndex: 4,
+                                    backgroundColor: "rgba(0,0,0,0.8)",
+                                    borderRadius: 24,
+                                    padding: 4,
+                                  }}
+                                >
+                                  <Check
+                                    size={20}
+                                    strokeWidth={3}
+                                    color={theme.success}
+                                  />
+                                </View>
+                              )}
+                              <TouchableOpacity
+                                className={`px-2 py-2 absolute ${
+                                  isWanted ? "opacity-80" : "opacity-100"
+                                }`}
+                                style={{ zIndex: 2, right: 0 }}
+                                disabled={isWanted}
+                                onPress={async () => {
+                                  try {
+                                    await addToWantListHandler(product.id)
+                                    incrementWantlistCount()
+                                    alert("Added to your want list!")
+                                  } catch (e) {
+                                    console.log(e)
+                                    alert("Failed to add to want list.")
+                                  }
+                                }}
+                              >
+                                {isWanted ? (
+                                  <Heart
+                                    size={20}
+                                    stroke={theme.error}
+                                    fill={theme.error}
+                                  />
+                                ) : (
+                                  <HeartIcon
+                                    size={20}
+                                    color={theme.error}
+                                    strokeWidth={3}
+                                    // fill={theme.primary[500]}
+                                  />
+                                )}
+                              </TouchableOpacity>
+                              {/* Already Reserved text above overlay */}
+                              {userReservationProductIds.includes(
+                                product.id
+                              ) && (
+                                <View
+                                  style={{
+                                    alignItems: "flex-end",
+                                    position: "absolute",
+                                    top: 80,
+                                    right: 0,
+                                    zIndex: 2,
+                                  }}
+                                >
+                                  <Text
+                                    style={[
+                                      fonts.caption,
+                                      { color: theme.white },
+                                    ]}
+                                    className='px-2'
+                                  >
+                                    Already Reserved
+                                  </Text>
+                                </View>
+                              )}
+                              {/* Product image always at bottom */}
                               <Image
                                 source={{
                                   uri:
@@ -592,49 +686,10 @@ export default function ReservationsScreen() {
                               {product.creators}
                             </Text>
                           </View>
-                          <View className='flex-row justify-between items-center mt-1'>
-                            <View style={{ alignItems: "flex-end" }}>
-                              {userReservationProductIds.includes(
-                                product.id
-                              ) && (
-                                <Text
-                                  style={[
-                                    fonts.caption,
-                                    { color: theme.orange },
-                                  ]}
-                                  className='px-2'
-                                >
-                                  Already Reserved
-                                </Text>
-                              )}
-                            </View>
-                          </View>
                         </View>
                       </Box>
                     </Pressable>
                   </View>
-                  <TouchableOpacity
-                    className={`px-2 py-2 ${
-                      isWanted ? "opacity-80" : "opacity-100"
-                    }`}
-                    disabled={isWanted}
-                    onPress={async () => {
-                      try {
-                        await addToWantListHandler(product.id)
-                        incrementWantlistCount()
-                        alert("Added to your want list!")
-                      } catch (e) {
-                        console.log(e)
-                        alert("Failed to add to want list.")
-                      }
-                    }}
-                  >
-                    <Text
-                      style={[fonts.caption, { color: theme.primary[500] }]}
-                    >
-                      {isWanted ? "Wanted!" : "I want this"}
-                    </Text>
-                  </TouchableOpacity>
                 </>
               )
             }}
