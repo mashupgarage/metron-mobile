@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  SafeAreaView,
   ActivityIndicator,
   TouchableOpacity,
   FlatList,
@@ -13,14 +12,11 @@ import {
 } from "react-native"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { LayoutGrid, LayoutList } from "lucide-react-native"
-import { useColorScheme } from "react-native"
 import { useBoundStore } from "@/src/store"
 import { getReservationList } from "@/src/api/apiEndpoints"
 import { ProductT, ReservationItemT } from "@/src/utils/types/common"
 import { useNavigation } from "@react-navigation/native"
-import { StatusBar } from "expo-status-bar"
 import ReservationCard from "@/src/components/ReservationCard"
-import NavigationHeader from "@/src/components/navigation-header"
 import { fonts } from "@/src/theme"
 
 const PAGE_SIZE = 50
@@ -48,23 +44,20 @@ interface ExtendedReservationItemT extends Omit<ReservationItemT, "product"> {
 export default function ReservationBoxScreen() {
   const [isGrid, setIsGrid] = useState(true)
   const theme = useBoundStore((state) => state.theme)
-  const colorScheme = useColorScheme()
   const store = useBoundStore()
   const navigation = useNavigation()
   const [reservations, setReservations] = useState<ExtendedReservationItemT[]>(
     []
   )
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [, setLoading] = useState(true)
+  const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [isFetchingMore, setIsFetchingMore] = useState(false)
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({})
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
   const deviceWidth = Dimensions.get("window").width
-  const third = deviceWidth / 3
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedQuery(searchQuery), 1500)
@@ -88,7 +81,7 @@ export default function ReservationBoxScreen() {
   // Initial load
   useEffect(() => {
     if (!store.user) {
-      // @ts-ignore
+      // @ts-expect-error navigation.replace
       navigation.replace("Auth", { screen: "SignIn" })
       return
     }
@@ -115,13 +108,7 @@ export default function ReservationBoxScreen() {
   }, [store.user, navigation, debouncedQuery])
 
   // Accept both MasonryList ({item, i}) and FlatList ({item}) signatures
-  const renderGridItem = ({
-    item,
-    i,
-  }: {
-    item: ExtendedReservationItemT
-    i?: number
-  }) => {
+  const renderGridItem = ({ item }: { item: ExtendedReservationItemT }) => {
     const reservation = item
     if (!reservation.product) return null
     const sanitizedProduct = {
@@ -280,7 +267,8 @@ export default function ReservationBoxScreen() {
         <MasonryList
           data={reservations}
           scrollEnabled
-          // @ts-ignore
+          keyExtractor={(item) => item.id.toString()}
+          // @ts-expect-error renderItem type mismatch
           renderItem={renderGridItem}
           numColumns={deviceWidth > 325 ? 3 : 2}
           style={{
@@ -299,14 +287,13 @@ export default function ReservationBoxScreen() {
               }}
             >
               <Text style={[fonts.body, { color: colors.text }]}>
-                We couldn't find any items in your reservation box
+                We couldn&apos;t find any items in your reservation box
                 {searchQuery.length > 0
                   ? " that matches, '" + searchQuery + "'"
                   : ""}
               </Text>
             </View>
           }
-          keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingBottom: 24 }}
           showsVerticalScrollIndicator={false}
           onEndReached={async () => {

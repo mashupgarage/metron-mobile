@@ -1,29 +1,41 @@
-import { Linking, Pressable, SafeAreaView, Text, View } from "react-native"
+import {
+  FlatList,
+  Linking,
+  Pressable,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native"
 import { useBoundStore } from "@/src/store"
 import { useEffect, useState } from "react"
 import MasonryList from "@react-native-seoul/masonry-list"
 import { getOrders } from "@/src/api/apiEndpoints"
 import { Box } from "@/src/components/ui/box"
 import { fonts } from "@/src/theme"
+import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
 
 const OrdersScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const user = useBoundStore((state) => state.user)
   const store = useBoundStore((state) => state)
+  const [activeTab, setActiveTab] = useState("Orders")
   const [orders, setOrders] = useState<[]>([])
 
   useEffect(() => {
-    const fetchOrders = async (userId: number) => {
-      try {
-        const response = await getOrders(userId)
-        setOrders(response.data)
-        store.setOrdersCount(response.data.length)
-      } catch (error) {
-        console.error("Error fetching orders:", error)
+    if (activeTab === "Orders") {
+      const fetchOrders = async (userId: number) => {
+        try {
+          const response = await getOrders(userId)
+          setOrders(response.data)
+          store.setOrdersCount(response.data.length)
+        } catch (error) {
+          console.error("Error fetching orders:", error)
+        }
       }
+      fetchOrders(user?.id)
     }
-    fetchOrders(user?.id)
-  }, [])
+  }, [user?.id, activeTab])
 
   const statusColors: Record<string, string> = {
     pending_store_delivery: theme.warning[500] || "#FFA500",
@@ -118,125 +130,174 @@ const OrdersScreen = () => {
 
   return (
     <SafeAreaView>
-      <Box
-        className='h-screen w-full pb-24'
-        style={{ backgroundColor: theme.background }}
-      >
-        <Text
-          style={[
-            fonts.title,
+      <View className='p-4 '>
+        <FlatList
+          data={[
             {
-              color: theme.text,
-              marginHorizontal: theme.spacing.md,
+              key: "Orders",
+              label: `Orders`,
             },
+            { key: "Reservations", label: `Reservations` },
           ]}
-        >
-          My Orders
-        </Text>
-        <Text
-          style={[
-            fonts.body,
-            {
-              color: theme.text,
-              marginVertical: theme.spacing.md,
-              marginHorizontal: theme.spacing.md,
-            },
-          ]}
-        >
-          This is a list of all your orders, you can track and manage your
-          orders here.
-        </Text>
-        <Box
-          className='h-screen w-full pb-24'
-          style={{
-            marginTop: theme.spacing.md,
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.key}
+          contentContainerStyle={{
+            paddingBottom: 8,
             backgroundColor: theme.background,
           }}
-        >
-          {user?.id ? (
-            <MasonryList
-              data={orders}
-              scrollEnabled={true}
-              ListHeaderComponent={
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: 48,
-                    borderBottomWidth: 1,
-                    marginHorizontal: theme.spacing.md,
-                    borderColor: theme.background2,
-                    marginBottom: 8,
-                  }}
-                >
-                  <Text
-                    style={[
-                      fonts.label,
-                      {
-                        flex: 1,
-                        color: theme.text,
-                        textAlignVertical: "center",
-                        textAlign: "left",
-                      },
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                  >
-                    Order ID
-                  </Text>
-                  <Text
-                    style={[
-                      fonts.label,
-                      {
-                        flex: 2,
-                        color: theme.text,
-                        textAlignVertical: "center",
-                        textAlign: "left",
-                      },
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                  >
-                    Order Status
-                  </Text>
-                  <Text
-                    style={[
-                      fonts.label,
-                      {
-                        flex: 1,
-                        color: theme.text,
-                        textAlignVertical: "center",
-                        textAlign: "left",
-                      },
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode='tail'
-                  >
-                    Status
-                  </Text>
-                </View>
-              }
-              ListFooterComponent={<Box className='mt-12 h-48' />}
-              numColumns={1}
-              renderItem={renderItem as never}
-            />
-          ) : (
-            <View
+          renderItem={({ item: tab }) => (
+            <TouchableOpacity
+              key={tab.key}
               style={{
-                flex: 1,
-                position: "relative",
-                marginVertical: 240,
-                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 7,
+                borderRadius: 18,
+                marginRight: 8,
+                backgroundColor:
+                  activeTab === tab.key
+                    ? theme.primary[500]
+                    : theme.background2,
+              }}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <Text
+                style={{
+                  ...fonts.body,
+                  color: activeTab === tab.key ? "#fff" : theme.text,
+                  fontWeight: activeTab === tab.key ? "bold" : "500",
+                }}
+              >
+                {tab.label}{" "}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+      <View>
+        {activeTab === "Orders" && (
+          <Box
+            className='h-screen w-full pb-24'
+            style={{ backgroundColor: theme.background }}
+          >
+            <Text
+              style={[
+                fonts.title,
+                {
+                  color: theme.text,
+                  marginHorizontal: theme.spacing.md,
+                },
+              ]}
+            >
+              My Orders
+            </Text>
+            <Text
+              style={[
+                fonts.body,
+                {
+                  color: theme.text,
+                  marginVertical: theme.spacing.md,
+                  marginHorizontal: theme.spacing.md,
+                },
+              ]}
+            >
+              This is a list of all your orders, you can track and manage your
+              orders here.
+            </Text>
+            <Box
+              className='h-screen w-full pb-24'
+              style={{
+                marginTop: theme.spacing.md,
+                backgroundColor: theme.background,
               }}
             >
-              <Text style={[fonts.caption, { textAlign: "center" }]}>
-                You need to be logged in to view your orders
-              </Text>
-            </View>
-          )}
-        </Box>
-      </Box>
+              {user?.id ? (
+                <MasonryList
+                  data={orders}
+                  scrollEnabled={true}
+                  ListHeaderComponent={
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: 48,
+                        borderBottomWidth: 1,
+                        marginHorizontal: theme.spacing.md,
+                        borderColor: theme.background2,
+                        marginBottom: 8,
+                      }}
+                    >
+                      <Text
+                        style={[
+                          fonts.label,
+                          {
+                            flex: 1,
+                            color: theme.text,
+                            textAlignVertical: "center",
+                            textAlign: "left",
+                          },
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                      >
+                        Order ID
+                      </Text>
+                      <Text
+                        style={[
+                          fonts.label,
+                          {
+                            flex: 2,
+                            color: theme.text,
+                            textAlignVertical: "center",
+                            textAlign: "left",
+                          },
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                      >
+                        Order Status
+                      </Text>
+                      <Text
+                        style={[
+                          fonts.label,
+                          {
+                            flex: 1,
+                            color: theme.text,
+                            textAlignVertical: "center",
+                            textAlign: "left",
+                          },
+                        ]}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                      >
+                        Status
+                      </Text>
+                    </View>
+                  }
+                  ListFooterComponent={<Box className='mt-12 h-48' />}
+                  numColumns={1}
+                  renderItem={renderItem as never}
+                />
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    position: "relative",
+                    marginVertical: 240,
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={[fonts.caption, { textAlign: "center" }]}>
+                    You need to be logged in to view your orders
+                  </Text>
+                </View>
+              )}
+            </Box>
+          </Box>
+        )}
+        {activeTab === "Reservations" && <ReservationBoxScreen />}
+      </View>
     </SafeAreaView>
   )
 }

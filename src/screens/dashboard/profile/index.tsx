@@ -3,7 +3,6 @@ import { StatusBar } from "expo-status-bar"
 import {
   Text,
   View,
-  Image,
   TouchableOpacity,
   SafeAreaView,
   FlatList,
@@ -19,7 +18,6 @@ import {
 
 import { removeAuthToken } from "@/src/api/tokenManager"
 import { fonts } from "@/src/theme"
-import ReservationBoxScreen from "../reservationBox/ReservationBoxScreen"
 import WantlistScreen from "../wantlist/WantlistScreen"
 import { ErrorBoundary } from "@/src/components/ErrorBoundary"
 import CollectionScreen from "../collection"
@@ -29,7 +27,6 @@ export default function Profile(props: { navigation }) {
   const theme = useBoundStore((state) => state.theme)
   const setCollectionCount = (count: number) => store.setCollectionCount(count)
   const collectionCount = store.collectionCount ?? 0
-  const [reservationCount, setReservationCount] = useState(0)
 
   const [checkingUser, setCheckingUser] = useState(true)
   const [selectedTab, setSelectedTab] = useState("collections")
@@ -44,13 +41,6 @@ export default function Profile(props: { navigation }) {
       return
     }
     setCheckingUser(false)
-    getReservationList(store.user.id)
-      .then((res) => {
-        setReservationCount(res.data.length)
-      })
-      .catch((err) => {
-        console.error("Failed to fetch reservations:", err)
-      })
     getOrders(store.user.id)
       .then((res) => {
         store.setOrdersCount(res.data.length)
@@ -163,19 +153,13 @@ export default function Profile(props: { navigation }) {
               label: `Collections`,
               count: collectionCount,
             },
-
-            {
-              key: "reservations",
-              label: `Reservations`,
-              count: reservationCount,
-            },
             { key: "wantlist", label: `Wantlist`, count: store.wantlistCount },
           ]}
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.key}
           contentContainerStyle={{
-            paddingHorizontal: 16,
+            paddingHorizontal: 4,
             paddingBottom: 8,
             backgroundColor: theme.background,
           }}
@@ -224,7 +208,6 @@ export default function Profile(props: { navigation }) {
             <CollectionScreen />
           </ErrorBoundary>
         )}
-        {selectedTab === "reservations" && <ReservationBoxScreen />}
         {selectedTab === "wantlist" && <WantlistScreen />}
       </View>
     </SafeAreaView>
