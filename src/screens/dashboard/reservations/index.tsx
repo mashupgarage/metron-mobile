@@ -365,6 +365,12 @@ export default function ReservationsScreen() {
               }}
               keyExtractor={(item, idx) => `${item.id}_${idx}`}
               loadMoreProducts={loadMoreProducts}
+              isMultiSelectMode={isMultiSelectMode}
+              selectedProducts={selectedProducts}
+              reservedProductIds={userReservationProductIds}
+              wantedProductIds={wantedProductIds}
+              toggleProductSelection={toggleProductSelection}
+              addToWantListHandler={addToWantListHandler}
             />
           ) : (
             <MasonryList
