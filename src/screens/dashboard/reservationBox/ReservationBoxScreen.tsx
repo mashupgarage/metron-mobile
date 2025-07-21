@@ -49,7 +49,6 @@ export default function ReservationBoxScreen() {
   const [reservations, setReservations] = useState<ExtendedReservationItemT[]>(
     []
   )
-  console.log("reservations", reservations.length)
   const [, setLoading] = useState(true)
   const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -149,11 +148,10 @@ export default function ReservationBoxScreen() {
               style={{
                 width: 90,
                 height: 90,
-                backgroundColor: colors.placeholder,
                 marginRight: 12,
               }}
               alt={reservation.product.title}
-              resizeMode='cover'
+              resizeMode='contain'
             />
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text
@@ -264,15 +262,15 @@ export default function ReservationBoxScreen() {
           )}
         </View>
       </View>
+      <View style={{ height: "100%" }}>
       {isGrid ? (
-        <MasonryList
-          data={reservations}
-          renderItem={(item) => {
-            return <Text>item</Text>
-          }}
-          numColumns={3}
-          contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
-          onEndReached={async () => {
+          <MasonryList
+            data={reservations}
+            renderItem={(item) => renderGridItem(item as { item: ExtendedReservationItemT })}
+            numColumns={3}
+            scrollEnabled={true}
+            contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
+            onEndReached={async () => {
             if (isFetchingMore || page >= totalPages) return
             setIsFetchingMore(true)
             try {
@@ -310,7 +308,7 @@ export default function ReservationBoxScreen() {
                 color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
-            ) : null
+            ) : <View style={{ height: Dimensions.get("window").height * 0.7 }} />
           }
         />
       ) : (
@@ -359,10 +357,11 @@ export default function ReservationBoxScreen() {
                 color={theme.primary[500]}
                 style={{ margin: 16 }}
               />
-            ) : null
+            ) : <View style={{ height: Dimensions.get("window").height * 0.7 }} />
           }
         />
       )}
+      </View>
       <View style={{ alignItems: "center", marginVertical: 24 }}>
         <Text style={[fonts.caption, { color: colors.textSecondary }]}>
           Showing {Math.min(reservations.length, totalCount)} of {totalCount}{" "}

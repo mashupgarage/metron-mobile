@@ -38,7 +38,7 @@ const ReservationCard: FC<ReservationCardProps> = ({ product }) => {
           {/* Show full screen icon if owned */}
 
           <View className='absolute top-1 left-1 right-1 bottom-1 bg-black/50 justify-center items-center'>
-            <Text style={[fonts.label, { color: theme.white }]}>
+            <Text style={[fonts.caption, { color: theme.white }]}>
               {product.status === "for_approval"
                 ? "Pending Approval"
                 : product.status}

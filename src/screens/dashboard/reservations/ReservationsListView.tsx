@@ -58,23 +58,6 @@ const ReservationsListView: React.FC<ReservationsListViewProps> = ({
                 <Check size={16} strokeWidth={3} color={theme.success} />
               </View>
             )}
-            {isMultiSelectMode && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 2,
-                  zIndex: 100,
-                  borderColor: theme.border,
-                  borderWidth: 2,
-                  backgroundColor: "rgba(0,0,0,0.0)",
-                  borderRadius: 24,
-                  padding: 2,
-                }}
-              >
-                <Check size={16} strokeWidth={3} color={"transparent"} />
-              </View>
-            )}
             <Pressable
               onPress={() => {
                 if (isMultiSelectMode) {
@@ -88,6 +71,7 @@ const ReservationsListView: React.FC<ReservationsListViewProps> = ({
               <CompactProductCard
                 product={item}
                 isReserved={isReserved}
+                isMultiSelectMode={isMultiSelectMode}
                 disabled={isMultiSelectMode && isReserved}
                 right={
                   <View
@@ -97,22 +81,24 @@ const ReservationsListView: React.FC<ReservationsListViewProps> = ({
                       gap: 8,
                     }}
                   >
-                    <TouchableOpacity
-                      onPress={() => addToWantListHandler(item.id)}
-                      disabled={isReserved}
-                      style={{ marginRight: 2, marginTop: 24 }}
-                    >
-                      {isWanted ? (
-                        <Heart
-                          fill={theme.error}
-                          color={theme.error}
-                          width={24}
-                          height={24}
-                        />
-                      ) : (
-                        <Heart color={theme.border} width={24} height={24} />
-                      )}
-                    </TouchableOpacity>
+                    {!isMultiSelectMode ? (
+                      <TouchableOpacity
+                        onPress={() => addToWantListHandler(item.id)}
+                        disabled={isReserved}
+                        style={{ marginRight: 2, marginTop: 0 }}
+                      >
+                        {isWanted ? (
+                          <Heart
+                            fill={theme.error}
+                            color={theme.error}
+                            width={24}
+                            height={24}
+                          />
+                        ) : (
+                          <Heart color={theme.border} width={24} height={24} />
+                        )}
+                      </TouchableOpacity>
+                    ) : null}
                   </View>
                 }
               />

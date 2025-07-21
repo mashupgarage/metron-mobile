@@ -23,7 +23,7 @@ const CompactProductCard: FC<CompactProductCardProps> = ({ product, onPress, dis
 
   return (
     <Box className="mb-4">
-      <HStack space='xs' style={{ flexDirection: "row", alignItems: "center", gap: 4, opacity: disabled ? 0.5 : 1 }}>
+      <HStack space='xs' style={{ flexDirection: "row", gap: 4, opacity: disabled ? 0.5 : 1 }}>
         <View className="w-1/4">
           <View style={{ position: "relative" }}>
             <Image
@@ -53,12 +53,12 @@ const CompactProductCard: FC<CompactProductCardProps> = ({ product, onPress, dis
             )}
           </View>
         </View>
-        <View style={{ flex: 1, minWidth: 0 }}>
+        <View style={{ flex: 1, minWidth: 0, maxWidth: "65%" }}>
           <Text numberOfLines={2} style={[fonts.label, { color: theme.text, fontWeight: "bold" }]}
             ellipsizeMode="tail">
             {product.title}
           </Text>
-          <Text numberOfLines={1} style={[fonts.caption, { color: theme.text }]} ellipsizeMode="tail">
+          <Text numberOfLines={2} style={[fonts.caption, { color: theme.text, marginTop: 4, lineHeight: 16 }]} ellipsizeMode="tail">
             {product.creators}
           </Text>
           {product.publisher && (

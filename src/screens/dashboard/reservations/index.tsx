@@ -782,8 +782,8 @@ export default function ReservationsScreen() {
                         <Image
                           source={{ uri: product.cover_url }}
                           alt={product.title}
-                          className='w-10 h-[60px] mr-2.5'
-                          resizeMode='cover'
+                          className='w-16 h-[60px] mr-2.5'
+                          resizeMode='contain'
                         />
                       ) : (
                         <View className='w-10 h-[60px] bg-gray-100 mr-2.5' />
@@ -791,13 +791,13 @@ export default function ReservationsScreen() {
 
                       <View className='flex-1 ml-3'>
                         <Text
-                          numberOfLines={1}
-                          style={[fonts.body, { color: theme.text }]}
+                          numberOfLines={2}
+                          style={[fonts.caption, { color: theme.text, fontWeight: "bold" }]}
                         >
                           {product.title}
                         </Text>
-                        <Text style={[fonts.body, { color: theme.text }]}>
-                          {product.formatted_price}
+                        <Text numberOfLines={1} style={[fonts.caption, { color: theme.text, marginTop: 4 }]}>
+                          {product.creators}
                         </Text>
                       </View>
                     </View>
@@ -814,7 +814,7 @@ export default function ReservationsScreen() {
                     borderColor: theme.border,
                   }}
                 >
-                  <Text style={[fonts.body, { color: theme.text }]}>
+                  <Text style={[fonts.label, { color: theme.text }]}>
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -827,7 +827,7 @@ export default function ReservationsScreen() {
                   }}
                   disabled={confirmationProducts.length === 0}
                 >
-                  <Text style={[fonts.body, { color: theme.text }]}>
+                  <Text style={[fonts.label, { color: theme.white }]}>
                     Confirm ({confirmationProducts.length})
                   </Text>
                 </TouchableOpacity>
