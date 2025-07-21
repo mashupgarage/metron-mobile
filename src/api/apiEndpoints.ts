@@ -365,9 +365,15 @@ export const addProductsToReservation = async (
   productIds: number[],
   quantities: number[]
 ) => {
+  const items = productIds.map((productId, index) => ({
+    product_id: productId,
+    quantity: quantities[index],
+  }))
   return axiosClient.post(
     `/mobile_reservations/${reservationListId}/add_products`,
-    { product_ids: productIds, quantities }
+    {
+      items: items,
+    }
   )
 }
 

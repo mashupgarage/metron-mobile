@@ -352,16 +352,6 @@ export const useReservationManager = () => {
     }
   }
 
-  // Helper: fetch products in reservation and update state
-  const refreshProductsInReservation = async (reservationListId: number) => {
-    try {
-      const prodRes = await fetchReservationProducts(reservationListId)
-      setProductsInReservation(prodRes.data || [])
-    } catch {
-      setProductsInReservation([])
-    }
-  }
-
   const confirmReservation = async () => {
     try {
       // Close modal first
@@ -372,6 +362,7 @@ export const useReservationManager = () => {
         .filter((p) => !uncheckedProducts.includes(p.id))
         .map((p) => p.id)
 
+      console.log("finalSelectedProducts", finalSelectedProducts)
       if (finalSelectedProducts.length === 0) {
         toast.show({
           placement: "top",
@@ -399,12 +390,14 @@ export const useReservationManager = () => {
 
       // Step 1: Use reservationListId if exists, otherwise create
       let currentReservationListId = reservationListId
+      console.log("currentReservationListId", currentReservationListId)
       if (!currentReservationListId) {
         try {
           const createRes = await createReservationEntry(selectedReleaseId!)
           currentReservationListId = createRes.data.reservation_list_id
           setReservationListId(currentReservationListId)
         } catch (err) {
+          console.log("err", err)
           toast.show({
             placement: "top",
             render: ({ id }) => (
@@ -417,21 +410,25 @@ export const useReservationManager = () => {
         }
       }
 
+      console.log("productsInReservation", productsInReservation)
       // Step 2: Add only products not already in reservation
-      const alreadyReservedIds = productsInReservation.map(
-        (item: any) => item.product_id || item.id
+      const alreadyReservedIds = productsInReservation?.reservations?.map(
+        (item) => item.product_id || item.id
       )
+      console.log("alreadyReservedIds", alreadyReservedIds)
       const productsToAdd = finalSelectedProducts.filter(
         (id) => !alreadyReservedIds.includes(id)
       )
+      console.log("productsToAdd", productsToAdd)
       if (productsToAdd.length > 0) {
         try {
+          console.log("sending request.", currentReservationListId)
           await addProductsToReservation(
             currentReservationListId!,
             productsToAdd,
             productsToAdd.map(() => 1)
           )
-        } catch (err) {
+        } catch {
           toast.show({
             placement: "top",
             render: ({ id }) => (
@@ -448,7 +445,7 @@ export const useReservationManager = () => {
       try {
         await submitReservation(currentReservationListId!)
         // Optionally, handle/display receiptRes.data
-      } catch (err) {
+      } catch {
         toast.show({
           placement: "top",
           render: ({ id }) => (

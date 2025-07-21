@@ -49,6 +49,7 @@ export default function ReservationBoxScreen() {
   const [reservations, setReservations] = useState<ExtendedReservationItemT[]>(
     []
   )
+  console.log("reservations", reservations.length)
   const [, setLoading] = useState(true)
   const [, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -57,7 +58,6 @@ export default function ReservationBoxScreen() {
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [debouncedQuery, setDebouncedQuery] = useState("")
-  const deviceWidth = Dimensions.get("window").width
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedQuery(searchQuery), 1500)
@@ -88,7 +88,7 @@ export default function ReservationBoxScreen() {
     setLoading(true)
     getReservationList(store.user.id, 1, PAGE_SIZE, debouncedQuery)
       .then((res) => {
-        const reservationData = (res.data.reservations || []).filter(
+        const reservationData = res.data.reservations.filter(
           (item) => item.status !== "fill"
         )
         setReservations(reservationData)
@@ -110,7 +110,7 @@ export default function ReservationBoxScreen() {
   // Accept both MasonryList ({item, i}) and FlatList ({item}) signatures
   const renderGridItem = ({ item }: { item: ExtendedReservationItemT }) => {
     const reservation = item
-    if (!reservation.product) return null
+    if (!reservation.product) return <></>
     const sanitizedProduct = {
       ...reservation.product,
       cover_url:
@@ -152,6 +152,7 @@ export default function ReservationBoxScreen() {
                 backgroundColor: colors.placeholder,
                 marginRight: 12,
               }}
+              alt={reservation.product.title}
               resizeMode='cover'
             />
             <View style={{ flex: 1, minWidth: 0 }}>
@@ -266,36 +267,11 @@ export default function ReservationBoxScreen() {
       {isGrid ? (
         <MasonryList
           data={reservations}
-          scrollEnabled
-          keyExtractor={(item) => item.id.toString()}
-          // @ts-expect-error renderItem type mismatch
-          renderItem={renderGridItem}
-          numColumns={deviceWidth > 325 ? 3 : 2}
-          style={{
-            columnGap: 12,
-            marginHorizontal: theme.spacing.md,
+          renderItem={(item) => {
+            return <Text>item</Text>
           }}
-          ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: colors.background,
-                justifyContent: "center",
-                alignItems: "center",
-                marginTop: Dimensions.get("window").height / 4,
-                padding: 16,
-              }}
-            >
-              <Text style={[fonts.body, { color: colors.text }]}>
-                We couldn&apos;t find any items in your reservation box
-                {searchQuery.length > 0
-                  ? " that matches, '" + searchQuery + "'"
-                  : ""}
-              </Text>
-            </View>
-          }
-          contentContainerStyle={{ paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
+          numColumns={3}
+          contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
           onEndReached={async () => {
             if (isFetchingMore || page >= totalPages) return
             setIsFetchingMore(true)

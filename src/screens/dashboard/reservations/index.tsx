@@ -23,6 +23,8 @@ import {
   HeartOff,
   Heart,
   HeartIcon,
+  LayoutList,
+  LayoutGrid,
 } from "lucide-react-native"
 import DashboardLayout from "../_layout"
 import { useToast, Toast, ToastTitle } from "@/src/components/ui/toast"
@@ -40,6 +42,8 @@ import { useBoundStore } from "@/src/store"
 import { useReservationManager } from "./useReservationManager"
 import { StatusBar } from "expo-status-bar"
 import { fonts } from "@/src/theme"
+import { useViewMode } from "./useViewMode"
+import ReservationsListView from "./ReservationsListView"
 
 export default function ReservationsScreen() {
   const store = useBoundStore()
@@ -109,6 +113,9 @@ export default function ReservationsScreen() {
     (state) => state.incrementWantlistCount
   )
 
+  // List/grid view mode state
+  const { viewMode, toggleViewMode } = useViewMode()
+
   // All reservation fetching and state logic is now handled in useReservationManager
   // No need to duplicate API calls or state management here.
 
@@ -125,7 +132,7 @@ export default function ReservationsScreen() {
 
   return (
     <DashboardLayout>
-      <>
+      <Box className='h-screen w-full'>
         <StatusBar style={isDark ? "light" : "dark"} />
         <Box className='h-screen w-full'>
           <ReleasesDrawer
@@ -251,8 +258,9 @@ export default function ReservationsScreen() {
                 </View>
               </View>
             )}
+            <Box className='flex-row justify-between items-center'>
             <Text
-              style={[{ color: theme.text, fontWeight: "bold", fontSize: 14 }]}
+              style={[{ color: theme.text, fontWeight: "bold", fontSize: 14, maxWidth: "90%" }]}
               className='mb-4'
             >
               {(() => {
@@ -262,6 +270,19 @@ export default function ReservationsScreen() {
                 return selectedRelease ? selectedRelease.title : ""
               })()}
             </Text>
+            <TouchableOpacity
+              className='mr-2'
+              onPress={toggleViewMode}
+            >
+              <Text style={[fonts.body, { color: theme.text }]}> 
+                    {viewMode !== "grid" ? (
+                      <LayoutList size={24} color={theme.text} />
+                    ) : (
+                      <LayoutGrid size={24} color={theme.text} />
+                    )}
+                  </Text>
+            </TouchableOpacity>
+            </Box>
             {/* Highlighted message for past releases */}
             {(() => {
               const latest = getLatestRelease(releaseDates)
@@ -327,377 +348,391 @@ export default function ReservationsScreen() {
                 </View>
               )}
           </View>
-          <MasonryList
-            data={(() => {
-              // Add debugging to see what products actually is
-              if (!Array.isArray(products)) {
-                console.log(
-                  "Products is not an array in MasonryList:",
-                  products
-                )
-                // If it's an object but not an array, try to convert it
-                if (products && typeof products === "object") {
-                  // If it has values or entries properties (like an object map)
-                  if ("values" in products) {
-                    console.log(
-                      "Attempting to convert products object to array"
-                    )
-                    return Object.values(products)
+          {viewMode === "list" ? (
+            <ReservationsListView
+              products={Array.isArray(products) ? products : []}
+              onPressProduct={(product) => {
+                getReservationList(store.user?.id).then((res) => {
+                  const reservationList = res.data.reservations
+                  // @ts-expect-error navigation.navigate is not typed
+                  navigation.navigate("Product", {
+                    product: product,
+                    fromReservations: true,
+                    reservationId: selectedReleaseId,
+                    reservationList,
+                  })
+                })
+              }}
+              keyExtractor={(item, idx) => `${item.id}_${idx}`}
+              loadMoreProducts={loadMoreProducts}
+            />
+          ) : (
+            <MasonryList
+              data={(() => {
+                // Add debugging to see what products actually is
+                if (!Array.isArray(products)) {
+                  console.log(
+                    "Products is not an array in MasonryList:",
+                    products
+                  )
+                  // If it's an object but not an array, try to convert it
+                  if (products && typeof products === "object") {
+                    // If it has values or entries properties (like an object map)
+                    if ("values" in products) {
+                      console.log(
+                        "Attempting to convert products object to array"
+                      )
+                      return Object.values(products)
+                    }
                   }
+                  return []
                 }
-                return []
-              }
-              return products
-            })()}
-            scrollEnabled
-            loading={loading && !isSearching}
-            onEndReached={loadMoreProducts}
-            onEndReachedThreshold={0.5}
-            ListEmptyComponent={
-              loading ? (
-                <View className='flex mt-56 mb-4 flex-col items-center' />
-              ) : (
-                <View className='flex mt-56 mb-4 flex-col items-center'>
-                  <View className='flex items-center'>
-                    <Image
-                      alt='Comic Odyssey Icon'
-                      key='closed'
-                      className='w-full max-h-16 scale-[0.8]'
-                      resizeMethod='scale'
-                      source={ComicOdysseyIcon}
-                    />
-                    <Text
-                      style={[fonts.caption, { color: theme.text }]}
-                      className='mt-4 mb-2'
-                    >
-                      {searchQuery.length > 0
-                        ? `No results found for "${searchQuery}"`
-                        : "The reservation list is already closed or was not found."}
-                    </Text>
-                    {searchQuery.length === 0 && (
-                      <Text style={[fonts.caption, { color: theme.text }]}>
-                        Please come back on Friday for the new releases!
+                return products
+              })()}
+              scrollEnabled
+              loading={loading && !isSearching}
+              onEndReached={loadMoreProducts}
+              onEndReachedThreshold={0.5}
+              ListEmptyComponent={
+                loading ? (
+                  <View className='flex mt-56 mb-4 flex-col items-center' />
+                ) : (
+                  <View className='flex mt-56 mb-4 flex-col items-center'>
+                    <View className='flex items-center'>
+                      <Image
+                        alt='Comic Odyssey Icon'
+                        key='closed'
+                        className='w-full max-h-16 scale-[0.8]'
+                        resizeMethod='scale'
+                        source={ComicOdysseyIcon}
+                      />
+                      <Text
+                        style={[fonts.caption, { color: theme.text }]}
+                        className='mt-4 mb-2'
+                      >
+                        {searchQuery.length > 0
+                          ? `No results found for "${searchQuery}"`
+                          : "The reservation list is already closed or was not found."}
                       </Text>
-                    )}
+                      {searchQuery.length === 0 && (
+                        <Text style={[fonts.caption, { color: theme.text }]}>
+                          Please come back on Friday for the new releases!
+                        </Text>
+                      )}
+                    </View>
                   </View>
-                </View>
-              )
-            }
-            ListFooterComponent={
-              <Box className='py-4 flex justify-center items-center'>
-                {(loading || isFetchingMore) && (
-                  <View>
-                    <ActivityIndicator
-                      size='small'
-                      color={theme.primary[500]}
-                    />
+                )
+              }
+              ListFooterComponent={
+                <Box className='py-4 flex justify-center items-center'>
+                  {(loading || isFetchingMore) && (
+                    <View>
+                      <ActivityIndicator
+                        size='small'
+                        color={theme.primary[500]}
+                      />
+                      <Text
+                        className='mt-2'
+                        style={[fonts.body, { color: theme.text }]}
+                      >
+                        Loading products...
+                      </Text>
+                    </View>
+                  )}
+
+                  {Array.isArray(products) && products.length > 0 && (
                     <Text
-                      className='mt-2'
+                      className='text-sm text-gray-500 mt-2'
                       style={[fonts.body, { color: theme.text }]}
                     >
-                      Loading products...
+                      Showing {products.length} of {totalCount} products
                     </Text>
-                  </View>
-                )}
-
-                {Array.isArray(products) && products.length > 0 && (
+                  )}
+                </Box>
+              }
+              LoadingView={
+                <View>
+                  <Image
+                    alt='Comic Odyssey Icon'
+                    key='loading'
+                    className='w-full max-h-16 scale-[0.8] align-center'
+                    resizeMethod='scale'
+                    source={ComicOdysseyIcon}
+                  />
                   <Text
-                    className='text-sm text-gray-500 mt-2'
                     style={[fonts.body, { color: theme.text }]}
+                    className='mt-4 text-center mb-2'
                   >
-                    Showing {products.length} of {totalCount} products Showing{" "}
-                    {products.length} of {totalCount} products
+                    {isSearching
+                      ? `Searching for "${searchQuery}"...`
+                      : "Hang tight, we're loading the latest releases!"}
                   </Text>
-                )}
-              </Box>
-            }
-            LoadingView={
-              <View>
-                <Image
-                  alt='Comic Odyssey Icon'
-                  key='loading'
-                  className='w-full max-h-16 scale-[0.8] align-center'
-                  resizeMethod='scale'
-                  source={ComicOdysseyIcon}
-                />
-                <Text
-                  style={[fonts.body, { color: theme.text }]}
-                  className='mt-4 text-center mb-2'
-                >
-                  {isSearching
-                    ? `Searching for "${searchQuery}"...`
-                    : "Hang tight, we're loading the latest releases!"}
-                </Text>
-              </View>
-            }
-            numColumns={deviceWidth > 325 ? 3 : 2}
-            keyExtractor={(item) => {
-              // Use _uniqueKey from search results if available, otherwise use product id
-              return item._uniqueKey || `${item.id}_${Date.now()}`
-            }}
-            style={{
-              columnGap: 12,
-              marginHorizontal: theme.spacing.sm,
-            }}
-            renderItem={({ item }) => {
-              const product = item as ProductT
-              const isWanted = wantedProductIds.includes(product.id)
-              const isSelected = selectedProducts.includes(product.id)
-              return (
-                <>
-                  <View>
-                    <Pressable
-                      onPress={() => {
-                        if (isMultiSelectMode) {
-                          // Prevent selecting already reserved products in the current view
-                          // or products that are already in the user's reservation list
-                          if (isOldRelease()) {
-                            toast.show({
-                              placement: "top",
-                              render: ({ id }) => (
-                                <Toast
-                                  nativeID={"toast-" + id}
-                                  action='warning'
-                                >
-                                  <ToastTitle>
-                                    Cannot reserve from past releases
-                                  </ToastTitle>
-                                </Toast>
-                              ),
-                            })
-                          } else if (
-                            !reservedProductIds.includes(product.id) &&
-                            !userReservationProductIds.includes(product.id)
-                          ) {
-                            toggleProductSelection(product.id)
-                          } else if (
-                            userReservationProductIds.includes(product.id)
-                          ) {
-                            toast.show({
-                              placement: "top",
-                              render: ({ id }) => (
-                                <Toast
-                                  nativeID={"toast-" + id}
-                                  action='warning'
-                                >
-                                  <ToastTitle>
-                                    Already in your reservation list
-                                  </ToastTitle>
-                                </Toast>
-                              ),
+                </View>
+              }
+              numColumns={deviceWidth > 325 ? 3 : 2}
+              keyExtractor={(item) => {
+                // Use _uniqueKey from search results if available, otherwise use product id
+                return item._uniqueKey || `${item.id}_${Date.now()}`
+              }}
+              style={{
+                columnGap: 12,
+                marginHorizontal: theme.spacing.sm,
+              }}
+              renderItem={({ item }) => {
+                const product = item as ProductT
+                const isWanted = wantedProductIds.includes(product.id)
+                const isSelected = selectedProducts.includes(product.id)
+                return (
+                  <>
+                    <View>
+                      <Pressable
+                        onPress={() => {
+                          if (isMultiSelectMode) {
+                            // Prevent selecting already reserved products in the current view
+                            // or products that are already in the user's reservation list
+                            if (isOldRelease()) {
+                              toast.show({
+                                placement: "top",
+                                render: ({ id }) => (
+                                  <Toast
+                                    nativeID={"toast-" + id}
+                                    action='warning'
+                                  >
+                                    <ToastTitle>
+                                      Cannot reserve from past releases
+                                    </ToastTitle>
+                                  </Toast>
+                                ),
+                              })
+                            } else if (
+                              !reservedProductIds.includes(product.id) &&
+                              !userReservationProductIds.includes(product.id)
+                            ) {
+                              toggleProductSelection(product.id)
+                            } else if (
+                              userReservationProductIds.includes(product.id)
+                            ) {
+                              toast.show({
+                                placement: "top",
+                                render: ({ id }) => (
+                                  <Toast
+                                    nativeID={"toast-" + id}
+                                    action='warning'
+                                  >
+                                    <ToastTitle>
+                                      Already in your reservation list
+                                    </ToastTitle>
+                                  </Toast>
+                                ),
+                              })
+                            }
+                          } else {
+                            getReservationList(store.user?.id).then((res) => {
+                              const reservationList = res.data.reservations
+                              // @ts-expect-error navigation.navigate is not typed
+                              navigation.navigate("Product", {
+                                product: product,
+                                fromReservations: true,
+                                reservationId: selectedReleaseId,
+                                reservationList,
+                              })
                             })
                           }
-                        } else {
-                          getReservationList(store.user?.id).then((res) => {
-                            const reservationList = res.data.reservations
-                            // @ts-expect-error navigation.navigate is not typed
-                            navigation.navigate("Product", {
-                              product: product,
-                              fromReservations: true,
-                              reservationId: selectedReleaseId,
-                              reservationList,
-                            })
-                          })
-                        }
-                      }}
-                      style={({ pressed }) => [
-                        { opacity: pressed ? 0.7 : 1 },
-                        // Reduce opacity for products that can't be selected (already reserved in UI or in user's list or old release)
-                        isMultiSelectMode &&
-                        (reservedProductIds.includes(product.id) ||
-                          userReservationProductIds.includes(product.id) ||
-                          isOldRelease())
-                          ? { opacity: 0.4 }
-                          : {},
-                        // Show different visual styling for products already in user's reservation list
-                        isMultiSelectMode &&
-                        userReservationProductIds.includes(product.id)
-                          ? {
+                        }}
+                        style={({ pressed }) => [
+                          { opacity: pressed ? 0.7 : 1 },
+                          // Reduce opacity for products that can't be selected (already reserved in UI or in user's list or old release)
+                          isMultiSelectMode &&
+                            (reservedProductIds.includes(product.id) ||
+                              userReservationProductIds.includes(product.id) ||
+                              isOldRelease())
+                            ? { opacity: 0.4 }
+                            : {},
+                          // Show different visual styling for products already in user's reservation list
+                          isMultiSelectMode &&
+                            userReservationProductIds.includes(product.id)
+                            ? {
                               borderWidth: 1,
                               borderColor: "#FF9800",
                               borderRadius: 12,
                               backgroundColor: "rgba(255, 152, 0, 0.1)",
                             }
-                          : {},
-                        isMultiSelectMode && isSelected
-                          ? {
+                            : {},
+                          isMultiSelectMode && isSelected
+                            ? {
                               borderWidth: 4,
                               borderColor: theme.primary[500],
                               borderRadius: 8,
                             }
-                          : {},
-                      ]}
-                    >
-                      <Box className='mb-2' style={{ width: thirdWidth * 0.9 }}>
-                        <View>
-                          {product.cover_url && !imageErrors[product.id] ? (
-                            // Show actual image if URL exists and no error
-                            <View
-                              style={{
-                                position: "relative",
-                                width: thirdWidth * 0.9,
-                                height: 200,
-                              }}
-                            >
-                              {/* Overlay only if reserved */}
-                              {userReservationProductIds.includes(
-                                product.id
-                              ) && (
-                                <View
-                                  style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    backgroundColor: "rgba(0,0,0,0.5)",
-                                    zIndex: 1,
-                                    borderRadius: 8,
-                                  }}
-                                />
-                              )}
-                              {/* selected as reserved */}
-                              {isMultiSelectMode && isSelected && (
-                                <View
-                                  style={{
-                                    position: "absolute",
-                                    top: 4,
-                                    left: 4,
-                                    zIndex: 4,
-                                    backgroundColor: "rgba(0,0,0,0.8)",
-                                    borderRadius: 24,
-                                    padding: 4,
-                                  }}
-                                >
-                                  <Check
-                                    size={20}
-                                    strokeWidth={3}
-                                    color={theme.success}
-                                  />
-                                </View>
-                              )}
-                              <TouchableOpacity
-                                className={`px-2 py-2 absolute ${
-                                  isWanted ? "opacity-80" : "opacity-100"
-                                }`}
-                                style={{ zIndex: 2, right: 0 }}
-                                disabled={isWanted}
-                                onPress={async () => {
-                                  try {
-                                    await addToWantListHandler(product.id)
-                                    incrementWantlistCount()
-                                    alert("Added to your want list!")
-                                  } catch (e) {
-                                    console.log(e)
-                                    alert("Failed to add to want list.")
-                                  }
+                            : {},
+                        ]}
+                      >
+                        <Box className='mb-2' style={{ width: thirdWidth * 0.9 }}>
+                          <View>
+                            {product.cover_url && !imageErrors[product.id] ? (
+                              // Show actual image if URL exists and no error
+                              <View
+                                style={{
+                                  position: "relative",
+                                  width: thirdWidth * 0.9,
+                                  height: 200,
                                 }}
                               >
-                                {isWanted ? (
-                                  <Heart
-                                    size={20}
-                                    stroke={theme.error}
-                                    fill={theme.error}
-                                  />
-                                ) : (
-                                  <HeartIcon
-                                    size={20}
-                                    color={theme.error}
-                                    strokeWidth={3}
-                                    // fill={theme.primary[500]}
-                                  />
+                                {/* Overlay only if reserved */}
+                                {userReservationProductIds.includes(
+                                  product.id
+                                ) && (
+                                    <View
+                                      style={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        backgroundColor: "rgba(0,0,0,0.5)",
+                                        zIndex: 1,
+                                        borderRadius: 8,
+                                      }}
+                                    />
+                                  )}
+                                {/* selected as reserved */}
+                                {isMultiSelectMode && isSelected && (
+                                  <View
+                                    style={{
+                                      position: "absolute",
+                                      top: 4,
+                                      left: 4,
+                                      zIndex: 4,
+                                      backgroundColor: "rgba(0,0,0,0.8)",
+                                      borderRadius: 24,
+                                      padding: 4,
+                                    }}
+                                  >
+                                    <Check
+                                      size={20}
+                                      strokeWidth={3}
+                                      color={theme.success}
+                                    />
+                                  </View>
                                 )}
-                              </TouchableOpacity>
-                              {/* Already Reserved text above overlay */}
-                              {userReservationProductIds.includes(
-                                product.id
-                              ) && (
-                                <View
-                                  style={{
-                                    alignItems: "flex-end",
-                                    position: "absolute",
-                                    top: 80,
-                                    right: 0,
-                                    zIndex: 2,
+                                <TouchableOpacity
+                                  className={`px-2 py-2 absolute ${isWanted ? "opacity-80" : "opacity-100"
+                                    }`}
+                                  style={{ zIndex: 2, right: 0 }}
+                                  disabled={isWanted}
+                                  onPress={async () => {
+                                    try {
+                                      await addToWantListHandler(product.id)
+                                      incrementWantlistCount()
+                                      alert("Added to your want list!")
+                                    } catch (e) {
+                                      console.log(e)
+                                      alert("Failed to add to want list.")
+                                    }
                                   }}
                                 >
-                                  <Text
-                                    style={[
-                                      fonts.caption,
-                                      { color: theme.white },
-                                    ]}
-                                    className='px-2'
-                                  >
-                                    Already Reserved
-                                  </Text>
-                                </View>
-                              )}
-                              {/* Product image always at bottom */}
-                              <Image
-                                source={{
-                                  uri:
-                                    product.cover_url ??
-                                    `https://assets.comic-odyssey.com/products/covers/small/${
-                                      product.cover_url || ""
-                                    }`,
-                                }}
-                                size='full'
-                                alt={product.id.toString()}
-                                resizeMode='cover'
-                                onError={() => {
-                                  console.log(
-                                    `Failed to load image for product: ${product.id}`
-                                  )
-                                  setImageErrors((prev) => ({
-                                    ...prev,
-                                    [product.id]: true,
-                                  }))
-                                }}
-                              />
+                                  {isWanted ? (
+                                    <Heart
+                                      size={20}
+                                      stroke={theme.error}
+                                      fill={theme.error}
+                                    />
+                                  ) : (
+                                    <HeartIcon
+                                      size={20}
+                                      color={theme.error}
+                                      strokeWidth={3}
+                                    // fill={theme.primary[500]}
+                                    />
+                                  )}
+                                </TouchableOpacity>
+                                {/* Already Reserved text above overlay */}
+                                {userReservationProductIds.includes(
+                                  product.id
+                                ) && (
+                                    <View
+                                      style={{
+                                        alignItems: "flex-end",
+                                        position: "absolute",
+                                        top: 80,
+                                        right: 0,
+                                        zIndex: 2,
+                                      }}
+                                    >
+                                      <Text
+                                        style={[
+                                          fonts.caption,
+                                          { color: theme.white },
+                                        ]}
+                                        className='px-2'
+                                      >
+                                        Already Reserved
+                                      </Text>
+                                    </View>
+                                  )}
+                                {/* Product image always at bottom */}
+                                <Image
+                                  source={{
+                                    uri:
+                                      product.cover_url ??
+                                      `https://assets.comic-odyssey.com/products/covers/small/${product.cover_url || ""
+                                      }`,
+                                  }}
+                                  size='full'
+                                  alt={product.id.toString()}
+                                  resizeMode='cover'
+                                  onError={() => {
+                                    console.log(
+                                      `Failed to load image for product: ${product.id}`
+                                    )
+                                    setImageErrors((prev) => ({
+                                      ...prev,
+                                      [product.id]: true,
+                                    }))
+                                  }}
+                                />
+                              </View>
+                            ) : (
+                              // Show placeholder when URL is missing or there was an error
+                              <View className='h-60 w-[130px] bg-gray-200 flex items-center justify-center'>
+                                <Image
+                                  source={ComicOdysseyIcon}
+                                  alt='Placeholder'
+                                  className='w-32 h-32 opacity-70'
+                                  resizeMode='contain'
+                                />
+                              </View>
+                            )}
+                            <View className='mt-2 px-2'>
+                              <Text
+                                style={[
+                                  fonts.label,
+                                  { color: theme.text, fontWeight: "bold" },
+                                ]}
+                                numberOfLines={1}
+                                ellipsizeMode='tail'
+                              >
+                                {product.title}
+                              </Text>
+                              <Text
+                                style={[fonts.caption, { color: theme.text }]}
+                                numberOfLines={1}
+                                ellipsizeMode='tail'
+                                className='text-gray-600'
+                              >
+                                {product.creators}
+                              </Text>
                             </View>
-                          ) : (
-                            // Show placeholder when URL is missing or there was an error
-                            <View className='h-60 w-[130px] bg-gray-200 flex items-center justify-center'>
-                              <Image
-                                source={ComicOdysseyIcon}
-                                alt='Placeholder'
-                                className='w-32 h-32 opacity-70'
-                                resizeMode='contain'
-                              />
-                            </View>
-                          )}
-                          <View className='mt-2 px-2'>
-                            <Text
-                              style={[
-                                fonts.label,
-                                { color: theme.text, fontWeight: "bold" },
-                              ]}
-                              numberOfLines={1}
-                              ellipsizeMode='tail'
-                            >
-                              {product.title}
-                            </Text>
-                            <Text
-                              style={[fonts.caption, { color: theme.text }]}
-                              numberOfLines={1}
-                              ellipsizeMode='tail'
-                              className='text-gray-600'
-                            >
-                              {product.creators}
-                            </Text>
                           </View>
-                        </View>
-                      </Box>
-                    </Pressable>
-                  </View>
-                </>
-              )
-            }}
-          />
-          <Box className='h-12' />
-        </Box>
-
-        {/* Confirmation Modal */}
+                        </Box>
+                      </Pressable>
+                    </View>
+                  </>
+                )
+              }}
+            />
+          )}
+          {/* Confirmation Modal */}
         <Modal
           animationType='slide'
           transparent={true}
@@ -793,8 +828,11 @@ export default function ReservationsScreen() {
               </View>
             </View>
           </View>
-        </Modal>
-      </>
+          </Modal>
+          
+      
+        </Box>
+      </Box>
     </DashboardLayout>
   )
 }
