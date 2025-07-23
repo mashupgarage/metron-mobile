@@ -2,21 +2,14 @@ import React, { useEffect, useState } from "react"
 import {
   View,
   Text,
-  Image,
-  ActivityIndicator,
-  TouchableOpacity,
-  FlatList,
   TextInput,
-  Pressable,
-  Dimensions,
+  TouchableOpacity,
 } from "react-native"
-import MasonryList from "@react-native-seoul/masonry-list"
-import { LayoutGrid, LayoutList } from "lucide-react-native"
 import { useBoundStore } from "@/src/store"
 import { getReservationList } from "@/src/api/apiEndpoints"
 import { ProductT, ReservationItemT } from "@/src/utils/types/common"
 import { useNavigation } from "@react-navigation/native"
-import ReservationCard from "@/src/components/ReservationCard"
+import { ProductListing } from "@/src/components/product-listing"
 import { fonts } from "@/src/theme"
 
 const PAGE_SIZE = 50
@@ -106,123 +99,33 @@ export default function ReservationBoxScreen() {
       })
   }, [store.user, navigation, debouncedQuery])
 
-  // Accept both MasonryList ({item, i}) and FlatList ({item}) signatures
-  const renderGridItem = ({ item }: { item: ExtendedReservationItemT }) => {
-    const reservation = item
-    if (!reservation.product) return <></>
-    const sanitizedProduct = {
-      ...reservation.product,
-      cover_url:
-        typeof reservation.product.cover_url === "string" &&
-        reservation.product.cover_url.trim() !== ""
-          ? reservation.product.cover_url
-          : reservation.product.cover_file_name
-          ? `https://assets.comic-odyssey.com/products/covers/medium/${reservation.product.cover_file_name}`
-          : "",
-      status: reservation.status,
-    }
-    const publisher = reservation.product.publisher || ""
-    // Grid: image top, text below. List: image left, text right.
-    if (isGrid) {
-      return (
-        <Pressable key={reservation.id}>
-          <ReservationCard product={sanitizedProduct as unknown as ProductT} />
-        </Pressable>
-      )
-    } else {
-      return (
-        <Pressable key={reservation.id} style={{ flex: 1, padding: 4 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              overflow: "hidden",
-              alignItems: "center",
-              shadowColor: colors.cardShadow,
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.13,
-              shadowRadius: 4,
-            }}
-          >
-            <Image
-              source={{ uri: sanitizedProduct.cover_url }}
-              style={{
-                width: 90,
-                height: 90,
-                marginRight: 12,
-              }}
-              alt={reservation.product.title}
-              resizeMode='contain'
-            />
-            <View style={{ flex: 1, minWidth: 0 }}>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode='tail'
-                style={[fonts.label, { color: colors.text }]}
-              >
-                {reservation.product.title}
-              </Text>
-              <Text
-                numberOfLines={1}
-                style={[
-                  fonts.caption,
-                  {
-                    color: colors.text,
-                  },
-                ]}
-              >
-                {reservation.product.creators}
-              </Text>
-              {publisher ? (
-                <Text
-                  numberOfLines={1}
-                  style={[fonts.caption, { color: colors.text }]}
-                >
-                  {publisher}
-                </Text>
-              ) : null}
-              <Text
-                style={[
-                  fonts.caption,
-                  { color: colors.text, marginTop: theme.spacing.sm },
-                ]}
-                numberOfLines={1}
-              >
-                Status:{" "}
-                {reservation.status === "for_approval"
-                  ? "Pending Approval"
-                  : reservation.status}
-              </Text>
-            </View>
-          </View>
-        </Pressable>
-      )
-    }
-  }
+  // Transform reservations to product listing data with overlays
+  const products = reservations
+    .filter((reservation) => reservation.product)
+    .map((reservation) => {
+      const product: ProductT & { reservationStatus: string } = {
+        ...(reservation.product as ProductT),
+        cover_url:
+          typeof reservation.product?.cover_url === "string" && reservation.product.cover_url.trim() !== ""
+            ? reservation.product.cover_url
+            : reservation.product?.cover_file_name
+            ? `https://assets.comic-odyssey.com/products/covers/medium/${reservation.product.cover_file_name}`
+            : "",
+        reservationStatus: reservation.status,
+      }
+      return {
+        ...product,
+        reservationStatus: reservation.status,
+        isReserved: reservation.status === "reserved",
+        // Optionally: add reservationId for key
+        reservationId: reservation.id,
+      }
+    })
 
   return (
     <>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          paddingHorizontal: 16,
-          marginBottom: theme.spacing.md,
-        }}
-      >
-        <Text style={[fonts.title, { color: colors.text }]}>Reservations</Text>
-        <TouchableOpacity
-          style={{ padding: 0, borderRadius: 999 }}
-          onPress={() => setIsGrid((prev) => !prev)}
-        >
-          {isGrid ? (
-            <LayoutList size={24} color={colors.icon} />
-          ) : (
-            <LayoutGrid size={24} color={colors.icon} />
-          )}
-        </TouchableOpacity>
-      </View>
       {/* Search Bar */}
-      <View style={{ paddingHorizontal: 16, marginBottom: theme.spacing.xl }}>
+      <View style={{ paddingHorizontal: 16 }}>
         <View style={{ position: "relative" }}>
           <TextInput
             placeholder='Search by title...'
@@ -263,104 +166,13 @@ export default function ReservationBoxScreen() {
         </View>
       </View>
       <View style={{ height: "100%" }}>
-      {isGrid ? (
-          <MasonryList
-            data={reservations}
-            renderItem={(item) => renderGridItem(item as { item: ExtendedReservationItemT })}
-            numColumns={3}
-            scrollEnabled={true}
-            contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
-            onEndReached={async () => {
-            if (isFetchingMore || page >= totalPages) return
-            setIsFetchingMore(true)
-            try {
-              const nextPage = page + 1
-              const res = await getReservationList(
-                store.user.id,
-                nextPage,
-                PAGE_SIZE,
-                debouncedQuery
-              )
-              const newReservations = (res.data.reservations || []).filter(
-                (item) => item.status !== "fill"
-              )
-              setReservations((prev) => {
-                const existingIds = new Set(prev.map((item) => item.id))
-                const filtered = newReservations.filter(
-                  (item) => !existingIds.has(item.id)
-                )
-                const combined = [...prev, ...filtered]
-                return combined
-              })
-              setPage(nextPage)
-              setTotalPages(res.data.metadata?.total_pages || totalPages)
-            } catch (err) {
-              console.error("Failed to fetch more reservations:", err)
-            } finally {
-              setIsFetchingMore(false)
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            isFetchingMore && page < totalPages ? (
-              <ActivityIndicator
-                size='small'
-                color={theme.primary[500]}
-                style={{ margin: 16 }}
-              />
-            ) : <View style={{ height: Dimensions.get("window").height * 0.7 }} />
-          }
+        <ProductListing
+          title="Reservations"
+          products={products}
+          showReservationStatus={true}
+          showPadding={true}
+          loading={isFetchingMore && page < totalPages} 
         />
-      ) : (
-        <FlatList
-          data={reservations}
-          renderItem={renderGridItem}
-          numColumns={1}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingHorizontal: 4, paddingBottom: 24 }}
-          showsVerticalScrollIndicator={false}
-          onEndReached={async () => {
-            if (isFetchingMore || page >= totalPages) return
-            setIsFetchingMore(true)
-            try {
-              const nextPage = page + 1
-              const res = await getReservationList(
-                store.user.id,
-                nextPage,
-                PAGE_SIZE,
-                debouncedQuery
-              )
-              const newReservations = (res.data.reservations || []).filter(
-                (item) => item.status !== "fill"
-              )
-              setReservations((prev) => {
-                const existingIds = new Set(prev.map((item) => item.id))
-                const filtered = newReservations.filter(
-                  (item) => !existingIds.has(item.id)
-                )
-                const combined = [...prev, ...filtered]
-                return combined
-              })
-              setPage(nextPage)
-              setTotalPages(res.data.metadata?.total_pages || totalPages)
-            } catch (err) {
-              console.error("Failed to fetch more reservations:", err)
-            } finally {
-              setIsFetchingMore(false)
-            }
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            isFetchingMore && page < totalPages ? (
-              <ActivityIndicator
-                size='small'
-                color={theme.primary[500]}
-                style={{ margin: 16 }}
-              />
-            ) : <View style={{ height: Dimensions.get("window").height * 0.7 }} />
-          }
-        />
-      )}
       </View>
       <View style={{ alignItems: "center", marginVertical: 24 }}>
         <Text style={[fonts.caption, { color: colors.textSecondary }]}>

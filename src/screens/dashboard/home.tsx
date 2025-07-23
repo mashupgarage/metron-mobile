@@ -10,11 +10,6 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native"
-import MasonryList from "@react-native-seoul/masonry-list"
-
-import ProductCard from "@/src/components/rework/product-card"
-import { ProductT } from "@/src/utils/types/common"
-import { Pressable } from "react-native-gesture-handler"
 import {
   NavigationProp,
   useNavigation,
@@ -34,7 +29,6 @@ import {
 } from "@/src/api/apiEndpoints"
 import Constants from "expo-constants"
 
-import { LayoutGrid, LayoutList } from "lucide-react-native"
 import { fonts } from "@/src/theme"
 import { ProductListing } from "@/src/components/product-listing"
 
@@ -242,9 +236,9 @@ export default function Home() {
   ]
 
   return (
-    <Box
-      className='h-screen w-full pb-24'
+    <View 
       style={{
+        height: 'auto',
         backgroundColor: theme.background,
       }}
     >
@@ -380,6 +374,6 @@ export default function Home() {
           </Box>
         }
       />
-    </Box>
+    </View>
   )
 }

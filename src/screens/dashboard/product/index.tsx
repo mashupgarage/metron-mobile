@@ -469,7 +469,7 @@ export default function Product(props: {
                         marginRight: theme.spacing.md,
                       }}
                     >
-                      <ProductCard product={item} />
+                      <ProductCard grid product={item} />
                     </Box>
                   )}
                   ListEmptyComponent={() =>

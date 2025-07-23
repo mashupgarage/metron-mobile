@@ -579,9 +579,9 @@ export default function ReservationsScreen() {
                         <ProductCard
                           product={product}
                           grid
-                          isReserved={userReservationProductIds.includes(
+                          reservationStatus={userReservationProductIds.includes(
                             product.id
-                          )}
+                          ) ? "Reserved" : ""}
                           isSelected={isMultiSelectMode && isSelected}
                           isWanted={isWanted}
                           showWantListButton

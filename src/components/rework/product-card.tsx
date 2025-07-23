@@ -20,7 +20,9 @@ interface ProductCardProps {
   onWantListPress?: () => void
   showAlreadyReservedText?: boolean
   reservedOverlayBottom?: number
+  reservationStatus?: string
   children?: React.ReactNode
+  isInCart?: boolean
 }
 
 const ProductCard: FC<ProductCardProps> = ({
@@ -34,6 +36,8 @@ const ProductCard: FC<ProductCardProps> = ({
   onWantListPress,
   showAlreadyReservedText,
   reservedOverlayBottom = 0,
+  reservationStatus,
+  isInCart = false,
 }) => {
   const [imgError, setImgError] = useState(false)
   const theme = useBoundStore((state) => state.theme)
@@ -44,24 +48,31 @@ const ProductCard: FC<ProductCardProps> = ({
 
   return grid ? (
     <Box className='mb-2' style={{ position: "relative" }}>
-      {/* Reserved overlay */}
-      {isReserved && (
+      {/* Reservation status overlay (grid) */}
+      { (isReserved || reservationStatus) && (
         <View
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom:
-              typeof reservedOverlayBottom === "number"
-                ? reservedOverlayBottom - 4
-                : 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 2,
-            borderRadius: 0,
-          }}
-          pointerEvents='none'
-        />
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 3,
+          borderRadius: 0,
+        }}
+        pointerEvents='none'
+      >
+          <Box className='absolute transform translate-y-4 translate-x-1 rounded-full mr-1 z-40 bg-orange-500 p-1 pl-4 pr-4 justify-center items-center'>
+            <Text
+              style={[
+                theme.fonts.caption,
+                { color: theme.white, fontWeight: "bold" },
+              ]}
+            >
+               {reservationStatus === "for_approval" ? "Pending" : reservationStatus}
+            </Text>
+          </Box>
+      </View>
       )}
       {/* Selection checkmark */}
       {isSelected && (
@@ -192,13 +203,13 @@ const ProductCard: FC<ProductCardProps> = ({
         </View>
       )}
       <>
-        {/* Reserved overlay */}
+        {/* Reserved badge (list) */}
         {isReserved && (
-          <Box className='absolute transform translate-y-16 translate-x-3 rounded-full mr-1 z-40 bg-black w-20 h-8 p-2'>
+          <Box className='absolute transform translate-y-16 translate-x-3 rounded-full mr-1 z-40 bg-orange-500 w-20 h-8 p-2 justify-center items-center'>
             <Text
               style={[
                 theme.fonts.caption,
-                { color: theme.white },
+                { color: theme.white, fontWeight: "bold" },
               ]}
             >
               Reserved
@@ -238,11 +249,36 @@ const ProductCard: FC<ProductCardProps> = ({
           {product.creators}
         </Text>
         <Text
-          style={{ color: theme.text, marginVertical: 4 }}
+          style={{ color: theme.text, marginTop: 4 }}
           className='text-sm'
         >
           {product.publisher}
-        </Text>
+          </Text>
+          {isInCart && (
+            <Text
+            style={{ color: theme.text, ...theme.fonts.label }}
+          >
+            {product.formatted_price}
+          </Text>
+          )}
+          {/* Reservation status badge (list) */}
+        {reservationStatus && (
+          <Text
+            style={[
+              fonts.caption,
+              {
+                color: theme.white,
+                backgroundColor: theme.gray[800],
+                borderRadius: 8,
+                paddingVertical: 2,
+                alignSelf: "flex-start",
+                paddingHorizontal: 8,
+              },
+            ]}
+          >
+            {reservationStatus === "for_approval" ? "Pending Approval" : reservationStatus}
+          </Text>
+        )}
       </Box>
       <Box style={{ position: "absolute", right: 5, top: 2 }}>
         {showWantListButton && (
