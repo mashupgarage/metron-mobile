@@ -39,7 +39,7 @@ import {
   useProductSeriesStatus,
   useProductRecommendations,
 } from "./productHooks"
-import ProductCard from "@/src/components/product"
+import ProductCard from "@/src/components/rework/product-card"
 import { VStack } from "@/src/components/ui/vstack"
 import { fonts } from "@/src/theme"
 

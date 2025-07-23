@@ -1,7 +1,7 @@
 import React from "react"
 import { FlatList, Pressable, View, TouchableOpacity } from "react-native"
 import { Check, Heart, HeartOff } from "lucide-react-native"
-import CompactProductCard from "@/src/components/CompactProductCard"
+import ProductCard from "@/src/components/rework/product-card"
 import { ProductT } from "@/src/utils/types/common"
 import { Box } from "@/src/components/ui/box"
 import { Text } from "@/src/components/ui/text"
@@ -43,21 +43,6 @@ const ReservationsListView: React.FC<ReservationsListViewProps> = ({
         const isWanted = wantedProductIds.includes(item.id)
         return (
           <>
-            {isSelected && isMultiSelectMode && (
-              <View
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  right: 2,
-                  zIndex: 100,
-                  backgroundColor: "rgba(0,0,0,0.8)",
-                  borderRadius: 24,
-                  padding: 4,
-                }}
-              >
-                <Check size={16} strokeWidth={3} color={theme.success} />
-              </View>
-            )}
             <Pressable
               onPress={() => {
                 if (isMultiSelectMode) {
@@ -68,48 +53,17 @@ const ReservationsListView: React.FC<ReservationsListViewProps> = ({
               }}
               disabled={isMultiSelectMode && isReserved}
             >
-              <CompactProductCard
+              <ProductCard
                 product={item}
+                showWantListButton
+                isWanted={isWanted}
                 isReserved={isReserved}
-                isMultiSelectMode={isMultiSelectMode}
-                disabled={isMultiSelectMode && isReserved}
-                right={
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 8,
-                    }}
-                  >
-                    {!isMultiSelectMode ? (
-                      <TouchableOpacity
-                        onPress={() => addToWantListHandler(item.id)}
-                        disabled={isReserved}
-                        style={{ marginRight: 2, marginTop: 0 }}
-                      >
-                        {isWanted ? (
-                          <Heart
-                            fill={theme.error}
-                            color={theme.error}
-                            width={24}
-                            height={24}
-                          />
-                        ) : (
-                          <Heart color={theme.border} width={24} height={24} />
-                        )}
-                      </TouchableOpacity>
-                    ) : null}
-                  </View>
-                }
+                isSelected={isSelected}
+                showAlreadyReservedText
+                reservedOverlayBottom={16}
+                onWantListPress={() => addToWantListHandler(item.id)}
               />
             </Pressable>
-            {isReserved && (
-              <Box className='absolute transform translate-y-16 translate-x-4 rounded-full p-1 mr-1'>
-                <Text style={[theme.fonts.caption, { color: theme.white, fontWeight: "bold" }]}>
-                  Reserved
-                </Text>
-              </Box>
-            )}
           </>
         )
       }}

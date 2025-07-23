@@ -12,7 +12,7 @@ import {
 } from "react-native"
 import MasonryList from "@react-native-seoul/masonry-list"
 
-import ProductCard from "@/src/components/product"
+import ProductCard from "@/src/components/rework/product-card"
 import { ProductT } from "@/src/utils/types/common"
 import { Pressable } from "react-native-gesture-handler"
 import {
@@ -36,6 +36,7 @@ import Constants from "expo-constants"
 
 import { LayoutGrid, LayoutList } from "lucide-react-native"
 import { fonts } from "@/src/theme"
+import { ProductListing } from "@/src/components/product-listing"
 
 const PAGE_SIZE = 10 // Define standard page size
 
@@ -247,12 +248,10 @@ export default function Home() {
         backgroundColor: theme.background,
       }}
     >
-      {/* Loading overlay */}
-      <MasonryList
-        data={products}
-        scrollEnabled
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
+      <ProductListing
+        title="Featured Products"
+        products={products}
+        loading={isLoading}
         ListHeaderComponent={
           <Box>
             <Box className='h-36'>
@@ -378,97 +377,8 @@ export default function Home() {
                 </Button>
               </HStack>
             </Box>
-            <HStack className='justify-between mr-2 ml-2'>
-              <Box className='p-2 mt-4'>
-                <Text
-                  style={[
-                    fonts.title,
-                    {
-                      color: theme.text,
-                    },
-                  ]}
-                >
-                  {selectedPill !== undefined
-                    ? `Featured ${
-                        pills.find((p) => p.id === selectedPill)?.name ?? ""
-                      }`
-                    : "Featured Products"}
-                </Text>
-                {/* <Text>{totalCount} products total</Text> */}
-              </Box>
-              <HStack space={"xl"} className='p-2 my-4 flex items-center'>
-                <Pressable onPress={() => setIsGrid(!isGrid)}>
-                  {isGrid ? (
-                    <LayoutList size={24} color={theme.text} />
-                  ) : (
-                    <LayoutGrid size={24} color={theme.text} />
-                  )}
-                </Pressable>
-              </HStack>
-            </HStack>
           </Box>
         }
-        ListFooterComponent={renderFooter()}
-        numColumns={!isGrid ? 3 : 1}
-        style={{
-          columnGap: 12,
-          marginHorizontal: 12,
-        }}
-        contentContainerStyle={{}}
-        keyExtractor={(item, index) => `${item.id}_${index}`}
-        renderItem={({ item }: { item: ProductT; i: number }) => (
-          <Pressable
-            key={item.id}
-            onPress={() => {
-              navigation.navigate("Product", { product: item })
-            }}
-          >
-            <View key={item.id}>
-              {!isGrid ? (
-                <ProductCard isInCart={false} product={item as ProductT} />
-              ) : (
-                <HStack space='xs' className='mb-3'>
-                  <Image
-                    className='aspect-[3/4] w-1/4 rounded-sm'
-                    resizeMode='contain'
-                    source={{ uri: item.cover_url }}
-                    alt={item.title}
-                  />
-                  <Box>
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        fontFamily: "Inter",
-                        color: theme.text,
-                        maxWidth: Dimensions.get("window").width - thirdWidth,
-                      }}
-                      numberOfLines={1}
-                      ellipsizeMode='tail'
-                      className='text-lg'
-                    >
-                      {item.title}
-                    </Text>
-                    <Text
-                      style={{
-                        color: theme.text,
-                        maxWidth: Dimensions.get("window").width - thirdWidth,
-                      }}
-                      className='text-sm'
-                    >
-                      {item.creators}
-                    </Text>
-                    <Text
-                      style={{ color: theme.text, marginVertical: 4 }}
-                      className='text-sm'
-                    >
-                      {item.publisher}
-                    </Text>
-                  </Box>
-                </HStack>
-              )}
-            </View>
-          </Pressable>
-        )}
       />
     </Box>
   )

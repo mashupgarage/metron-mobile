@@ -20,7 +20,6 @@ import {
   Menu,
   Search,
   Check,
-  HeartOff,
   Heart,
   HeartIcon,
   LayoutList,
@@ -35,7 +34,7 @@ import {
   CheckboxIndicator,
   CheckboxIcon,
 } from "@/src/components/ui/checkbox"
-
+import ProductCard from "@/src/components/rework/product-card"
 import { useNavigation } from "@react-navigation/native"
 import { Pressable } from "react-native"
 import { useBoundStore } from "@/src/store"
@@ -259,29 +258,33 @@ export default function ReservationsScreen() {
               </View>
             )}
             <Box className='flex-row justify-between items-center'>
-            <Text
-              style={[{ color: theme.text, fontWeight: "bold", fontSize: 14, maxWidth: "90%" }]}
-              className='mb-4'
-            >
-              {(() => {
-                const selectedRelease = releaseDates.find(
-                  (item) => item.id === selectedReleaseId
-                )
-                return selectedRelease ? selectedRelease.title : ""
-              })()}
-            </Text>
-            <TouchableOpacity
-              className='mr-2'
-              onPress={toggleViewMode}
-            >
-              <Text style={[fonts.body, { color: theme.text }]}> 
-                    {viewMode !== "grid" ? (
-                      <LayoutList size={24} color={theme.text} />
-                    ) : (
-                      <LayoutGrid size={24} color={theme.text} />
-                    )}
-                  </Text>
-            </TouchableOpacity>
+              <Text
+                style={[
+                  {
+                    color: theme.text,
+                    fontWeight: "bold",
+                    fontSize: 14,
+                    maxWidth: "90%",
+                  },
+                ]}
+                className='mb-4'
+              >
+                {(() => {
+                  const selectedRelease = releaseDates.find(
+                    (item) => item.id === selectedReleaseId
+                  )
+                  return selectedRelease ? selectedRelease.title : ""
+                })()}
+              </Text>
+              <TouchableOpacity className='mr-2' onPress={toggleViewMode}>
+                <Text style={[fonts.body, { color: theme.text }]}>
+                  {viewMode !== "grid" ? (
+                    <LayoutList size={24} color={theme.text} />
+                  ) : (
+                    <LayoutGrid size={24} color={theme.text} />
+                  )}
+                </Text>
+              </TouchableOpacity>
             </Box>
             {/* Highlighted message for past releases */}
             {(() => {
@@ -549,188 +552,52 @@ export default function ReservationsScreen() {
                           { opacity: pressed ? 0.7 : 1 },
                           // Reduce opacity for products that can't be selected (already reserved in UI or in user's list or old release)
                           isMultiSelectMode &&
-                            (reservedProductIds.includes(product.id) ||
-                              userReservationProductIds.includes(product.id) ||
-                              isOldRelease())
+                          (reservedProductIds.includes(product.id) ||
+                            userReservationProductIds.includes(product.id) ||
+                            isOldRelease())
                             ? { opacity: 0.4 }
                             : {},
                           // Show different visual styling for products already in user's reservation list
                           isMultiSelectMode &&
-                            userReservationProductIds.includes(product.id)
+                          userReservationProductIds.includes(product.id)
                             ? {
-                              borderWidth: 1,
-                              borderColor: "#FF9800",
-                              borderRadius: 12,
-                              backgroundColor: "rgba(255, 152, 0, 0.1)",
-                            }
+                                borderWidth: 1,
+                                borderColor: "#FF9800",
+                                borderRadius: 12,
+                                backgroundColor: "rgba(255, 152, 0, 0.1)",
+                              }
                             : {},
                           isMultiSelectMode && isSelected
                             ? {
-                              borderWidth: 4,
-                              borderColor: theme.primary[500],
-                              borderRadius: 8,
-                            }
+                                borderWidth: 4,
+                                borderColor: theme.primary[500],
+                                borderRadius: 8,
+                              }
                             : {},
                         ]}
                       >
-                        <Box className='mb-2' style={{ width: thirdWidth * 0.9 }}>
-                          <View>
-                            {product.cover_url && !imageErrors[product.id] ? (
-                              // Show actual image if URL exists and no error
-                              <View
-                                style={{
-                                  position: "relative",
-                                  width: thirdWidth * 0.9,
-                                  height: 200,
-                                }}
-                              >
-                                {/* Overlay only if reserved */}
-                                {userReservationProductIds.includes(
-                                  product.id
-                                ) && (
-                                    <View
-                                      style={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        backgroundColor: "rgba(0,0,0,0.5)",
-                                        zIndex: 1,
-                                        borderRadius: 8,
-                                      }}
-                                    />
-                                  )}
-                                {/* selected as reserved */}
-                                {isMultiSelectMode && isSelected && (
-                                  <View
-                                    style={{
-                                      position: "absolute",
-                                      top: 4,
-                                      left: 4,
-                                      zIndex: 4,
-                                      backgroundColor: "rgba(0,0,0,0.8)",
-                                      borderRadius: 24,
-                                      padding: 4,
-                                    }}
-                                  >
-                                    <Check
-                                      size={20}
-                                      strokeWidth={3}
-                                      color={theme.success}
-                                    />
-                                  </View>
-                                )}
-                                <TouchableOpacity
-                                  className={`px-2 py-2 absolute ${isWanted ? "opacity-80" : "opacity-100"
-                                    }`}
-                                  style={{ zIndex: 2, right: 0 }}
-                                  disabled={isWanted}
-                                  onPress={async () => {
-                                    try {
-                                      await addToWantListHandler(product.id)
-                                      incrementWantlistCount()
-                                      alert("Added to your want list!")
-                                    } catch (e) {
-                                      console.log(e)
-                                      alert("Failed to add to want list.")
-                                    }
-                                  }}
-                                >
-                                  {isWanted ? (
-                                    <Heart
-                                      size={20}
-                                      stroke={theme.error}
-                                      fill={theme.error}
-                                    />
-                                  ) : (
-                                    <HeartIcon
-                                      size={20}
-                                      color={theme.error}
-                                      strokeWidth={3}
-                                    // fill={theme.primary[500]}
-                                    />
-                                  )}
-                                </TouchableOpacity>
-                                {/* Already Reserved text above overlay */}
-                                {userReservationProductIds.includes(
-                                  product.id
-                                ) && (
-                                    <View
-                                      style={{
-                                        alignItems: "flex-end",
-                                        position: "absolute",
-                                        top: 80,
-                                        right: 0,
-                                        zIndex: 2,
-                                      }}
-                                    >
-                                      <Text
-                                        style={[
-                                          fonts.caption,
-                                          { color: theme.white },
-                                        ]}
-                                        className='px-2'
-                                      >
-                                        Already Reserved
-                                      </Text>
-                                    </View>
-                                  )}
-                                {/* Product image always at bottom */}
-                                <Image
-                                  source={{
-                                    uri:
-                                      product.cover_url ??
-                                      `https://assets.comic-odyssey.com/products/covers/small/${product.cover_url || ""
-                                      }`,
-                                  }}
-                                  size='full'
-                                  alt={product.id.toString()}
-                                  resizeMode='cover'
-                                  onError={() => {
-                                    console.log(
-                                      `Failed to load image for product: ${product.id}`
-                                    )
-                                    setImageErrors((prev) => ({
-                                      ...prev,
-                                      [product.id]: true,
-                                    }))
-                                  }}
-                                />
-                              </View>
-                            ) : (
-                              // Show placeholder when URL is missing or there was an error
-                              <View className='h-60 w-[130px] bg-gray-200 flex items-center justify-center'>
-                                <Image
-                                  source={ComicOdysseyIcon}
-                                  alt='Placeholder'
-                                  className='w-32 h-32 opacity-70'
-                                  resizeMode='contain'
-                                />
-                              </View>
-                            )}
-                            <View className='mt-2 px-2'>
-                              <Text
-                                style={[
-                                  fonts.label,
-                                  { color: theme.text, fontWeight: "bold" },
-                                ]}
-                                numberOfLines={1}
-                                ellipsizeMode='tail'
-                              >
-                                {product.title}
-                              </Text>
-                              <Text
-                                style={[fonts.caption, { color: theme.text }]}
-                                numberOfLines={1}
-                                ellipsizeMode='tail'
-                                className='text-gray-600'
-                              >
-                                {product.creators}
-                              </Text>
-                            </View>
-                          </View>
-                        </Box>
+                        <ProductCard
+                          product={product}
+                          grid
+                          isReserved={userReservationProductIds.includes(
+                            product.id
+                          )}
+                          isSelected={isMultiSelectMode && isSelected}
+                          isWanted={isWanted}
+                          showWantListButton
+                          onWantListPress={async () => {
+                            try {
+                              await addToWantListHandler(product.id)
+                              incrementWantlistCount()
+                              alert("Added to your want list!")
+                            } catch (e) {
+                              console.log(e)
+                              alert("Failed to add to want list.")
+                            }
+                          }}
+                          showAlreadyReservedText
+                          reservedOverlayBottom={40}
+                        />
                       </Pressable>
                     </View>
                   </>
@@ -739,104 +606,111 @@ export default function ReservationsScreen() {
             />
           )}
           {/* Confirmation Modal */}
-        <Modal
-          animationType='slide'
-          transparent={true}
-          visible={showConfirmationModal}
-          onRequestClose={() => setShowConfirmationModal(false)}
-        >
-          <View className='flex-1 justify-center items-center bg-black/50'>
-            <View
-              style={{
-                backgroundColor: theme.background,
-              }}
-              className='w-[90%] max-h-[80%] rounded-xl p-5 shadow-lg'
-            >
-              <Text style={[fonts.body, { color: theme.text }]}>
-                Please Confirm the products you want to request for this
-                release.
-              </Text>
+          <Modal
+            animationType='slide'
+            transparent={true}
+            visible={showConfirmationModal}
+            onRequestClose={() => setShowConfirmationModal(false)}
+          >
+            <View className='flex-1 justify-center items-center bg-black/50'>
+              <View
+                style={{
+                  backgroundColor: theme.background,
+                }}
+                className='w-[90%] max-h-[80%] rounded-xl p-5 shadow-lg'
+              >
+                <Text style={[fonts.body, { color: theme.text }]}>
+                  Please Confirm the products you want to request for this
+                  release.
+                </Text>
 
-              <ScrollView className='max-h-[400px]'>
-                {confirmationProducts.map((product) => (
-                  <View
-                    key={product.id}
-                    className='flex-row items-center p-2.5 border-b border-gray-200'
-                  >
-                    <Checkbox
-                      value={product.id.toString()}
-                      isChecked={!uncheckedProducts.includes(product.id)}
-                      onChange={(isSelected) =>
-                        handleCheckboxToggle(product.id, isSelected)
-                      }
-                      size='md'
-                      aria-label={`Select ${product.title}`}
+                <ScrollView className='max-h-[400px]'>
+                  {confirmationProducts.map((product) => (
+                    <View
+                      key={product.id}
+                      className='flex-row items-center p-2.5 border-b border-gray-200'
                     >
-                      <CheckboxIndicator>
-                        <CheckboxIcon as={Check} />
-                      </CheckboxIndicator>
-                    </Checkbox>
+                      <Checkbox
+                        value={product.id.toString()}
+                        isChecked={!uncheckedProducts.includes(product.id)}
+                        onChange={(isSelected) =>
+                          handleCheckboxToggle(product.id, isSelected)
+                        }
+                        size='md'
+                        aria-label={`Select ${product.title}`}
+                      >
+                        <CheckboxIndicator>
+                          <CheckboxIcon as={Check} />
+                        </CheckboxIndicator>
+                      </Checkbox>
 
-                    <View className='mx-2.5 flex-1 flex-row items-center'>
-                      {product.cover_url ? (
-                        <Image
-                          source={{ uri: product.cover_url }}
-                          alt={product.title}
-                          className='w-16 h-[60px] mr-2.5'
-                          resizeMode='contain'
-                        />
-                      ) : (
-                        <View className='w-10 h-[60px] bg-gray-100 mr-2.5' />
-                      )}
+                      <View className='mx-2.5 flex-1 flex-row items-center'>
+                        {product.cover_url ? (
+                          <Image
+                            source={{ uri: product.cover_url }}
+                            alt={product.title}
+                            className='w-16 h-[60px] mr-2.5'
+                            resizeMode='contain'
+                          />
+                        ) : (
+                          <View className='w-10 h-[60px] bg-gray-100 mr-2.5' />
+                        )}
 
-                      <View className='flex-1 ml-3'>
-                        <Text
-                          numberOfLines={2}
-                          style={[fonts.caption, { color: theme.text, fontWeight: "bold" }]}
-                        >
-                          {product.title}
-                        </Text>
-                        <Text numberOfLines={1} style={[fonts.caption, { color: theme.text, marginTop: 4 }]}>
-                          {product.creators}
-                        </Text>
+                        <View className='flex-1 ml-3'>
+                          <Text
+                            numberOfLines={2}
+                            style={[
+                              fonts.caption,
+                              { color: theme.text, fontWeight: "bold" },
+                            ]}
+                          >
+                            {product.title}
+                          </Text>
+                          <Text
+                            numberOfLines={1}
+                            style={[
+                              fonts.caption,
+                              { color: theme.text, marginTop: 4 },
+                            ]}
+                          >
+                            {product.creators}
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
-                ))}
-              </ScrollView>
+                  ))}
+                </ScrollView>
 
-              <View className='flex-row justify-between mt-5'>
-                <TouchableOpacity
-                  onPress={() => setShowConfirmationModal(false)}
-                  className='py-2.5 px-5 rounded'
-                  style={{
-                    borderWidth: 1,
-                    borderColor: theme.border,
-                  }}
-                >
-                  <Text style={[fonts.label, { color: theme.text }]}>
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
+                <View className='flex-row justify-between mt-5'>
+                  <TouchableOpacity
+                    onPress={() => setShowConfirmationModal(false)}
+                    className='py-2.5 px-5 rounded'
+                    style={{
+                      borderWidth: 1,
+                      borderColor: theme.border,
+                    }}
+                  >
+                    <Text style={[fonts.label, { color: theme.text }]}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={confirmReservation}
-                  className='py-2.5 px-5 rounded'
-                  style={{
-                    backgroundColor: theme.primary[500],
-                  }}
-                  disabled={confirmationProducts.length === 0}
-                >
-                  <Text style={[fonts.label, { color: theme.white }]}>
-                    Confirm ({confirmationProducts.length})
-                  </Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={confirmReservation}
+                    className='py-2.5 px-5 rounded'
+                    style={{
+                      backgroundColor: theme.primary[500],
+                    }}
+                    disabled={confirmationProducts.length === 0}
+                  >
+                    <Text style={[fonts.label, { color: theme.white }]}>
+                      Confirm ({confirmationProducts.length})
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
           </Modal>
-          
-      
         </Box>
       </Box>
     </DashboardLayout>
