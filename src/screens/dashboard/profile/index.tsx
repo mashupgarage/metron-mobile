@@ -173,7 +173,7 @@ export default function Profile(props: { navigation }) {
                 marginRight: 8,
                 backgroundColor:
                   selectedTab === tab.key
-                    ? theme.primary[500]
+                    ? theme.gray[800]
                     : theme.background2,
               }}
               onPress={() => setSelectedTab(tab.key)}

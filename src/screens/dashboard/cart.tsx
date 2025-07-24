@@ -106,15 +106,16 @@ export default function Cart() {
         className='mr-2 p-2'
       >
         <ProductCard isInCart product={item.product} />
-        <Button
+       
+      </Checkbox>
+      <Button
           size='xs'
           variant='link'
-          className='p-2 ml-auto'
+          className='p-2 ml-auto mr-2 top-3 absolute right-0'
           onPress={() => handleRemoveCompletely(item.id)}
         >
           <Trash2 size={18} color={theme.error} />
         </Button>
-      </Checkbox>
     </Box>
   )
 

@@ -266,7 +266,7 @@ export default function Home() {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               horizontal
-              className='mr-2 ml-2 mt-4'
+              className='mr-2 ml-2 mt-4 mb-4'
             >
               {pills.map((pill) => (
                 <TouchableOpacity
@@ -278,7 +278,7 @@ export default function Home() {
                     marginRight: 8,
                     backgroundColor:
                       selectedPill === pill.id
-                        ? theme.primary[500]
+                        ? theme.gray[900]
                         : theme.background2,
                   }}
                   onPress={() => {
@@ -305,7 +305,7 @@ export default function Home() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Box className='p-4 mt-2 pb-0'>
+            <Box className='p-4 pb-0'>
               <HStack className='w-full'>
                 <View
                   style={{

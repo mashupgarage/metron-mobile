@@ -19,11 +19,11 @@ const OrdersScreen = () => {
   const theme = useBoundStore((state) => state.theme)
   const user = useBoundStore((state) => state.user)
   const store = useBoundStore((state) => state)
-  const [activeTab, setActiveTab] = useState("Orders")
+  const [activeTab, setActiveTab] = useState("Reservations")
   const [orders, setOrders] = useState<[]>([])
 
   useEffect(() => {
-    if (activeTab === "Orders") {
+    if (activeTab === "Reservations") {
       const fetchOrders = async (userId: number) => {
         try {
           const response = await getOrders(userId)
@@ -133,11 +133,11 @@ const OrdersScreen = () => {
       <View className='p-4 '>
         <FlatList
           data={[
+            { key: "Reservations", label: `Reservations` },
             {
               key: "Orders",
               label: `Orders`,
             },
-            { key: "Reservations", label: `Reservations` },
           ]}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -156,7 +156,7 @@ const OrdersScreen = () => {
                 marginRight: 8,
                 backgroundColor:
                   activeTab === tab.key
-                    ? theme.primary[500]
+                    ? theme.gray[800]
                     : theme.background2,
               }}
               onPress={() => setActiveTab(tab.key)}
@@ -175,6 +175,8 @@ const OrdersScreen = () => {
         />
       </View>
       <View>
+       
+        {activeTab === "Reservations" && <ReservationBoxScreen />}
         {activeTab === "Orders" && (
           <Box
             className='h-screen w-full pb-24'
@@ -296,7 +298,6 @@ const OrdersScreen = () => {
             </Box>
           </Box>
         )}
-        {activeTab === "Reservations" && <ReservationBoxScreen />}
       </View>
     </SafeAreaView>
   )

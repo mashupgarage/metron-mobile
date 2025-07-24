@@ -20,8 +20,6 @@ import {
   Menu,
   Search,
   Check,
-  Heart,
-  HeartIcon,
   LayoutList,
   LayoutGrid,
 } from "lucide-react-native"
@@ -49,7 +47,6 @@ export default function ReservationsScreen() {
   const { theme, isDark } = store
   const toast = useToast()
   const deviceWidth = Dimensions.get("window").width
-  const thirdWidth = deviceWidth / 3
 
   const {
     // State
@@ -66,13 +63,11 @@ export default function ReservationsScreen() {
     searchQuery,
     isSearching,
     showSearchBar,
-    imageErrors,
     showConfirmationModal,
     confirmationProducts,
     uncheckedProducts,
 
     // State Setters
-    setImageErrors,
     setShowSearchBar,
     setShowConfirmationModal,
 
@@ -218,43 +213,45 @@ export default function ReservationsScreen() {
                         })
                         return
                       }
-
-                      if (isMultiSelectMode) {
-                        toggleMultiSelectMode()
-                      } else {
-                        toggleMultiSelectMode()
-                      }
+                      toggleMultiSelectMode()
                     }}
                   >
-                    {isMultiSelectMode ? (
-                      <Text
-                        className='mr-4 ml-4'
-                        style={[fonts.body, { color: theme.text }]}
-                      >
-                        Cancel
-                      </Text>
-                    ) : (
-                      <ClipboardCheck
-                        size={24}
-                        color={isOldRelease() ? theme.gray[500] : theme.text}
-                        className='mr-4 ml-4'
-                      />
-                    )}
+                    <ClipboardCheck
+                      size={24}
+                      color={isOldRelease() ? theme.gray[500] : theme.text}
+                      className='mr-4 ml-4'
+                    />
                   </TouchableOpacity>
-                  {selectedProducts.length > 0 && (
-                    <Pressable onPress={showConfirmationDialog}>
-                      <Text
-                        className='font-bold'
-                        style={[fonts.body, { color: theme.text }]}
-                      >
-                        Confirm ({selectedProducts.length})
-                      </Text>
-                    </Pressable>
-                  )}
                   <TouchableOpacity onPress={toggleDrawer} className='p-2'>
                     <Menu size={24} color={theme.text} />
                   </TouchableOpacity>
                 </View>
+              </View>
+            )}
+            {/* Action Strip Bar for Multi-Select Mode */}
+            {isMultiSelectMode && (
+              <View
+                style={{
+                  backgroundColor: theme.card,
+                  zIndex: 10,
+                }}
+                className='w-full flex-row justify-between items-center py-3 mb-2 rounded-b-lg'
+              >
+                <TouchableOpacity
+                  onPress={toggleMultiSelectMode}
+                  className='py-2.5 px-5 rounded'
+                  style={{ borderWidth: 1, borderColor: theme.border }}
+                >
+                  <Text style={[fonts.label, { color: theme.text }]}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={showConfirmationDialog}
+                  className='py-2.5 px-5 rounded'
+                  style={{ backgroundColor: selectedProducts.length > 0 ? theme.primary[500] : theme.gray[300] }}
+                  disabled={selectedProducts.length === 0}
+                >
+                  <Text style={[fonts.label, { color: selectedProducts.length > 0 ? theme.white : theme.text }]}>Confirm ({selectedProducts.length})</Text>
+                </TouchableOpacity>
               </View>
             )}
             <Box className='flex-row justify-between items-center'>

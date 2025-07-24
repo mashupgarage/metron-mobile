@@ -11,7 +11,6 @@ import { HStack } from "../ui/hstack"
 
 interface ProductCardProps {
   product: ProductT
-  isInCart?: boolean
   grid?: boolean
   isReserved?: boolean
   isSelected?: boolean
@@ -62,7 +61,7 @@ const ProductCard: FC<ProductCardProps> = ({
         }}
         pointerEvents='none'
       >
-          <Box className='absolute transform translate-y-4 translate-x-1 rounded-full mr-1 z-40 bg-orange-500 p-1 pl-4 pr-4 justify-center items-center'>
+          <Box className='absolute transform translate-y-4 translate-x-1 rounded-full mr-1 z-40 bg-black p-1 pl-4 pr-4 justify-center items-center'>
             <Text
               style={[
                 theme.fonts.caption,
@@ -88,7 +87,7 @@ const ProductCard: FC<ProductCardProps> = ({
           }}
           pointerEvents='none'
         >
-          <Check size={20} strokeWidth={3} color={theme.success} />
+          <Check size={16} strokeWidth={3} color={theme.success} />
         </View>
       )}
       {/* Want-list button */}
@@ -165,7 +164,7 @@ const ProductCard: FC<ProductCardProps> = ({
         <View>
           <Text
             style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
-            numberOfLines={1}
+            numberOfLines={2}
             ellipsizeMode='tail'
             className='text-lg'
           >
@@ -199,23 +198,10 @@ const ProductCard: FC<ProductCardProps> = ({
           }}
           pointerEvents='none'
         >
-          <Check size={20} strokeWidth={3} color={theme.success} />
+          <Check size={16} strokeWidth={3} color={theme.success} />
         </View>
       )}
       <>
-        {/* Reserved badge (list) */}
-        {isReserved && (
-          <Box className='absolute transform translate-y-16 translate-x-3 rounded-full mr-1 z-40 bg-orange-500 w-20 h-8 p-2 justify-center items-center'>
-            <Text
-              style={[
-                theme.fonts.caption,
-                { color: theme.white, fontWeight: "bold" },
-              ]}
-            >
-              Reserved
-            </Text>
-          </Box>
-        )}
         <Image
           className='aspect-[3/4] w-1/4'
           resizeMode='contain'
@@ -243,13 +229,34 @@ const ProductCard: FC<ProductCardProps> = ({
           style={{
             color: theme.text,
             maxWidth: Dimensions.get("window").width - thirdWidth,
-          }}
+            }}
+            numberOfLines={2}
+            ellipsizeMode='tail'
           className='text-sm'
         >
           {product.creators}
-        </Text>
+          </Text>
+               {/* Reservation status badge (list) */}
+        {reservationStatus && (
+          <Text
+            style={[
+              fonts.caption,
+              {
+                color: theme.white,
+                backgroundColor: theme.gray[800],
+                borderRadius: 8,
+                marginTop: theme.spacing.xs,
+                paddingVertical: 2,
+                alignSelf: "flex-start",
+                paddingHorizontal: 8,
+              },
+            ]}
+          >
+            {reservationStatus === "for_approval" ? "Pending Approval" : reservationStatus}
+          </Text>
+          )}
         <Text
-          style={{ color: theme.text, marginTop: 4 }}
+          style={{ color: theme.text, marginTop: 2 }}
           className='text-sm'
         >
           {product.publisher}
@@ -261,13 +268,14 @@ const ProductCard: FC<ProductCardProps> = ({
             {product.formatted_price}
           </Text>
           )}
-          {/* Reservation status badge (list) */}
-        {reservationStatus && (
+          {/* Reserved badge (list) */}
+       {isReserved && (
           <Text
             style={[
               fonts.caption,
               {
                 color: theme.white,
+                marginTop: theme.spacing.xs,
                 backgroundColor: theme.gray[800],
                 borderRadius: 8,
                 paddingVertical: 2,
@@ -276,10 +284,11 @@ const ProductCard: FC<ProductCardProps> = ({
               },
             ]}
           >
-            {reservationStatus === "for_approval" ? "Pending Approval" : reservationStatus}
+            Already Reserved
           </Text>
-        )}
-      </Box>
+          )}
+      
+        </Box>
       <Box style={{ position: "absolute", right: 5, top: 2 }}>
         {showWantListButton && (
           <TouchableOpacity disabled={isWanted} onPress={onWantListPress}>
