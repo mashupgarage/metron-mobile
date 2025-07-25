@@ -22,6 +22,7 @@ interface ProductCardProps {
   reservationStatus?: string
   children?: React.ReactNode
   isInCart?: boolean
+  hasPreview?: boolean
 }
 
 const ProductCard: FC<ProductCardProps> = ({
@@ -37,6 +38,7 @@ const ProductCard: FC<ProductCardProps> = ({
   reservedOverlayBottom = 0,
   reservationStatus,
   isInCart = false,
+  hasPreview = false,
 }) => {
   const [imgError, setImgError] = useState(false)
   const theme = useBoundStore((state) => state.theme)
@@ -44,6 +46,61 @@ const ProductCard: FC<ProductCardProps> = ({
   const mainImage = product.cover_url || undefined
   const highResImage = product.cover_url_large || undefined
   const thirdWidth = Dimensions.get("window").width / 3
+
+  // Preview mode for collection screen
+  if (hasPreview) {
+    return (
+      <Box className='mb-2' style={{ width: thirdWidth * 0.9 }}>
+        <View style={{ marginBottom: 0 }}>
+          <View style={{ position: "relative" }}>
+            <Image
+              source={
+                imgError || !mainImage
+                  ? require("@/src/assets/icon.png")
+                  : { uri: mainImage }
+              }
+              alt={product.title}
+              className={imgError ? 'pl-4 h-56 w-[160px] bg-gray-200' : 'h-56 w-[160px]'}
+              resizeMode='contain'
+              onError={() => setImgError(true)}
+            />
+            {children && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 10,
+                }}
+                pointerEvents='box-none'
+              >
+                {children}
+              </View>
+            )}
+          </View>
+          <View className='px-2'>
+            <View style={{ minHeight: 48 }}>
+              <Text
+                numberOfLines={2}
+                style={[fonts.label, { color: theme.text, fontWeight: "bold", lineHeight: 18 }]}
+              >
+                {product.title}
+              </Text>
+            </View>
+            {typeof product.meta_attributes?.owned_products === "number" &&
+            typeof product.meta_attributes?.unowned_products === "number" ? (
+              <Text style={[fonts.caption, { color: theme.text }]}>
+                {product.meta_attributes.owned_products.toString()} out of{" "}
+                {(product.meta_attributes.owned_products + product.meta_attributes.unowned_products).toString()}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      </Box>
+    )
+  }
 
   return grid ? (
     <Box className='mb-2' style={{ position: "relative" }}>
@@ -163,7 +220,7 @@ const ProductCard: FC<ProductCardProps> = ({
         />
         <View>
           <Text
-            style={[fonts.body, { color: theme.text, fontWeight: "bold" }]}
+            style={[fonts.body, { color: theme.text, fontWeight: "bold", lineHeight: 18 }]}
             numberOfLines={2}
             ellipsizeMode='tail'
             className='text-lg'

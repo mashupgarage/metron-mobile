@@ -31,7 +31,10 @@ export function useProductSeriesStatus(productId: number) {
     if (!productId) return;
     setLoading(true);
     fetchProductSeriesStatus(productId)
-      .then((res) => setData(res.data))
+      .then((res) => {
+        setData(res.data)
+        console.log(res.data.related_series)
+      })
       .catch(setError)
       .finally(() => setLoading(false));
   }, [productId]);

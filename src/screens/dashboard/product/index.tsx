@@ -348,6 +348,7 @@ export default function Product(props: {
                   style={[
                     fonts.label,
                     {
+                      marginTop: theme.spacing.md,
                       color: theme.text,
                     },
                   ]}
