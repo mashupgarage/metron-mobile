@@ -113,46 +113,46 @@ export default function Home() {
   }, [])
 
   // Function to load more products
-  const loadMoreProducts = useCallback(async () => {
-    if (
-      isFetchingMore ||
-      currentPage >= totalPages ||
-      store.products_list?.loading
-    ) {
-      return
-    }
-    setIsFetchingMore(true)
-    const nextPage = currentPage + 1
-    try {
-      if (isSearchMode && searchQuery.trim() !== "") {
-        // Fetch more search results
-        await handleSearch(nextPage)
-      } else {
-        // Fetch more products
-        const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
-        const newProducts = res.data.products || []
-        store.appendProducts({
-          products: newProducts,
-          total_count: res.data.total_count,
-          total_pages: res.data.total_pages,
-          page: nextPage,
-        })
-        setCurrentPage(nextPage)
-      }
-    } catch (err) {
-      console.error("Failed to fetch more products:", err)
-    } finally {
-      setIsFetchingMore(false)
-    }
-  }, [
-    currentPage,
-    totalPages,
-    isFetchingMore,
-    store.products_list?.loading,
-    isSearchMode,
-    searchQuery,
-    selectedPill,
-  ])
+  // const loadMoreProducts = useCallback(async () => {
+  //   if (
+  //     isFetchingMore ||
+  //     currentPage >= totalPages ||
+  //     store.products_list?.loading
+  //   ) {
+  //     return
+  //   }
+  //   setIsFetchingMore(true)
+  //   const nextPage = currentPage + 1
+  //   try {
+  //     if (isSearchMode && searchQuery.trim() !== "") {
+  //       // Fetch more search results
+  //       await handleSearch(nextPage)
+  //     } else {
+  //       // Fetch more products
+  //       const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
+  //       const newProducts = res.data.products || []
+  //       store.appendProducts({
+  //         products: newProducts,
+  //         total_count: res.data.total_count,
+  //         total_pages: res.data.total_pages,
+  //         page: nextPage,
+  //       })
+  //       setCurrentPage(nextPage)
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to fetch more products:", err)
+  //   } finally {
+  //     setIsFetchingMore(false)
+  //   }
+  // }, [
+  //   currentPage,
+  //   totalPages,
+  //   isFetchingMore,
+  //   store.products_list?.loading,
+  //   isSearchMode,
+  //   searchQuery,
+  //   selectedPill,
+  // ])
 
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
   const products = store.products_list?.products || []

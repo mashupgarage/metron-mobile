@@ -15,23 +15,22 @@ import {
 import MasonryList from "@react-native-seoul/masonry-list"
 import { useBoundStore } from "@/src/store"
 import { getWantList, addToCart, fetchCartItems } from "@/src/api/apiEndpoints"
-import { WantListItemT } from "@/src/utils/types/common"
+import { WantListItemT, ProductT } from "@/src/utils/types/common"
 import { useNavigation } from "@react-navigation/native"
 import { Toast, ToastTitle, useToast } from "@/src/components/ui/toast"
-import { LayoutGrid, LayoutList } from "lucide-react-native"
-import NavigationHeader from "@/src/components/navigation-header"
+import ProductCard from "@/src/components/rework/product-card"
 
 const PAGE_SIZE = 20
 
 // Helper function to construct image URL from cover_file_name
 const getCoverUrl = (
-  coverFileName: string | undefined,
+  coverUrl: string | undefined,
   productId?: number
 ): string => {
-  if (!coverFileName) return ""
-
+  if (!coverUrl) return ""
+  else if (coverUrl) return coverUrl
   // Try format with just the filename
-  return `https://assets.comic-odyssey.com/products/covers/medium/${coverFileName}`
+  return `https://assets.comic-odyssey.com/products/covers/medium/${coverUrl}`
 }
 
 // Extended product type that includes quantity
@@ -57,8 +56,6 @@ interface ExtendedWantListItemT extends Omit<WantListItemT, "product"> {
   product?: ExtendedProduct
 }
 
-import { useColorScheme } from "react-native"
-import { Box } from "@/src/components/ui/box"
 import { fonts } from "@/src/theme"
 
 const WantlistScreen = () => {
@@ -229,6 +226,51 @@ const WantlistScreen = () => {
     return item.product
   }
 
+  // Transform WantListItem to ProductT format for ProductCard
+  const transformToProductT = (wantlistItem: ExtendedWantListItemT): ProductT | null => {
+    if (!wantlistItem.product) return null
+
+    const product = wantlistItem.product
+    const coverUrl = getCoverUrl(product.cover_url, product.id)
+    console.log(product)
+    return {
+      id: product.id,
+      title: product.title,
+      cover_price: product.cover_price || "",
+      price: product.price || "",
+      quantity: product.quantity || null,
+      featured: false,
+      hidden: false,
+      description: product.description || "",
+      creators: product.creators || "",
+      series: {
+        id: product.id,
+        title: product.title,
+        slug: "",
+        publisher_id: 0,
+        category_id: 0,
+      },
+      slug: "",
+      isbn: null,
+      upc: "",
+      publisher_id: 0,
+      category_id: 0,
+      series_id: product.id,
+      issue_number: product.issue_number || "",
+      year: null,
+      cover_url: coverUrl,
+      cover_url_large: coverUrl,
+      formatted_price: product.formatted_price || product.cover_price || "",
+      publisher: "",
+      publisher_name: "",
+      category_name: "",
+      meta_attributes: {
+        quantity: product.quantity,
+        wantlist_id: wantlistItem.id,
+      },
+    }
+  }
+
   const renderGridItem = ({
     item,
     i,
@@ -331,14 +373,44 @@ const WantlistScreen = () => {
             }}
           >
             <Image
-              source={{ uri: coverUrl }}
+              source={coverUrl ? { uri: coverUrl } : require("@/src/assets/icon.png")}
               style={{
                 width: "100%",
                 height: 190,
-                backgroundColor: colors.placeholder,
+                backgroundColor: theme.gray[300],
               }}
-              resizeMode='cover'
+              resizeMode={coverUrl ? 'cover' : 'contain'}
+              onError={() => {
+                setImageErrors(prev => ({ ...prev, [productId]: true }))
+              }}
             />
+            {/* Gray overlay for missing/error images */}
+            {(!coverUrl || imageErrors[productId]) && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: theme.gray[300],
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    color: theme.gray[600],
+                    fontSize: 12,
+                    textAlign: "center",
+                    fontFamily: "Inter",
+                  }}
+                >
+                  No Image
+                  {"\n"}Available
+                </Text>
+              </View>
+            )}
             <View style={{ padding: theme.spacing.sm }}>
               <Text
                 numberOfLines={1}
@@ -401,80 +473,36 @@ const WantlistScreen = () => {
       )
     }
 
-    // List view item
+    // List view item using ProductCard
+    const transformedProduct = transformToProductT(wantlistItem)
+    if (!transformedProduct) return null
+
     return (
       <Pressable
         key={`${wantlistItem.id}-${i}`}
         onPress={navigateToProduct}
-        style={{
-          flexDirection: "row",
-          padding: 12,
-          marginVertical: 4,
-          marginHorizontal: 8,
-          backgroundColor: colors.surface,
-          borderRadius: 4,
-          shadowColor: colors.cardShadow,
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.1,
-          shadowRadius: 2,
-          elevation: 2,
-        }}
+        style={{ marginVertical: 2 }}
       >
-        <Image
-          source={{ uri: coverUrl }}
-          style={{
-            width: 60,
-            height: 90,
-            borderRadius: 0,
-            backgroundColor: colors.placeholder,
-            marginRight: 12,
-          }}
-          resizeMode='cover'
-        />
-        <View style={{ flex: 1, justifyContent: "space-between" }}>
-          <View>
-            <Text
-              numberOfLines={1}
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: colors.text,
-                marginBottom: 4,
-              }}
-            >
-              {wantlistItem.product.title}
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={{
-                fontFamily: "Inter",
-                fontSize: 14,
-                color: colors.textSecondary,
-                marginBottom: 4,
-              }}
-            >
-              {wantlistItem.product.creators}
-            </Text>
-          </View>
+        <ProductCard
+          product={transformedProduct}
+          grid={false}
+          isInCart={false}
+        >
+          {/* Add to Cart button overlay */}
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
+              position: "absolute",
+              bottom: 8,
+              right: 8,
+              zIndex: 10,
             }}
+            pointerEvents="box-none"
           >
-            <Text
-              style={{
-                fontFamily: "Inter",
-                fontSize: 16,
-                color: theme.text,
-              }}
-            >
-              {wantlistItem.product.formatted_price ||
-                wantlistItem.product.cover_price}
-            </Text>
             <TouchableOpacity
-              onPress={handleAddToCart}
+              onPress={(e) => {
+                e.stopPropagation()
+                handleAddToCart()
+              }}
               disabled={!isAvailable}
               style={[
                 {
@@ -493,13 +521,14 @@ const WantlistScreen = () => {
                   color: colors.buttonText,
                   fontSize: 14,
                   fontFamily: "Inter",
+                  fontWeight: "600",
                 }}
               >
                 {isAvailable ? "Add to Cart" : "Out of Stock"}
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ProductCard>
       </Pressable>
     )
   }
@@ -579,7 +608,7 @@ const WantlistScreen = () => {
       </View>
 
       {/* Information Banner */}
-      <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
+      {/* <View style={{ paddingHorizontal: 16, marginBottom: 8 }}>
         <View
           style={{
             backgroundColor: colors.yellowBg,
@@ -599,7 +628,7 @@ const WantlistScreen = () => {
             come, first served.
           </Text>
         </View>
-      </View>
+      </View> */}
 
       {/* Main Content */}
       {isGrid ? (
