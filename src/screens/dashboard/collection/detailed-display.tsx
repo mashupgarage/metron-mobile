@@ -106,7 +106,7 @@ const DetailedCollectionScreen = () => {
             },
           ]}
         >
-          {total_owned ?? 0} of {total_products ?? 0} Collected
+          {total_owned ?? 0} of {total_products ?? 0}
         </Text>
       </HStack>
       <MasonryList
@@ -147,6 +147,8 @@ const DetailedCollectionScreen = () => {
               title: item.title,
               image_url: item.image_url,
             },
+            description: item.description,
+            creators: item.creators,
             owned_products: item.owned_products,
             unowned_products: item.unowned_products,
             cover_url_large: item.cover_url_large,
@@ -154,11 +156,12 @@ const DetailedCollectionScreen = () => {
             in_want_list: !wantList.includes(item.id),
             ...item,
           }
+          console.log(transformed.description)
 
           return (
             // @ts-ignore
             <Box key={i} className='items-center'>
-              <SeriesCard data={transformed} grayed={grayed} detailedDisplay />
+              <SeriesCard data={transformed} grayed={grayed} />
             </Box>
           )
         }}

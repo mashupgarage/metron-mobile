@@ -39,7 +39,7 @@ import {
   useProductSeriesStatus,
   useProductRecommendations,
 } from "./productHooks"
-import ProductCard from "@/src/components/product"
+import ProductCard from "@/src/components/rework/product-card"
 import { VStack } from "@/src/components/ui/vstack"
 import { fonts } from "@/src/theme"
 
@@ -348,6 +348,7 @@ export default function Product(props: {
                   style={[
                     fonts.label,
                     {
+                      marginTop: theme.spacing.md,
                       color: theme.text,
                     },
                   ]}
@@ -469,7 +470,7 @@ export default function Product(props: {
                         marginRight: theme.spacing.md,
                       }}
                     >
-                      <ProductCard product={item} />
+                      <ProductCard grid product={item} />
                     </Box>
                   )}
                   ListEmptyComponent={() =>

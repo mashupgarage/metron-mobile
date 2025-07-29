@@ -1,22 +1,18 @@
 import { FC, useState } from "react"
-import { Box } from "../ui/box"
-import { Image } from "../ui/image"
-import { Text } from "../ui/text"
-import { Dimensions, Pressable, View } from "react-native"
+import { Pressable, View } from "react-native"
 import { addToWantList } from "@/src/api/apiEndpoints"
-import { useToast } from "@/src/components/ui/toast"
 import { useBoundStore } from "@/src/store"
-import { ShoppingCart, StarIcon, ZoomIn, Download } from "lucide-react-native"
+import { StarIcon } from "lucide-react-native"
 import ImageViewing from "react-native-image-viewing"
-import * as FileSystem from "expo-file-system"
-import * as MediaLibrary from "expo-media-library"
 import {
   NavigationProp,
   ParamListBase,
   useNavigation,
 } from "@react-navigation/native"
-import { HStack } from "../ui/hstack"
 import { fonts } from "@/src/theme"
+import ProductCard from "../rework/product-card"
+import { ProductT } from "@/src/utils/types/common"
+import { Text } from "../ui/text"
 
 interface SeriesCardProps {
   data: {
@@ -43,34 +39,58 @@ interface SeriesCardProps {
 
 const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
   const theme = useBoundStore((state) => state.theme)
-  const deviceWidth = Dimensions.get("window").width
-  const thirdWidth = deviceWidth / 3
   const navigation = useNavigation<NavigationProp<ParamListBase>>()
-  const toast = useToast()
-  const [imgError, setImgError] = useState(false)
   const [isImageViewerVisible, setIsImageViewerVisible] = useState(false)
-  const [downloading, setDownloading] = useState(false)
+
 
   if (!data || !data.series) return null
 
-  const mainImage =
-    data.last_product?.image_url || data.cover_url_large || undefined
+  const mainImage = data.last_product?.image_url || data.cover_url_large || undefined
+
+  // Transform series data to ProductT format for ProductCard
+  const transformedProduct: ProductT = {
+    id: data.series.id,
+    title: data.series.title,
+    cover_price: "",
+    price: "",
+    quantity: null,
+    featured: false,
+    hidden: false,
+    description: "",
+    creators: "",
+    series: {
+      id: data.series.id,
+      title: data.series.title,
+      slug: "",
+      publisher_id: 0,
+      category_id: 0,
+    },
+    slug: "",
+    isbn: null,
+    upc: "",
+    publisher_id: 0,
+    category_id: 0,
+    series_id: data.series.id,
+    issue_number: "",
+    year: null,
+    cover_url: mainImage || "",
+    cover_url_large: data.cover_url_large || "",
+    formatted_price: "",
+    publisher: data.publisher || "",
+    publisher_name: data.publisher || "",
+    category_name: "",
+    meta_attributes: {
+      owned_products: data.owned_products,
+      unowned_products: data.unowned_products,
+    },
+  }
   const handleAddToWantList = async () => {
     try {
       await addToWantList(data.series.id)
-      toast.show({
-        placement: "top",
-        render: () => (
-          <Text className='text-green-600'>Added to Want List!</Text>
-        ),
-      })
+      // TODO: Add toast notification for success
     } catch {
-      toast.show({
-        placement: "top",
-        render: () => (
-          <Text className='text-red-600'>Failed to add to Want List.</Text>
-        ),
-      })
+      // TODO: Add toast notification for error
+      console.error('Failed to add to Want List')
     }
   }
 
@@ -86,199 +106,53 @@ const SeriesCard: FC<SeriesCardProps> = ({ data, grayed }) => {
   }
 
   return (
-    <Box className={`mb-2`} style={{ width: thirdWidth * 0.9 }}>
-      <View style={{ marginBottom: 0 }}>
-        <View style={{ position: "relative" }}>
-          <View>
-            <Image
-              source={
-                imgError || !mainImage
-                  ? require("@/src/assets/icon.png")
-                  : { uri: mainImage }
-              }
-              alt={"banner"}
-              className={
-                imgError ? "pl-4 h-60 p-8 w-[130px]" : "h-60 p-1 w-[130px] "
-              }
-              resizeMode={imgError ? "contain" : "cover"}
-              style={{
-                opacity: grayed ? 0.9 : 1,
-              }}
-              onError={() => setImgError(true)}
-            />
-          </View>
-          {/* Show full screen icon if owned */}
-          {!imgError && mainImage && (
-            <Pressable
-              onPress={() => setIsImageViewerVisible(true)}
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: 24,
-                padding: 6,
-                zIndex: 10,
-              }}
-              accessibilityLabel='View cover full screen'
-              hitSlop={8}
-            >
-              <ZoomIn size={22} color='#fff' />
-            </Pressable>
-          )}
-          <ImageViewing
-            images={[{ uri: mainImage }]}
-            imageIndex={0}
-            visible={isImageViewerVisible}
-            onRequestClose={() => setIsImageViewerVisible(false)}
-            FooterComponent={() => (
-              <View
-                style={{
-                  width: "100%",
-                  alignItems: "flex-end",
-                  padding: 24,
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                }}
-              >
-                <Pressable
-                  onPress={async () => {
-                    if (!mainImage) return
-                    setDownloading(true)
-                    try {
-                      const { status } =
-                        await MediaLibrary.requestPermissionsAsync()
-                      if (status !== "granted") {
-                        toast.show({
-                          placement: "top",
-                          render: () => (
-                            <Text style={{ color: "red" }}>
-                              Permission denied: Cannot save image.
-                            </Text>
-                          ),
-                        })
-                        setDownloading(false)
-                        return
-                      }
-                      const fileUri =
-                        FileSystem.cacheDirectory +
-                        "cover_" +
-                        Date.now() +
-                        ".jpg"
-                      const downloadRes = await FileSystem.downloadAsync(
-                        mainImage,
-                        fileUri
-                      )
-                      const asset = await MediaLibrary.createAssetAsync(
-                        downloadRes.uri
-                      )
-                      await MediaLibrary.createAlbumAsync(
-                        "Download",
-                        asset,
-                        false
-                      )
-                      toast.show({
-                        placement: "top",
-                        render: () => (
-                          <Text style={{ color: "green" }}>
-                            Image saved to gallery.
-                          </Text>
-                        ),
-                      })
-                    } catch {
-                      toast.show({
-                        placement: "top",
-                        render: () => (
-                          <Text style={{ color: "red" }}>
-                            Failed to save image.
-                          </Text>
-                        ),
-                      })
-                    } finally {
-                      setDownloading(false)
-                    }
-                  }}
-                  style={{
-                    backgroundColor: "rgba(0,0,0,0.7)",
-                    borderRadius: 0,
-                    padding: 10,
-                    marginBottom: 10,
-                    marginRight: 10,
-                  }}
-                  accessibilityLabel='Download image'
-                  hitSlop={8}
-                  disabled={downloading}
-                >
-                  <HStack className='flex-row items-center' space='md'>
-                    <Download size={28} color={theme.text} />
-                    <Text style={[fonts.body, { color: theme.text }]}>
-                      Download
-                    </Text>
-                  </HStack>
-                </Pressable>
-              </View>
-            )}
-          />
-          {grayed && (
-            <View className='absolute top-2 left-2 right-2 bottom-2 h-56 bg-black/50 justify-center items-center'>
-              <Text style={[fonts.caption, { color: theme.white }]}>
-                Not Collected
-              </Text>
-              <View className='flex-row gap-2 mt-2'>
-                <Pressable
-                  className='p-3 rounded-full'
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                    opacity: data.in_want_list ? 1 : 0.7,
-                  }}
-                  onPress={handleAddToWantList}
-                  disabled={data.in_want_list !== true}
-                >
-                  <StarIcon
-                    fill={
-                      !data.in_want_list ? "#ffd700" : "rgba(255,255,255,0.1)"
-                    }
-                    color={data.in_want_list ? "#ffd700" : "#fff"}
-                    size={24}
-                  />
-                </Pressable>
-                <Pressable
-                  className='p-3 rounded-full'
-                  style={{
-                    backgroundColor: "rgba(255,255,255,0.4)",
-                    opacity: data.product_items_count !== 0 ? 1 : 0.4,
-                  }}
-                  onPress={() => handleAddToCart(data)}
-                  disabled={data.product_items_count === 0}
-                >
-                  <ShoppingCart size={24} color='white' />
-                </Pressable>
-              </View>
-            </View>
-          )}
-        </View>
-        <View className='mt-2 px-2'>
-          <Text
-            numberOfLines={1}
-            style={[fonts.label, { color: theme.text, fontWeight: "bold" }]}
+    <>
+      <Pressable onLongPress={() => setIsImageViewerVisible(true)} onPress={() => navigation.navigate("Product", { product: data })}>
+        <ProductCard
+          product={transformedProduct}
+          hasPreview={true}
+          grid={true}
+      >
+        {/* Collection status badge */}
+        {grayed && (
+          <View
+            style={{
+              position: "absolute",
+              top: 16,
+              left: 4,
+              zIndex: 10,
+              backgroundColor: theme.gray[800],
+              borderRadius: 12,
+              paddingHorizontal: 8,
+              paddingVertical: 4,
+            }}
+            pointerEvents='none'
           >
-            {typeof data.series.title === "string" ? data.series.title : ""}
-          </Text>
-
-          {typeof data.owned_products === "number" &&
-          typeof data.unowned_products === "number" ? (
-            <Text style={[fonts.caption, { color: theme.text }]}>
-              {data.owned_products.toString()} out of{" "}
-              {(data.owned_products + data.unowned_products).toString()}
+            <Text
+              style={[
+                fonts.caption,
+                {
+                  color: theme.white,
+                  fontWeight: "bold",
+                  fontSize: 12,
+                },
+              ]}
+            >
+              Not Owned
             </Text>
-          ) : null}
-        </View>
-        <View className='flex-row justify-between items-center mt-1'>
-          <View style={{ alignItems: "flex-end" }}></View>
-        </View>
-      </View>
-    </Box>
+          </View>
+        )}
+      </ProductCard>
+      
+      {/* Image viewer modal */}
+      <ImageViewing
+        images={[{ uri: mainImage }]}
+        imageIndex={0}
+        visible={isImageViewerVisible}
+        onRequestClose={() => setIsImageViewerVisible(false)}
+        />
+        </Pressable>
+    </>
   )
 }
 

@@ -14,6 +14,7 @@ import { fetchCartItems, removeFromCart } from "@/src/api/apiEndpoints"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { NavigationProp } from "@react-navigation/native"
 import { fonts } from "@/src/theme"
+import ProductCard from "@/src/components/rework/product-card"
 
 export default function Cart() {
   const store = useBoundStore()
@@ -91,10 +92,7 @@ export default function Cart() {
     item: CartItemT & { cartQuantity: number }
   }) => (
     <Box
-      style={{
-        borderColor: theme.border,
-      }}
-      className={`flex-row items-center p-2 border-b`}
+      className={`flex-row items-center p-2`}
     >
       <Checkbox
         aria-label={`Select item ${item.product.title}`}
@@ -107,34 +105,17 @@ export default function Cart() {
         onChange={() => toggleItemSelection(item.id)}
         className='mr-2 p-2'
       >
-        <Image
-          source={{ uri: item.product.cover_url_large }}
-          className='aspect-[3/4] w-1/4 rounded-sm'
-          resizeMode='contain'
-          alt={item.product.title}
-        />
-        <View className='flex-1'>
-          <Text style={[fonts.label, { color: theme.text }]}>
-            {item.product.title}
-          </Text>
-          <Text style={[fonts.body, { color: theme.text }]}>
-            NM: {item.product_item_id}
-          </Text>
-          <Text style={[fonts.body, { color: theme.text }]}>
-            Price:{" "}
-            {item.product.formatted_price ||
-              "₱" + Number(item.price).toFixed(2)}
-          </Text>
-        </View>
-        <Button
+        <ProductCard isInCart product={item.product} />
+       
+      </Checkbox>
+      <Button
           size='xs'
           variant='link'
-          className='p-2 ml-auto self-center'
+          className='p-2 ml-auto mr-2 top-3 absolute right-0'
           onPress={() => handleRemoveCompletely(item.id)}
         >
           <Trash2 size={18} color={theme.error} />
         </Button>
-      </Checkbox>
     </Box>
   )
 

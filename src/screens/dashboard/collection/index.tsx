@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useMemo } from "react"
-import { Text, ScrollView, TextInput, Dimensions } from "react-native"
+import { Text, ScrollView, TextInput, Dimensions, View } from "react-native"
 
 import MasonryList from "@react-native-seoul/masonry-list"
 import { Box } from "@/src/components/ui/box"
 import { useBoundStore } from "@/src/store"
-import SeriesCard from "@/src/components/series"
-import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton"
+import ProductCard from "@/src/components/rework/product-card"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { Pressable } from "react-native"
 import { DashboardStackParams } from "@/src/utils/types/navigation"
 import { fonts } from "@/src/theme"
+import { ProductT } from "@/src/utils/types/common"
+import SeriesCardSkeleton from "@/src/components/series/SeriesCardSkeleton"
 
 const CollectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState("")
@@ -37,6 +38,40 @@ const CollectionScreen = () => {
     return () => clearTimeout(handler)
   }, [searchQuery])
 
+  // Transform series data to ProductT format for ProductCard
+  const transformSeriesToProduct = (seriesItem: any): ProductT => {
+    return {
+      id: seriesItem.series?.id || 0,
+      title: seriesItem.series?.title || "Unknown Series",
+      cover_price: "0",
+      price: "0",
+      quantity: 1,
+      featured: false,
+      hidden: false,
+      description: "",
+      creators: seriesItem.publisher || "",
+      series: seriesItem.series || { id: 0, title: "Unknown Series" },
+      slug: `series-${seriesItem.series?.id}`,
+      isbn: null,
+      upc: "",
+      publisher_id: 0,
+      category_id: 0,
+      series_id: seriesItem.series?.id || 0,
+      issue_number: "",
+      year: null,
+      cover_url: seriesItem.last_product?.image_url || seriesItem.cover_url_large || "",
+      cover_url_large: seriesItem.cover_url_large || "",
+      formatted_price: "",
+      publisher: seriesItem.publisher || "",
+      publisher_name: seriesItem.publisher || "",
+      category_name: "",
+      meta_attributes: {
+        owned_products: seriesItem.owned_products,
+        unowned_products: seriesItem.unowned_products,
+      },
+    }
+  }
+
   // Memoize sorted and filtered series
   const filteredSeries = useMemo(() => {
     try {
@@ -51,6 +86,7 @@ const CollectionScreen = () => {
               .includes(debouncedQuery.trim().toLowerCase())
         )
         .sort((a, b) => b.series.title.localeCompare(a.series.title))
+        .map(transformSeriesToProduct)
     } catch (e) {
       // Defensive: fallback to empty array if error
       console.error("Error filtering/sorting series:", e)
@@ -61,7 +97,7 @@ const CollectionScreen = () => {
   // Memoize collectedSeries for header section
   const collectedSeries = useMemo(() => {
     try {
-      return collection
+      return collection.map(transformSeriesToProduct)
     } catch (e) {
       console.error("Error in collectedSeries:", e)
       return []
@@ -149,7 +185,7 @@ const CollectionScreen = () => {
         keyExtractor={(item, idx) =>
           loading
             ? idx.toString()
-            : item.series?.id?.toString() || idx.toString()
+            : item.id?.toString() || idx.toString()
         }
         style={{
           alignSelf: "flex-start",
@@ -160,28 +196,21 @@ const CollectionScreen = () => {
           item,
           i,
         }: {
-          item: { series: { id: number; title: string } }
+          item: ProductT
           i: number
         }) =>
           loading ? (
-            <Box key={i} className='items-center'>
-              <SeriesCardSkeleton />
-            </Box>
-          ) : item && item.series ? (
+            <SeriesCardSkeleton grid />
+          ) : item ? (
             <Box key={i} className='items-center'>
               <Pressable
                 onPress={() =>
                   navigation.navigate("DetailedCollectionScreen", {
-                    seriesId: item.series.id,
+                    seriesId: item.series_id || item.id,
                   })
                 }
               >
-                {/*
-                  For best performance, ensure SeriesCard supports lazy loading/caching for images.
-                  If you notice image-related memory issues, consider react-native-fast-image or similar.
-                */}
-                {/* @ts-expect-error "Type 'Series' is not assignable to type 'SeriesCardProps'." */}
-                <SeriesCard data={item} />
+                <ProductCard product={item} hasPreview />
               </Pressable>
             </Box>
           ) : null
@@ -219,13 +248,12 @@ const CollectionScreen = () => {
             </Text>
             <ScrollView horizontal style={{ marginBottom: theme.spacing.md }}>
               {loading ? (
-                <Box className='flex-row'>
-                  {Array.from({ length: 3 }).map((_, idx) => (
-                    <Box style={{ marginLeft: theme.spacing.md }} key={idx}>
-                      <SeriesCardSkeleton horizontal />
-                    </Box>
-                  ))}
-                </Box>
+                <View style={{ marginHorizontal: theme.spacing.md, flexDirection: "row", gap: theme.spacing.lg }}>
+                <SeriesCardSkeleton grid />
+                <SeriesCardSkeleton grid />
+                  <SeriesCardSkeleton grid />
+                  <SeriesCardSkeleton grid />
+                </View>
               ) : collectedSeries.length === 0 ? (
                 <Text
                   style={[
@@ -241,25 +269,23 @@ const CollectionScreen = () => {
                   No collected series yet.
                 </Text>
               ) : (
-                collectedSeries.map((s) =>
-                  s && s.series ? (
-                    <Pressable
-                      style={{
-                        width: (deviceWidth / 3) * 0.9,
-                        marginLeft: theme.spacing.sm,
-                        marginRight: theme.spacing.xs,
-                      }}
-                      key={s.series.id}
-                      onPress={() =>
-                        navigation.navigate("DetailedCollectionScreen", {
-                          seriesId: s.series.id,
-                        })
-                      }
-                    >
-                      <SeriesCard data={s} />
-                    </Pressable>
-                  ) : null
-                )
+                collectedSeries.map((product) => (
+                  <Pressable
+                    style={{
+                      width: (deviceWidth / 3) * 0.9,
+                      marginLeft: theme.spacing.sm,
+                      marginRight: theme.spacing.xs,
+                    }}
+                    key={product.id}
+                    onPress={() =>
+                      navigation.navigate("DetailedCollectionScreen", {
+                        seriesId: product.series_id || product.id,
+                      })
+                    }
+                  >
+                    <ProductCard product={product} hasPreview />
+                  </Pressable>
+                ))
               )}
             </ScrollView>
             <Text

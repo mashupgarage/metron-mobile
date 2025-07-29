@@ -10,11 +10,6 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native"
-import MasonryList from "@react-native-seoul/masonry-list"
-
-import ProductCard from "@/src/components/product"
-import { ProductT } from "@/src/utils/types/common"
-import { Pressable } from "react-native-gesture-handler"
 import {
   NavigationProp,
   useNavigation,
@@ -34,8 +29,8 @@ import {
 } from "@/src/api/apiEndpoints"
 import Constants from "expo-constants"
 
-import { LayoutGrid, LayoutList } from "lucide-react-native"
 import { fonts } from "@/src/theme"
+import { ProductListing } from "@/src/components/product-listing"
 
 const PAGE_SIZE = 10 // Define standard page size
 
@@ -118,46 +113,46 @@ export default function Home() {
   }, [])
 
   // Function to load more products
-  const loadMoreProducts = useCallback(async () => {
-    if (
-      isFetchingMore ||
-      currentPage >= totalPages ||
-      store.products_list?.loading
-    ) {
-      return
-    }
-    setIsFetchingMore(true)
-    const nextPage = currentPage + 1
-    try {
-      if (isSearchMode && searchQuery.trim() !== "") {
-        // Fetch more search results
-        await handleSearch(nextPage)
-      } else {
-        // Fetch more products
-        const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
-        const newProducts = res.data.products || []
-        store.appendProducts({
-          products: newProducts,
-          total_count: res.data.total_count,
-          total_pages: res.data.total_pages,
-          page: nextPage,
-        })
-        setCurrentPage(nextPage)
-      }
-    } catch (err) {
-      console.error("Failed to fetch more products:", err)
-    } finally {
-      setIsFetchingMore(false)
-    }
-  }, [
-    currentPage,
-    totalPages,
-    isFetchingMore,
-    store.products_list?.loading,
-    isSearchMode,
-    searchQuery,
-    selectedPill,
-  ])
+  // const loadMoreProducts = useCallback(async () => {
+  //   if (
+  //     isFetchingMore ||
+  //     currentPage >= totalPages ||
+  //     store.products_list?.loading
+  //   ) {
+  //     return
+  //   }
+  //   setIsFetchingMore(true)
+  //   const nextPage = currentPage + 1
+  //   try {
+  //     if (isSearchMode && searchQuery.trim() !== "") {
+  //       // Fetch more search results
+  //       await handleSearch(nextPage)
+  //     } else {
+  //       // Fetch more products
+  //       const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
+  //       const newProducts = res.data.products || []
+  //       store.appendProducts({
+  //         products: newProducts,
+  //         total_count: res.data.total_count,
+  //         total_pages: res.data.total_pages,
+  //         page: nextPage,
+  //       })
+  //       setCurrentPage(nextPage)
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to fetch more products:", err)
+  //   } finally {
+  //     setIsFetchingMore(false)
+  //   }
+  // }, [
+  //   currentPage,
+  //   totalPages,
+  //   isFetchingMore,
+  //   store.products_list?.loading,
+  //   isSearchMode,
+  //   searchQuery,
+  //   selectedPill,
+  // ])
 
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
   const products = store.products_list?.products || []
@@ -241,18 +236,16 @@ export default function Home() {
   ]
 
   return (
-    <Box
-      className='h-screen w-full pb-24'
+    <View 
       style={{
+        height: 'auto',
         backgroundColor: theme.background,
       }}
     >
-      {/* Loading overlay */}
-      <MasonryList
-        data={products}
-        scrollEnabled
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
+      <ProductListing
+        title="Featured Products"
+        products={products}
+        loading={isLoading}
         ListHeaderComponent={
           <Box>
             <Box className='h-36'>
@@ -273,7 +266,7 @@ export default function Home() {
               showsVerticalScrollIndicator={false}
               showsHorizontalScrollIndicator={false}
               horizontal
-              className='mr-2 ml-2 mt-4'
+              className='mr-2 ml-2 mt-4 mb-4'
             >
               {pills.map((pill) => (
                 <TouchableOpacity
@@ -285,7 +278,7 @@ export default function Home() {
                     marginRight: 8,
                     backgroundColor:
                       selectedPill === pill.id
-                        ? theme.primary[500]
+                        ? theme.gray[900]
                         : theme.background2,
                   }}
                   onPress={() => {
@@ -312,7 +305,7 @@ export default function Home() {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <Box className='p-4 mt-2 pb-0'>
+            <Box className='p-4 pb-0'>
               <HStack className='w-full'>
                 <View
                   style={{
@@ -378,98 +371,9 @@ export default function Home() {
                 </Button>
               </HStack>
             </Box>
-            <HStack className='justify-between mr-2 ml-2'>
-              <Box className='p-2 mt-4'>
-                <Text
-                  style={[
-                    fonts.title,
-                    {
-                      color: theme.text,
-                    },
-                  ]}
-                >
-                  {selectedPill !== undefined
-                    ? `Featured ${
-                        pills.find((p) => p.id === selectedPill)?.name ?? ""
-                      }`
-                    : "Featured Products"}
-                </Text>
-                {/* <Text>{totalCount} products total</Text> */}
-              </Box>
-              <HStack space={"xl"} className='p-2 my-4 flex items-center'>
-                <Pressable onPress={() => setIsGrid(!isGrid)}>
-                  {isGrid ? (
-                    <LayoutList size={24} color={theme.text} />
-                  ) : (
-                    <LayoutGrid size={24} color={theme.text} />
-                  )}
-                </Pressable>
-              </HStack>
-            </HStack>
           </Box>
         }
-        ListFooterComponent={renderFooter()}
-        numColumns={!isGrid ? 3 : 1}
-        style={{
-          columnGap: 12,
-          marginHorizontal: 12,
-        }}
-        contentContainerStyle={{}}
-        keyExtractor={(item, index) => `${item.id}_${index}`}
-        renderItem={({ item }: { item: ProductT; i: number }) => (
-          <Pressable
-            key={item.id}
-            onPress={() => {
-              navigation.navigate("Product", { product: item })
-            }}
-          >
-            <View key={item.id}>
-              {!isGrid ? (
-                <ProductCard isInCart={false} product={item as ProductT} />
-              ) : (
-                <HStack space='xs' className='mb-3'>
-                  <Image
-                    className='aspect-[3/4] w-1/4 rounded-sm'
-                    resizeMode='contain'
-                    source={{ uri: item.cover_url }}
-                    alt={item.title}
-                  />
-                  <Box>
-                    <Text
-                      style={{
-                        fontWeight: "bold",
-                        fontFamily: "Inter",
-                        color: theme.text,
-                        maxWidth: Dimensions.get("window").width - thirdWidth,
-                      }}
-                      numberOfLines={1}
-                      ellipsizeMode='tail'
-                      className='text-lg'
-                    >
-                      {item.title}
-                    </Text>
-                    <Text
-                      style={{
-                        color: theme.text,
-                        maxWidth: Dimensions.get("window").width - thirdWidth,
-                      }}
-                      className='text-sm'
-                    >
-                      {item.creators}
-                    </Text>
-                    <Text
-                      style={{ color: theme.text, marginVertical: 4 }}
-                      className='text-sm'
-                    >
-                      {item.publisher}
-                    </Text>
-                  </Box>
-                </HStack>
-              )}
-            </View>
-          </Pressable>
-        )}
       />
-    </Box>
+    </View>
   )
 }

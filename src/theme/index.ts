@@ -27,7 +27,7 @@ export const fonts = {
   },
   title: {
     fontSize: 24,
-    lineHeight: 28,
+    lineHeight: 24,
     fontFamily: "Inter",
     fontWeight: "bold" as "bold",
   },
