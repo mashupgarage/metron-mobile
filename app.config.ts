@@ -19,7 +19,7 @@ const config: ExpoConfig = {
     bundleIdentifier: 'com.metron.comic-odyssey',
   },
   android: {
-    package: 'com.metron.comic-odyssey',
+    package: 'com.metron.comicodyssey',
     adaptiveIcon: {
       foregroundImage: './src/assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
