@@ -15,10 +15,10 @@ const config: ExpoConfig = {
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.comicodyssey.metron',
+    bundleIdentifier: 'com.metron.comic-odyssey',
   },
   android: {
-    package: 'com.comicodyssey.metron',
+    package: 'com.metron.comic-odyssey',
     adaptiveIcon: {
       foregroundImage: './src/assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
@@ -31,7 +31,7 @@ const config: ExpoConfig = {
     sessionToken: process.env.SESSION_TOKEN,
     apiUrl: process.env.API_URL,
     eas: {
-      projectId: '80691796-1460-45bd-93f5-1df0268da7a7',
+      projectId: 'd035a0af-1107-499b-88e8-74976f6a2bdc',
     },
   },
   plugins: ['expo-font'],
