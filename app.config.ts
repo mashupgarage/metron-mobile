@@ -5,6 +5,7 @@ const config: ExpoConfig = {
   name: 'comic-odyssey',
   slug: 'comic-odyssey',
   version: '1.0.0',
+  owner: 'mashupgarage',
   orientation: 'portrait',
   icon: './src/assets/icon.png',
   userInterfaceStyle: 'light',
