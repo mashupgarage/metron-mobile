@@ -25,6 +25,20 @@ export type AddressT = {
   country: string;
 };
 
+export type ShippingAddressT = {
+  id: number;
+  region: string;
+  house_number: string;
+  street_name: string;
+  building: string;
+  barangay: string;
+  city: string;
+  zip_code: string;
+  country: string;
+  address_type: string;
+  full_address: string;
+};
+
 export type SeriesT = {
   id: number;
   title: string;
