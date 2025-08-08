@@ -155,6 +155,16 @@ export const fetchUserProfile = (userId: UserT["id"]) => {
   return axiosClient.get(`/users/${userId}`)
 }
 
+export const fetchUserShippingAddress = (userId: UserT["id"]) => {
+  return axiosClient.get(`/users/${userId}/shipping_addresses`)
+}
+
+export const createShippingAddress = (userId: UserT["id"], addressData: any) => {
+  return axiosClient.post(`/users/${userId}/shipping_address`, {
+    address: addressData
+  })
+}
+
 /**
  * Update the current user's profile information.
  * @param userId - The user ID.
@@ -425,7 +435,6 @@ export const getUserCollection = async (payload?: {
   if (payload?.page !== undefined) params.page = payload.page
   if (payload?.per_page !== undefined) params.per_page = payload.per_page
   const res = await axiosClient.get(`/user_collection`, { params })
-  console.log(res)
   return res
 }
 

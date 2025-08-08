@@ -14,6 +14,7 @@ import DetailedCollectionScreen from "../screens/dashboard/collection/detailed-d
 import CheckoutScreen from "../screens/dashboard/CheckoutScreen"
 import OrdersScreen from "../screens/dashboard/orders/OrdersScreen"
 import OrderDetails from "../screens/dashboard/orders/OrderDetails"
+import AddShippingAddressScreen from "../screens/dashboard/profile/AddShippingAddressScreen"
 
 const Stack = createStackNavigator()
 export function DashboardStack() {
@@ -56,6 +57,16 @@ export function DashboardStack() {
         component={CGCSubmitScreen}
       />
       <Stack.Screen
+        name='OrderDetails'
+        options={screenOption}
+        component={OrderDetails}
+      />
+      <Stack.Screen
+        name='AddShippingAddress'
+        options={screenOption}
+        component={AddShippingAddressScreen}
+      />
+      <Stack.Screen
         name='EditProfile'
         options={screenOption}
         component={EditProfile}
@@ -79,11 +90,6 @@ export function DashboardStack() {
         name='OrdersScreen'
         options={screenOption}
         component={OrdersScreen}
-      />
-      <Stack.Screen
-        name='OrderDetails'
-        options={screenOption}
-        component={OrderDetails}
       />
     </Stack.Navigator>
   )
