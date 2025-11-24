@@ -78,12 +78,15 @@ export default function App() {
               border: theme.border,
               notification: theme.notification,
             },
-            // @ts-ignore - fonts property is not actually required despite the type definition
-            fonts: {},
+            fonts: {
+              regular: InterFonts["Inter-Regular"],
+              medium: InterFonts["Inter-Medium"],
+              bold: InterFonts["Inter-Bold"],
+              heavy: InterFonts["Inter-Heavy"],
+            },
           }}
         >
           <Stack.Navigator
-            // @ts-ignore - id is not actually required despite the type definition
             id={undefined}
             screenOptions={getScreenOptions(isDark)}
           >

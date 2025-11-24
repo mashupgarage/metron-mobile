@@ -123,7 +123,7 @@ export const authenticateUser = async (email: string, password: string) => {
  * @example
  * registerUser({ email: 'user@email.com', password: 'password' }).then(res => ...)
  */
-export const registerUser = async (payload: any) => {
+export const registerUser = async (payload: unknown) => {
   try {
     const authClient = axios.create({
       baseURL: constants.expoConfig?.extra?.apiUrl,
@@ -159,9 +159,12 @@ export const fetchUserShippingAddress = (userId: UserT["id"]) => {
   return axiosClient.get(`/users/${userId}/shipping_addresses`)
 }
 
-export const createShippingAddress = (userId: UserT["id"], addressData: any) => {
+export const createShippingAddress = (
+  userId: UserT["id"],
+  addressData: unknown
+) => {
   return axiosClient.post(`/users/${userId}/shipping_address`, {
-    address: addressData
+    address: addressData,
   })
 }
 
@@ -173,7 +176,7 @@ export const createShippingAddress = (userId: UserT["id"], addressData: any) => 
  * @example
  * updateUserProfile(123, { email: 'user@email.com' }).then(res => res.data)
  */
-export const updateUserProfile = (userId: UserT["id"], payload: any) => {
+export const updateUserProfile = (userId: UserT["id"], payload: unknown) => {
   return axiosClient.put(`/users/${userId}`, payload)
 }
 
