@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { View, ActivityIndicator, TextInput } from "react-native"
 import { searchMarketplaceProducts } from "@/src/api/apiEndpoints"
 import { Button, ButtonText, ButtonSpinner } from "@/src/components/ui/button"
@@ -27,8 +27,8 @@ export default function Search() {
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const [error, setError] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
+  const [, setTotalPages] = useState(1)
+  const [, setTotalCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
 
   const handleSearch = async (page = 1) => {
@@ -66,7 +66,7 @@ export default function Search() {
       setTotalCount(totalItems)
       setHasMore(page < totalPagesValue)
       setCurrentPage(currentPageValue)
-    } catch (err) {
+    } catch {
       setError("Failed to fetch search results. Please try again.")
     } finally {
       setLoading(false)
@@ -107,7 +107,7 @@ export default function Search() {
             style={[fonts.body, { color: theme.text }]}
             className='text-center text-base'
           >
-            No products found matching "{searchQuery}"
+            No products found matching &ldquo;{searchQuery}&rdquo;
           </Text>
         ) : (
           <>
