@@ -8,7 +8,7 @@ import { useRoute, RouteProp, ParamListBase } from "@react-navigation/native"
 import { HStack } from "@/src/components/ui/hstack"
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button"
 import { mockedCarouselItems } from "@/src/utils/mock"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
   fetchCartItems,
   fetchProducts,
@@ -38,6 +38,7 @@ export default function Home() {
   const [, setCurrentPage] = useState(1)
   const [, setTotalPages] = useState(1)
   const [isSearchMode, setIsSearchMode] = useState(false)
+  const pillCacheRef = useRef({})
 
   console.log(
     "------------------------------------------------>",
@@ -47,6 +48,7 @@ export default function Home() {
 
   // Load first page of products when component mounts or route params change
   useEffect(() => {
+    pillCacheRef.current = {}
     setSelectedPill(undefined)
     loadInitialProducts()
     fetchUserProfile(store.user?.id)
@@ -72,6 +74,13 @@ export default function Home() {
 
   // Function to load initial products
   const loadInitialProducts = useCallback((pill?: number) => {
+    const key = pill === undefined ? "featured" : String(pill)
+
+    if (pillCacheRef.current[key]) {
+      store.setProducts(pillCacheRef.current[key])
+      return
+    }
+
     store.setProductsLoading(true)
     setCurrentPage(1)
 
@@ -81,11 +90,14 @@ export default function Home() {
         const totalCount = res.data.total_count || 0
         const pages = res.data.total_pages || 1
 
-        store.setProducts({
+        const payload = {
           products: products,
           total_count: totalCount,
           total_pages: pages,
-        })
+        }
+
+        store.setProducts(payload)
+        pillCacheRef.current[key] = payload
 
         setTotalPages(pages)
       })
@@ -211,12 +223,10 @@ export default function Home() {
                   onPress={() => {
                     // change results based on pill
                     console.log("pill pressed", pill)
+                    if (selectedPill === pill.id) {
+                      return
+                    }
                     setSelectedPill(pill.id)
-                    store.setProducts({
-                      products: [],
-                      total_count: 0,
-                      total_pages: 1,
-                    })
                   }}
                   activeOpacity={0.8}
                 >
