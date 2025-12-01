@@ -1,5 +1,5 @@
 {
-  "extends": "node_modules/expo/tsconfig.base",
+  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "jsx": "react-jsx", // keep this if you added it already
     "paths": {
