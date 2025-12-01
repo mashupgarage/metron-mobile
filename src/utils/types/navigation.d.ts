@@ -15,7 +15,7 @@ export interface DashboardStackParams {
   Wantlist: undefined
   CGCSubmit: undefined
   DetailedCollectionScreen: { seriesId: number }
-  CheckoutScreen: { itemsToCheckout: any[] }
-  OrderDetails: { order: any }
+  CheckoutScreen: { itemsToCheckout: unknown[] }
+  OrderDetails: { order: unknown }
   OrdersScreen: undefined
 }

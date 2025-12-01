@@ -1,22 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box } from "@/src/components/ui/box"
 import { Image } from "@/src/components/ui/image"
 import { Text } from "@/src/components/ui/text"
 import { useBoundStore } from "@/src/store"
-import {
-  View,
-  ActivityIndicator,
-  ScrollView,
-  Dimensions,
-  TouchableOpacity,
-  TextInput,
-} from "react-native"
-import {
-  NavigationProp,
-  useNavigation,
-  useRoute,
-  RouteProp,
-  ParamListBase,
-} from "@react-navigation/native"
+import { View, ScrollView, TouchableOpacity, TextInput } from "react-native"
+import { useRoute, RouteProp, ParamListBase } from "@react-navigation/native"
 import { HStack } from "@/src/components/ui/hstack"
 import { Button, ButtonSpinner, ButtonText } from "@/src/components/ui/button"
 import { mockedCarouselItems } from "@/src/utils/mock"
@@ -28,7 +16,7 @@ import {
   searchMarketplaceProducts,
 } from "@/src/api/apiEndpoints"
 import Constants from "expo-constants"
-
+import logoImage from "@/src/assets/icon.png"
 import { fonts } from "@/src/theme"
 import { ProductListing } from "@/src/components/product-listing"
 
@@ -38,21 +26,18 @@ export default function Home() {
   const store = useBoundStore()
   const theme = useBoundStore((state) => state.theme)
   const route = useRoute<RouteProp<ParamListBase, "Home">>()
-  const navigation = useNavigation<NavigationProp<ParamListBase>>()
   const [selectedPill, setSelectedPill] = useState<number | undefined>(
     undefined
   )
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [carouselItems, setCarouselItems] =
+  const [, setError] = useState("")
+  const [carouselItems] =
     useState<{ name: string; img_url: string }[]>(mockedCarouselItems)
-  const [isFetchingMore, setIsFetchingMore] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [isGrid, setIsGrid] = useState(true)
+  const [, setIsFetchingMore] = useState(false)
+  const [, setCurrentPage] = useState(1)
+  const [, setTotalPages] = useState(1)
   const [isSearchMode, setIsSearchMode] = useState(false)
-  const thirdWidth = Dimensions.get("window").width / 3
 
   console.log(
     "------------------------------------------------>",
@@ -112,67 +97,9 @@ export default function Home() {
       })
   }, [])
 
-  // Function to load more products
-  // const loadMoreProducts = useCallback(async () => {
-  //   if (
-  //     isFetchingMore ||
-  //     currentPage >= totalPages ||
-  //     store.products_list?.loading
-  //   ) {
-  //     return
-  //   }
-  //   setIsFetchingMore(true)
-  //   const nextPage = currentPage + 1
-  //   try {
-  //     if (isSearchMode && searchQuery.trim() !== "") {
-  //       // Fetch more search results
-  //       await handleSearch(nextPage)
-  //     } else {
-  //       // Fetch more products
-  //       const res = await fetchProducts(selectedPill, nextPage, PAGE_SIZE)
-  //       const newProducts = res.data.products || []
-  //       store.appendProducts({
-  //         products: newProducts,
-  //         total_count: res.data.total_count,
-  //         total_pages: res.data.total_pages,
-  //         page: nextPage,
-  //       })
-  //       setCurrentPage(nextPage)
-  //     }
-  //   } catch (err) {
-  //     console.error("Failed to fetch more products:", err)
-  //   } finally {
-  //     setIsFetchingMore(false)
-  //   }
-  // }, [
-  //   currentPage,
-  //   totalPages,
-  //   isFetchingMore,
-  //   store.products_list?.loading,
-  //   isSearchMode,
-  //   searchQuery,
-  //   selectedPill,
-  // ])
-
   // Ensure products array exists to prevent "Cannot read property 'length' of undefined" error
   const products = store.products_list?.products || []
   const isLoading = store.products_list?.loading || false
-
-  // Footer component shown during loading or displaying count
-  const renderFooter = () => {
-    return (
-      <Box className='py-4 flex justify-center items-center'>
-        {(isLoading || isFetchingMore) && (
-          <>
-            <ActivityIndicator size='small' color={theme.primary[500]} />
-            <Text style={[fonts.body, { color: theme.text }]} className='mt-2'>
-              Loading products...
-            </Text>
-          </>
-        )}
-      </Box>
-    )
-  }
 
   const handleSearch = async (page = 1) => {
     if (searchQuery.trim() === "") return
@@ -236,14 +163,14 @@ export default function Home() {
   ]
 
   return (
-    <View 
+    <View
       style={{
-        height: 'auto',
+        height: "auto",
         backgroundColor: theme.background,
       }}
     >
       <ProductListing
-        title="Featured Products"
+        title='Featured Products'
         products={products}
         loading={isLoading}
         ListHeaderComponent={
@@ -251,7 +178,7 @@ export default function Home() {
             <Box className='h-36'>
               <Image
                 className='w-36 absolute h-48 z-10 left-1/2 -translate-x-1/2'
-                source={require("@/src/assets/icon.png")}
+                source={logoImage}
                 alt='logo'
                 resizeMode='contain'
               />
